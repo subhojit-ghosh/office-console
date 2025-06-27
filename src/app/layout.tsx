@@ -10,6 +10,7 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { HydrateClient } from "~/trpc/server";
 
 export const metadata: Metadata = {
   title: "Office Console",
@@ -32,7 +33,9 @@ export default function RootLayout({
       </head>
       <body>
         <TRPCReactProvider>
-          <MantineProvider>{children}</MantineProvider>
+          <HydrateClient>
+            <MantineProvider>{children}</MantineProvider>
+          </HydrateClient>
         </TRPCReactProvider>
       </body>
     </html>

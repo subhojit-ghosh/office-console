@@ -86,7 +86,7 @@ model Project {
   updatedAt   DateTime      @updatedAt
 
   modules Module[]
-  Task    Task[]
+  tasks    Task[]
 }
 
 model Module {
@@ -97,7 +97,7 @@ model Module {
   project     Project  @relation(fields: [projectId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Task        Task[]
+  tasks        Task[]
 }
 
 enum TaskStatus {

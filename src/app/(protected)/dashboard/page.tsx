@@ -1,6 +1,7 @@
-import { auth } from "~/server/auth";
+import { api } from "~/trpc/server";
 
 export default async function DashboardPage() {
-  const session = await auth();
-  return <code>{JSON.stringify(session, null, 4)}</code>;
+  const stats = await api.dashboard.stats();
+
+  return <code>{JSON.stringify(stats)}</code>;
 }
