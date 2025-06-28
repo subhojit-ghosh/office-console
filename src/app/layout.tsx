@@ -1,4 +1,6 @@
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
+import "mantine-datatable/styles.layer.css";
 import "~/styles/globals.css";
 
 import {
@@ -6,8 +8,10 @@ import {
   MantineProvider,
   mantineHtmlProps,
 } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
+import { Notifications } from "@mantine/notifications";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
@@ -34,7 +38,12 @@ export default function RootLayout({
       <body>
         <TRPCReactProvider>
           <HydrateClient>
-            <MantineProvider>{children}</MantineProvider>
+            <MantineProvider>
+              <ModalsProvider>
+                <Notifications />
+                {children}
+              </ModalsProvider>
+            </MantineProvider>
           </HydrateClient>
         </TRPCReactProvider>
       </body>

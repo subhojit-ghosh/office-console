@@ -1,13 +1,53 @@
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const clientsRouter = createTRPCRouter({
-  getAll: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.client.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-  }),
+  getAll: protectedProcedure
+    .input(
+      z.object({
+        page: z.number().int().min(1).default(1).optional(),
+        pageSize: z.number().int().min(1).max(100).default(10).optional(),
+        search: z.string().optional(),
+        sortBy: z.string().default("name").optional(),
+        sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const page = input.page ?? 1;
+      const pageSize = input.pageSize ?? 10;
+      const search = input?.search?.trim();
+      const sortBy = input.sortBy ?? "name";
+      const sortOrder = input.sortOrder ?? "asc";
+
+      const where: Prisma.ClientWhereInput = search
+        ? {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          }
+        : {};
+
+      const [clients, total] = await Promise.all([
+        ctx.db.client.findMany({
+          where,
+          orderBy: { [sortBy]: sortOrder },
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+        }),
+        ctx.db.client.count({ where }),
+      ]);
+
+      return {
+        clients,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      };
+    }),
 
   getById: protectedProcedure
     .input(z.object({ id: z.string().nonempty("ID is required") }))
