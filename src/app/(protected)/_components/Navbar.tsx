@@ -1,14 +1,11 @@
 "use client";
 
 import { Anchor, Button, Group, useMantineColorScheme } from "@mantine/core";
-import {
-  IconFoldersFilled,
-  IconHomeFilled,
-  IconLogout,
-  IconSettings,
-} from "@tabler/icons-react";
+import { IconFoldersFilled, IconHomeFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BiSolidTimer } from "react-icons/bi";
+import { BsBarChartLineFill } from "react-icons/bs";
 import { FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
 
 import classes from "./Navbar.module.css";
@@ -16,8 +13,10 @@ import { UserButton } from "./UserButton";
 
 const data = [
   { link: "/dashboard", label: "Dashboard", icon: IconHomeFilled },
-  { link: "/projects", label: "Projects", icon: IconFoldersFilled },
+  { link: "/reporting", label: "Reporting", icon: BsBarChartLineFill },
+  { link: "/time", label: "Time", icon: BiSolidTimer },
   { link: "/tasks", label: "Tasks", icon: FaTasks },
+  { link: "/projects", label: "Projects", icon: IconFoldersFilled },
   { link: "/users", label: "Users", icon: FaUsers },
   { link: "/clients", label: "Clients", icon: FaUserTie },
 ];
@@ -47,8 +46,12 @@ export function Navbar({ name, email }: Props) {
   return (
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>{links}</div>
-      <Button variant="subtle" onClick={() => setColorScheme("light")}>Light</Button>
-      <Button variant="subtle" onClick={() => setColorScheme("dark")}>Dark</Button>
+      <Button variant="subtle" onClick={() => setColorScheme("light")}>
+        Light
+      </Button>
+      <Button variant="subtle" onClick={() => setColorScheme("dark")}>
+        Dark
+      </Button>
       <div className={classes.footer}>
         <Group>
           <UserButton name={name} email={email} />
