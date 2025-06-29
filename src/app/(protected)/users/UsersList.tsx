@@ -4,12 +4,11 @@ import {
   ActionIcon,
   Box,
   Button,
-  Grid,
   Group,
   Menu,
+  Select,
   TextInput,
   Title,
-  Tooltip,
 } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -24,14 +23,14 @@ import {
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
-import { DataTable, type DataTableSortStatus } from "mantine-datatable";
+import { type DataTableSortStatus } from "mantine-datatable";
 import { useState } from "react";
 
-import type { AppRouter } from "~/server/api/root";
-import { api } from "~/trpc/react";
-import UserForm from "./UserForm";
 import { FaUsers } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
+import type { AppRouter } from "~/server/api/root";
+import { api } from "~/trpc/react";
+import UserForm, { userRoleOptions } from "./UserForm";
 
 type UsersResponse = inferRouterOutputs<AppRouter>["users"]["getAll"];
 
@@ -51,6 +50,7 @@ export default function UsersList() {
   const [filters, setFilters] = useDebouncedState(
     {
       search: "",
+      role: "",
     },
     300,
   );
@@ -59,6 +59,7 @@ export default function UsersList() {
     page,
     pageSize,
     search: filters.search,
+    role: (filters.role as User["role"]) || undefined,
     sortBy: sortStatus.columnAccessor,
     sortOrder: sortStatus.direction,
   });
@@ -112,6 +113,13 @@ export default function UsersList() {
             onChange={(e) =>
               setFilters({ ...filters, search: e.currentTarget.value })
             }
+          />
+          <Select
+            placeholder="All Roles"
+            clearable
+            data={userRoleOptions}
+            defaultValue={filters.role}
+            onChange={(value) => setFilters({ ...filters, role: value ?? "" })}
           />
         </Group>
         <Button

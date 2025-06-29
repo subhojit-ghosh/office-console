@@ -19,7 +19,7 @@ import { createUserSchema, updateUserSchema } from "~/schemas/user";
 
 import { api } from "~/trpc/react";
 
-const userRoleOptions = [
+export const userRoleOptions = [
   { value: "ADMIN", label: "Admin" },
   { value: "STAFF", label: "Staff" },
   { value: "CLIENT", label: "Client" },
