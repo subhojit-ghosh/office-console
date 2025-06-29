@@ -2,6 +2,7 @@
 
 import { Button, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import type { Client } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
@@ -52,6 +53,11 @@ export default function ClientForm({
 
   const createClient = api.clients.create.useMutation({
     onSuccess: async () => {
+      notifications.show({
+        title: "Client created",
+        message: "Client has been created successfully.",
+        color: "green",
+      });
       await utils.clients.getAll.invalidate();
       form.reset();
       close();
@@ -66,6 +72,11 @@ export default function ClientForm({
 
   const updateClient = api.clients.update.useMutation({
     onSuccess: async () => {
+      notifications.show({
+        title: "Client updated",
+        message: "Client has been updated successfully.",
+        color: "green",
+      });
       await utils.clients.getAll.invalidate();
       form.reset();
       close();

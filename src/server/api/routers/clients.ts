@@ -83,6 +83,14 @@ export const clientsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const existingClient = await ctx.db.client.findFirst({
+        where: { name: input.name, id: { not: input.id } },
+      });
+
+      if (existingClient) {
+        throw new Error("Client with this name already exists.");
+      }
+
       return ctx.db.client.update({
         where: { id: input.id },
         data: { name: input.name },

@@ -1,0 +1,236 @@
+"use client";
+
+import {
+  Button,
+  Grid,
+  Group,
+  Modal,
+  PasswordInput,
+  Select,
+  Switch,
+  TextInput,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import type { User } from "@prisma/client";
+import { zodResolver } from "mantine-form-zod-resolver";
+import { useEffect, useState } from "react";
+import { z } from "zod";
+
+import { api } from "~/trpc/react";
+
+const userRoleOptions = [
+  { value: "SUPER_ADMIN", label: "Super Admin" },
+  { value: "ADMIN", label: "Admin" },
+  { value: "STAFF", label: "Staff" },
+  { value: "CLIENT", label: "Client" },
+];
+
+interface Props {
+  mode: "add" | "edit";
+  opened: boolean;
+  close: () => void;
+  initialData?: User | null;
+}
+
+export default function UserForm({ mode, opened, close, initialData }: Props) {
+  const utils = api.useUtils();
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm({
+    initialValues: {
+      name: "",
+      email: "",
+      role: "STAFF",
+      password: "",
+      isActive: true,
+      clientId: "",
+    },
+    validate: zodResolver(
+      z.object({
+        name: z.string().nonempty("Name is required"),
+        email: z.string().email("Valid email is required"),
+        role: z.enum(["SUPER_ADMIN", "ADMIN", "STAFF", "CLIENT"]),
+        password: z
+          .string()
+          .min(6, "Password must be at least 6 characters")
+          .optional(),
+        clientId: z.string().optional(),
+      }),
+    ),
+  });
+
+  const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
+
+  useEffect(() => {
+    if (mode === "add") {
+      form.reset();
+    }
+    if (mode === "edit" && initialData) {
+      form.setValues({
+        name: initialData.name,
+        email: initialData.email,
+        role: initialData.role,
+        password: "",
+        isActive: initialData.isActive,
+        clientId: initialData.clientId ?? undefined,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, initialData, opened]);
+
+  const createUser = api.users.create.useMutation({
+    onSuccess: async () => {
+      notifications.show({
+        title: "User created",
+        message: "User has been created successfully.",
+        color: "green",
+      });
+      await utils.users.getAll.invalidate();
+      setLoading(false);
+      close();
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Error",
+        message: error.message,
+        color: "red",
+      });
+      setLoading(false);
+    },
+  });
+
+  const updateUser = api.users.update.useMutation({
+    onSuccess: async () => {
+      notifications.show({
+        title: "User updated",
+        message: "User has been updated successfully.",
+        color: "green",
+      });
+      await utils.users.getAll.invalidate();
+      setLoading(false);
+      close();
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Error",
+        message: error.message,
+        color: "red",
+      });
+      setLoading(false);
+    },
+  });
+
+  const handleSubmit = (values: typeof form.values) => {
+    setLoading(true);
+    if (mode === "add") {
+      createUser.mutate({
+        name: values.name,
+        email: values.email,
+        role: values.role as User["role"],
+        password: values.password,
+        isActive: values.isActive,
+        clientId: values.role === "CLIENT" ? values.clientId : undefined,
+      });
+    } else if (mode === "edit" && initialData) {
+      updateUser.mutate({
+        id: initialData.id,
+        name: values.name,
+        email: values.email,
+        role: values.role as User["role"],
+        password: values.password || undefined,
+        isActive: values.isActive,
+        clientId: values.role === "CLIENT" ? values.clientId : undefined,
+      });
+    }
+  };
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={close}
+      title={mode === "add" ? "Add User" : "Edit User"}
+      centered
+    >
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Grid>
+          <Grid.Col span={12}>
+            <TextInput
+              label="Name"
+              {...form.getInputProps("name")}
+              required
+              disabled={loading}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <TextInput
+              label="Email"
+              {...form.getInputProps("email")}
+              required
+              disabled={loading}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Select
+              label="Role"
+              data={userRoleOptions}
+              {...form.getInputProps("role")}
+              required
+              disabled={loading}
+            />
+          </Grid.Col>
+          {form.values.role === "CLIENT" && (
+            <Grid.Col span={12}>
+              <Select
+                label="Client"
+                data={
+                  clientsQuery.data?.clients.map((c) => ({
+                    value: c.id,
+                    label: c.name,
+                  })) ?? []
+                }
+                value={form.values.clientId ?? null}
+                onChange={(val) => form.setFieldValue("clientId", val ?? "")}
+                required
+                disabled={loading || clientsQuery.isLoading}
+                placeholder={
+                  clientsQuery.isLoading
+                    ? "Loading clients..."
+                    : "Select client"
+                }
+              />
+            </Grid.Col>
+          )}
+          <Grid.Col span={12}>
+            <PasswordInput
+              label="Password"
+              {...form.getInputProps("password")}
+              required={mode === "add"}
+              disabled={loading}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Switch
+              label="Active"
+              checked={form.values.isActive}
+              onChange={(e) =>
+                form.setFieldValue("isActive", e.currentTarget.checked)
+              }
+              disabled={loading}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Group justify="space-between">
+              <Button variant="subtle" onClick={() => close()}>
+                Cancel
+              </Button>
+              <Button loading={loading} type="submit">
+                Save
+              </Button>
+            </Group>
+          </Grid.Col>
+        </Grid>
+      </form>
+    </Modal>
+  );
+}

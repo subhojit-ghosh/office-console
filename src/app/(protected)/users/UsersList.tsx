@@ -10,34 +10,34 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
+import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { Client } from "@prisma/client";
+import type { User } from "@prisma/client";
 import { IconEdit, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { DataTable, type DataTableSortStatus } from "mantine-datatable";
 import { useState } from "react";
 
-import { useDebouncedState } from "@mantine/hooks";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
-import ClientForm from "./ClientForm";
+import UserForm from "./UserForm";
 
-type ClientsResponse = inferRouterOutputs<AppRouter>["clients"]["getAll"];
+type UsersResponse = inferRouterOutputs<AppRouter>["users"]["getAll"];
 
-export default function ClientsList() {
+export default function UsersList() {
   const utils = api.useUtils();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [formData, setFormData] = useState<Client | null>(null);
+  const [formData, setFormData] = useState<User | null>(null);
   const [sortStatus, setSortStatus] = useState<
-    DataTableSortStatus<ClientsResponse["clients"][0]>
+    DataTableSortStatus<UsersResponse["users"][0]>
   >({
     columnAccessor: "name",
-    direction: "desc",
+    direction: "asc",
   });
   const [filters, setFilters] = useDebouncedState(
     {
@@ -46,7 +46,7 @@ export default function ClientsList() {
     300,
   );
 
-  const { data, isPending } = api.clients.getAll.useQuery({
+  const { data, isPending } = api.users.getAll.useQuery({
     page,
     pageSize,
     search: filters.search,
@@ -54,11 +54,11 @@ export default function ClientsList() {
     sortOrder: sortStatus.direction,
   });
 
-  const deleteClient = api.clients.delete.useMutation({
+  const deleteUser = api.users.delete.useMutation({
     onSuccess: async () => {
-      await utils.clients.getAll.invalidate();
+      await utils.users.getAll.invalidate();
       notifications.show({
-        message: "Client deleted successfully",
+        message: "User deleted successfully",
         color: "green",
       });
     },
@@ -70,21 +70,19 @@ export default function ClientsList() {
     },
   });
 
-  const deleteConfirmation = (client: ClientsResponse["clients"][0]) => {
+  const deleteConfirmation = (user: UsersResponse["users"][0]) => {
     modals.openConfirmModal({
-      title: "Delete Client",
+      title: "Delete User",
       children: (
         <Box>
-          Are you sure you want to delete <strong>{client.name}</strong>? This
+          Are you sure you want to delete <strong>{user.name}</strong>? This
           cannot be undone.
         </Box>
       ),
       labels: { confirm: "Delete", cancel: "Cancel" },
       confirmProps: { color: "red" },
       onConfirm: () => {
-        deleteClient.mutate({
-          id: client.id,
-        });
+        deleteUser.mutate({ id: user.id });
       },
     });
   };
@@ -92,7 +90,7 @@ export default function ClientsList() {
   return (
     <>
       <Group justify="space-between" align="center" mb="md">
-        <Title size="lg">Clients</Title>
+        <Title size="lg">Users</Title>
         <Button
           variant="filled"
           leftSection={<IconPlus size={16} />}
@@ -109,7 +107,7 @@ export default function ClientsList() {
         <Grid.Col span={6}>
           <TextInput
             type="search"
-            placeholder="Search by name"
+            placeholder="Search by name or email"
             leftSection={<IconSearch size={16} />}
             defaultValue={filters.search}
             onChange={(e) =>
@@ -118,9 +116,9 @@ export default function ClientsList() {
           />
         </Grid.Col>
       </Grid>
-      <DataTable<ClientsResponse["clients"][0]>
+      <DataTable<UsersResponse["users"][0]>
         fetching={isPending}
-        records={data?.clients ?? []}
+        records={data?.users ?? []}
         totalRecords={data?.total}
         recordsPerPage={pageSize}
         page={page}
@@ -162,6 +160,13 @@ export default function ClientsList() {
             ),
           },
           { accessor: "name", title: "Name", sortable: true },
+          { accessor: "email", title: "Email", sortable: true },
+          { accessor: "role", title: "Role", sortable: true },
+          {
+            accessor: "isActive",
+            title: "Active",
+            render: (row) => (row.isActive ? "Yes" : "No"),
+          },
           {
             accessor: "createdAt",
             title: "Created At",
@@ -175,7 +180,7 @@ export default function ClientsList() {
         withColumnBorders
         withRowBorders
       />
-      <ClientForm
+      <UserForm
         opened={formOpened}
         close={() => setFormOpened(false)}
         mode={formMode}
