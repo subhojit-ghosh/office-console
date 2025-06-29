@@ -15,15 +15,14 @@ export function Layout({
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      // header={{ height: 60 }}
       navbar={{
-        width: 250,
+        width: 230,
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
-      padding="md"
     >
-      <AppShell.Header>
+      {/* <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
           <div>
             <Burger
@@ -42,11 +41,11 @@ export function Layout({
           </div>
           <UserButton name={user.name!} email={user.email!} />
         </Group>
-      </AppShell.Header>
+      </AppShell.Header> */}
       <AppShell.Navbar>
         <Navbar />
       </AppShell.Navbar>
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShell.Main pt="md">{children}</AppShell.Main>
     </AppShell>
   );
 }

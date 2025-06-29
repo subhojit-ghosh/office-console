@@ -6,6 +6,7 @@ import {
   Button,
   Grid,
   Group,
+  Menu,
   TextInput,
   Title,
   Tooltip,
@@ -13,13 +14,21 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import type { Client } from "@prisma/client";
-import { IconEdit, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
+import {
+  IconBriefcase,
+  IconDotsVertical,
+  IconEdit,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+} from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
-import { DataTable, type DataTableSortStatus } from "mantine-datatable";
+import { type DataTableSortStatus } from "mantine-datatable";
 import { useState } from "react";
 
 import { useDebouncedState } from "@mantine/hooks";
+import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ClientForm from "./ClientForm";
@@ -91,10 +100,24 @@ export default function ClientsList() {
 
   return (
     <>
-      <Group justify="space-between" align="center" mb="md">
-        <Title size="lg">Clients</Title>
+      <Group justify="space-between" px="md" mb="md">
+        <Group gap="xs">
+          <IconBriefcase />
+          <Title size="lg">Clients</Title>
+          <TextInput
+            ml="md"
+            type="search"
+            leftSection={<IconSearch size={16} />}
+            placeholder="Search by name"
+            defaultValue={filters.search}
+            onChange={(e) =>
+              setFilters({ ...filters, search: e.currentTarget.value })
+            }
+          />
+        </Group>
         <Button
-          variant="filled"
+          style={{ float: "right" }}
+          variant="outline"
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             setFormMode("add");
@@ -105,20 +128,7 @@ export default function ClientsList() {
           Add
         </Button>
       </Group>
-      <Grid mb="md">
-        <Grid.Col span={6}>
-          <TextInput
-            type="search"
-            placeholder="Search by name"
-            leftSection={<IconSearch size={16} />}
-            defaultValue={filters.search}
-            onChange={(e) =>
-              setFilters({ ...filters, search: e.currentTarget.value })
-            }
-          />
-        </Grid.Col>
-      </Grid>
-      <DataTable<ClientsResponse["clients"][0]>
+      <AppTable
         fetching={isPending}
         records={data?.clients ?? []}
         totalRecords={data?.total}
@@ -129,51 +139,52 @@ export default function ClientsList() {
         onSortStatusChange={setSortStatus}
         columns={[
           {
-            accessor: "actions",
-            title: <Box mr={6}>Actions</Box>,
-            textAlign: "center",
-            width: 100,
-            render: (row) => (
-              <Group gap={4} justify="center" wrap="nowrap">
-                <Tooltip label="Edit" withArrow>
-                  <ActionIcon
-                    size="sm"
-                    variant="subtle"
-                    onClick={() => {
-                      setFormMode("edit");
-                      setFormData(row);
-                      setFormOpened(true);
-                    }}
-                  >
-                    <IconEdit size={16} />
-                  </ActionIcon>
-                </Tooltip>
-                <Tooltip label="Delete" withArrow>
-                  <ActionIcon
-                    size="sm"
-                    variant="subtle"
-                    color="red"
-                    onClick={() => deleteConfirmation(row)}
-                  >
-                    <IconTrash size={16} />
-                  </ActionIcon>
-                </Tooltip>
-              </Group>
-            ),
+            accessor: "name",
+            title: "Name",
+            sortable: true,
           },
-          { accessor: "name", title: "Name", sortable: true },
           {
             accessor: "createdAt",
             title: "Created At",
             sortable: true,
             render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
           },
+          {
+            accessor: "actions",
+            title: "",
+            textAlign: "center",
+            width: 100,
+            render: (row) => (
+              <Menu withArrow position="bottom-end">
+                <Menu.Target>
+                  <ActionIcon variant="subtle">
+                    <IconDotsVertical size={18} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    color="blue"
+                    leftSection={<IconEdit size={14} />}
+                    onClick={() => {
+                      setFormMode("edit");
+                      setFormData(row);
+                      setFormOpened(true);
+                    }}
+                  >
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item
+                    color="red"
+                    leftSection={<IconTrash size={14} />}
+                    onClick={() => deleteConfirmation(row)}
+                  >
+                    Delete
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            ),
+          },
         ]}
-        minHeight={455}
-        borderRadius="sm"
-        withTableBorder
-        withColumnBorders
-        withRowBorders
       />
       <ClientForm
         opened={formOpened}

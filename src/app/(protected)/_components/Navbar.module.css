@@ -1,11 +1,11 @@
 .navbar {
   height: 100vh;
-  width: 250;
+  width: 230px;
   padding: var(--mantine-spacing-md);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  background-color: light-dark(#ffffff, #090909);
+  border-right: 1px solid light-dark(#e7e7e7, #191b1f);
 }
 
 .navbarMain {
@@ -15,15 +15,18 @@
 .header {
   padding-bottom: var(--mantine-spacing-md);
   margin-bottom: calc(var(--mantine-spacing-md) * 1.5);
-  border-bottom: 1px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-bottom: 1px solid var(--mantine-color-blue-7);
 }
 
 .footer {
   padding-top: var(--mantine-spacing-md);
   margin-top: var(--mantine-spacing-md);
-  border-top: 1px solid
-    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-top: 1px solid var(--mantine-color-blue-7);
+}
+
+.version {
+  background-color: var(--mantine-color-blue-7);
+  color: var(--mantine-color-white);
 }
 
 .link {
@@ -31,16 +34,14 @@
   align-items: center;
   text-decoration: none;
   font-size: var(--mantine-font-size-sm);
-  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-1));
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-  border-radius: var(--mantine-radius-sm);
+  color: light-dark(#3f3f46, #e3e4e6);
+  padding: 6px 10px;
+  margin-bottom: 5px;
+  border-radius: var(--mantine-radius-md);
   font-weight: 500;
 
   @mixin hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-dark-6)
-    );
+    background-color: light-dark(#e1e1e3, #17181b);
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
     text-decoration: none;
 
@@ -52,19 +53,23 @@
   &[data-active] {
     &,
     &:hover {
-      background-color: var(--mantine-color-blue-light);
-      color: var(--mantine-color-blue-light-color);
+      background-color: light-dark(#e1e1e3, #17181b);
+      color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+      font-weight: 500;
 
       .linkIcon {
-        color: var(--mantine-color-blue-light-color);
+        color: light-dark(
+          var(--mantine-color-black),
+          var(--mantine-color-white)
+        );
       }
     }
   }
 }
 
 .linkIcon {
-  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2));
+  color: light-dark(#a1a1aa, #969799);
   margin-right: var(--mantine-spacing-sm);
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
 }

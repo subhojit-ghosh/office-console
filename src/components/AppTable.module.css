@@ -1,0 +1,42 @@
+.root {
+  @mixin light {
+    background-color: #ffffff;
+  }
+}
+
+.table {
+  th,
+  td {
+    @mixin light {
+      border-color: #e7e7e7;
+    }
+
+    @mixin dark {
+      border-color: #191b1f;
+    }
+  }
+
+  td {
+    @mixin light {
+      background-color: #ffffff;
+    }
+  }
+
+  th.mantine-datatable-header-cell-sortable {
+    background-color: red !important;
+  }
+}
+
+.header th .mantine-datatable-header-cell-sortable {
+  background-color: red;
+}
+
+.pagination {
+  @mixin light {
+    border-top-color: #e7e7e7;
+  }
+
+  @mixin dark {
+    border-top-color: #191b1f;
+  }
+}

@@ -54,7 +54,6 @@ export default function ClientForm({
   const createClient = api.clients.create.useMutation({
     onSuccess: async () => {
       notifications.show({
-        title: "Client created",
         message: "Client has been created successfully.",
         color: "green",
       });
@@ -73,7 +72,6 @@ export default function ClientForm({
   const updateClient = api.clients.update.useMutation({
     onSuccess: async () => {
       notifications.show({
-        title: "Client updated",
         message: "Client has been updated successfully.",
         color: "green",
       });

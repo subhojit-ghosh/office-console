@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { createUserSchema, updateUserSchema } from "~/schemas/user";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -87,26 +88,7 @@ export const usersRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(
-      z
-        .object({
-          name: z.string().nonempty("Name is required"),
-          email: z.string().email("Valid email is required"),
-          role: userRoleEnum,
-          clientId: z.string().optional(),
-          password: z.string().min(6, "Password must be at least 6 characters"),
-          isActive: z.boolean().optional(),
-        })
-        .superRefine((data, ctx) => {
-          if (data.role === userRoleEnum.Values.CLIENT && !data.clientId) {
-            ctx.addIssue({
-              path: ["clientId"],
-              code: z.ZodIssueCode.custom,
-              message: "Client ID is required when role is CLIENT",
-            });
-          }
-        }),
-    )
+    .input(createUserSchema)
     .mutation(async ({ ctx, input }) => {
       const existingUser = await ctx.db.user.findFirst({
         where: { email: input.email },
@@ -136,17 +118,7 @@ export const usersRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string().nonempty("ID is required"),
-        name: z.string().nonempty("Name is required"),
-        email: z.string().email("Valid email is required"),
-        role: userRoleEnum,
-        clientId: z.string().optional(),
-        password: z.string().min(6).optional(),
-        isActive: z.boolean().optional(),
-      }),
-    )
+    .input(updateUserSchema)
     .mutation(async ({ ctx, input }) => {
       const existingUser = await ctx.db.user.findFirst({
         where: {

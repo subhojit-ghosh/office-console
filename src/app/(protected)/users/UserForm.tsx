@@ -15,7 +15,7 @@ import { notifications } from "@mantine/notifications";
 import type { User } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
-import { z } from "zod";
+import { createUserSchema, updateUserSchema } from "~/schemas/user";
 
 import { api } from "~/trpc/react";
 
@@ -38,6 +38,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
 
   const form = useForm({
     initialValues: {
+      id: "",
       name: "",
       email: "",
       role: "STAFF",
@@ -45,18 +46,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
       isActive: true,
       clientId: "",
     },
-    validate: zodResolver(
-      z.object({
-        name: z.string().nonempty("Name is required"),
-        email: z.string().email("Valid email is required"),
-        role: z.enum(["SUPER_ADMIN", "ADMIN", "STAFF", "CLIENT"]),
-        password: z
-          .string()
-          .min(6, "Password must be at least 6 characters")
-          .optional(),
-        clientId: z.string().optional(),
-      }),
-    ),
+    validate: zodResolver(mode === "add" ? createUserSchema : updateUserSchema),
   });
 
   const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
@@ -67,6 +57,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
     }
     if (mode === "edit" && initialData) {
       form.setValues({
+        id: initialData.id,
         name: initialData.name,
         email: initialData.email,
         role: initialData.role,
@@ -81,7 +72,6 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
   const createUser = api.users.create.useMutation({
     onSuccess: async () => {
       notifications.show({
-        title: "User created",
         message: "User has been created successfully.",
         color: "green",
       });
@@ -107,7 +97,6 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
   const updateUser = api.users.update.useMutation({
     onSuccess: async () => {
       notifications.show({
-        title: "User updated",
         message: "User has been updated successfully.",
         color: "green",
       });
@@ -138,7 +127,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
       });
     } else if (mode === "edit" && initialData) {
       updateUser.mutate({
-        id: initialData.id,
+        id: values.id,
         name: values.name,
         email: values.email,
         role: values.role as User["role"],
@@ -162,7 +151,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
             <TextInput
               label="Name"
               {...form.getInputProps("name")}
-              required
+              withAsterisk
               disabled={loading}
             />
           </Grid.Col>
@@ -170,7 +159,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
             <TextInput
               label="Email"
               {...form.getInputProps("email")}
-              required
+              withAsterisk
               disabled={loading}
             />
           </Grid.Col>
@@ -179,7 +168,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
               label="Role"
               data={userRoleOptions}
               {...form.getInputProps("role")}
-              required
+              withAsterisk
               disabled={loading}
             />
           </Grid.Col>
@@ -194,7 +183,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
                   })) ?? []
                 }
                 {...form.getInputProps("clientId")}
-                // required
+                withAsterisk
                 searchable
                 disabled={loading || clientsQuery.isLoading}
                 placeholder={
@@ -209,7 +198,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
             <PasswordInput
               label="Password"
               {...form.getInputProps("password")}
-              // required={mode === "add"}
+              withAsterisk={mode === "add"}
               disabled={loading}
             />
           </Grid.Col>

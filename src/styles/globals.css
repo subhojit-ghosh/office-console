@@ -1,10 +1,41 @@
 /* @layer tailwind {
   @import "tailwindcss/preflight";
-}
-@tailwind utilities; */
+} */
+/* @tailwind utilities; */
 
-@theme {
-  --font-sans:
-    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+:root[data-mantine-color-scheme="light"] {
+  --mantine-color-body: #f5f5f5;
+}
+:root[data-mantine-color-scheme="dark"] {
+  --mantine-color-body: #101012;
+}
+
+.mantine-datatable-header {
+  background-color: light-dark(#e1e1e3, #17181b);
+}
+
+:where([data-mantine-color-scheme="dark"]) .mantine-datatable-row {
+  --table-border-color: #191b1f;
+}
+
+.mantine-datatable-table thead tr th:first-child,
+.mantine-datatable-table tbody tr td:first-child {
+  padding-left: 18px !important;
+}
+
+th.mantine-datatable-header-cell-sortable:hover {
+  @mixin light {
+    background-color: #d0d0d0;
+  }
+}
+.mantine-Input-input {
+  @mixin dark {
+    background-color: #17181b;
+  }
+}
+
+.mantine-Menu-dropdown {
+  @mixin dark {
+    background-color: #17181b;
+  }
 }

@@ -1,28 +1,24 @@
 "use client";
 
-import {
-  IconBriefcase,
-  IconChecklist,
-  IconDashboard,
-  IconFolders,
-  IconUsers,
-} from "@tabler/icons-react";
-
-import { Anchor } from "@mantine/core";
+import { Anchor, Button, useMantineColorScheme } from "@mantine/core";
+import { IconFoldersFilled, IconHomeFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
+
 import classes from "./Navbar.module.css";
 
 const data = [
-  { link: "/dashboard", label: "Dashboard", icon: IconDashboard },
-  { link: "/projects", label: "Projects", icon: IconFolders },
-  { link: "/tasks", label: "Tasks", icon: IconChecklist },
-  { link: "/users", label: "Users", icon: IconUsers },
-  { link: "/clients", label: "Clients", icon: IconBriefcase },
+  { link: "/dashboard", label: "Dashboard", icon: IconHomeFilled },
+  { link: "/projects", label: "Projects", icon: IconFoldersFilled },
+  { link: "/tasks", label: "Tasks", icon: FaTasks },
+  { link: "/users", label: "Users", icon: FaUsers },
+  { link: "/clients", label: "Clients", icon: FaUserTie },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
+  const { setColorScheme } = useMantineColorScheme();
 
   const links = data.map((item) => (
     <Anchor
@@ -32,7 +28,7 @@ export function Navbar() {
       href={item.link}
       key={item.label}
     >
-      <item.icon className={classes.linkIcon} stroke={1.5} />
+      <item.icon className={classes.linkIcon} />
       <span>{item.label}</span>
     </Anchor>
   ));
@@ -40,6 +36,8 @@ export function Navbar() {
   return (
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>{links}</div>
+      <Button onClick={() => setColorScheme("light")}>Light</Button>
+      <Button onClick={() => setColorScheme("dark")}>Dark</Button>
     </nav>
   );
 }
