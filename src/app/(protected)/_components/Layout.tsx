@@ -1,10 +1,9 @@
 "use client";
 
-import { AppShell, Burger, Group } from "@mantine/core";
+import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { User } from "next-auth";
 import { Navbar } from "./Navbar";
-import { UserButton } from "./UserButton";
 
 export function Layout({
   children,
@@ -15,37 +14,38 @@ export function Layout({
 
   return (
     <AppShell
-      // header={{ height: 60 }}
       navbar={{
         width: 230,
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
     >
-      {/* <AppShell.Header>
-        <Group h="100%" px="md" justify="space-between">
-          <div>
-            <Burger
-              opened={mobileOpened}
-              onClick={toggleMobile}
-              hiddenFrom="sm"
-              size="sm"
-            />
-            <Burger
-              opened={desktopOpened}
-              onClick={toggleDesktop}
-              visibleFrom="sm"
-              size="sm"
-            />
-            Office Console
-          </div>
-          <UserButton name={user.name!} email={user.email!} />
-        </Group>
-      </AppShell.Header> */}
       <AppShell.Navbar>
-        <Navbar />
+        <Navbar name={user.name!} email={user.email!} />
       </AppShell.Navbar>
       <AppShell.Main pt="md">{children}</AppShell.Main>
+      <div
+        style={{
+          position: "fixed",
+          bottom: "1rem",
+          right: "1rem",
+          fontSize: "0.85rem",
+          color: "#888",
+          zIndex: 50,
+        }}
+      >
+        {/* 🐛 Built by Subhojit Ghosh — free bugs included */}
+        {/* 🛠️ In development - Subhojit Ghosh */}
+        {/* 🐛 More features coming (and bugs too) — Subhojit Ghosh */}
+        ⚒️ Development in progress -{" "}
+        <a
+          href="https://github.com/subhojit-ghosh/office-console"
+          target="_blank"
+          style={{ textDecoration: "none" }}
+        >
+          Subhojit Ghosh
+        </a>
+      </div>
     </AppShell>
   );
 }

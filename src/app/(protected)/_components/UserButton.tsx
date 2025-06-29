@@ -1,7 +1,11 @@
 import classes from "./UserButton.module.css";
 
 import { Avatar, Group, Menu, Text, UnstyledButton } from "@mantine/core";
-import { IconChevronDown, IconLogout } from "@tabler/icons-react";
+import {
+  IconChevronDown,
+  IconChevronRight,
+  IconLogout,
+} from "@tabler/icons-react";
 import { signOut } from "next-auth/react";
 
 interface Props {
@@ -11,11 +15,11 @@ interface Props {
 
 export function UserButton({ name, email }: Props) {
   return (
-    <Menu shadow="md" width={200} withArrow position="bottom-end">
+    <Menu shadow="md" width={200} withArrow position="right-end">
       <Menu.Target>
         <UnstyledButton className={classes.user}>
           <Group>
-            <Avatar name={name} />
+            {/* <Avatar name={name} /> */}
 
             <div style={{ flex: 1 }}>
               <Text size="sm" fw={500}>
@@ -26,7 +30,7 @@ export function UserButton({ name, email }: Props) {
               </Text>
             </div>
 
-            <IconChevronDown size={14} stroke={1.5} />
+            <IconChevronRight size={14} stroke={1.5} />
           </Group>
         </UnstyledButton>
       </Menu.Target>

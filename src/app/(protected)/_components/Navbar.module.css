@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   background-color: light-dark(#ffffff, #090909);
-  border-right: 1px solid light-dark(#e7e7e7, #191b1f);
+  border-right: 1px solid light-dark(#e7e7e7, light-dark(#e7e7e7, #191b1f));
 }
 
 .navbarMain {
@@ -15,17 +15,17 @@
 .header {
   padding-bottom: var(--mantine-spacing-md);
   margin-bottom: calc(var(--mantine-spacing-md) * 1.5);
-  border-bottom: 1px solid var(--mantine-color-blue-7);
+  border-bottom: 1px solid light-dark(#e7e7e7, #191b1f);
 }
 
 .footer {
   padding-top: var(--mantine-spacing-md);
   margin-top: var(--mantine-spacing-md);
-  border-top: 1px solid var(--mantine-color-blue-7);
+  border-top: 1px solid light-dark(#e7e7e7, #191b1f);
 }
 
 .version {
-  background-color: var(--mantine-color-blue-7);
+  background-color: light-dark(#e7e7e7, #191b1f);
   color: var(--mantine-color-white);
 }
 
