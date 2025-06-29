@@ -1,7 +1,7 @@
-@layer tailwind {
+/* @layer tailwind {
   @import "tailwindcss/preflight";
 }
-@tailwind utilities;
+@tailwind utilities; */
 
 @theme {
   --font-sans:

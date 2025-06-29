@@ -1,10 +1,10 @@
 "use client";
 
-import { AppShell, Burger, Group, Skeleton } from "@mantine/core";
+import { AppShell, Burger, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { User } from "next-auth";
-import { UserButton } from "./UserButton";
 import { Navbar } from "./Navbar";
+import { UserButton } from "./UserButton";
 
 export function Layout({
   children,

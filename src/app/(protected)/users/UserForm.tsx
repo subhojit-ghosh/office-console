@@ -20,7 +20,6 @@ import { z } from "zod";
 import { api } from "~/trpc/react";
 
 const userRoleOptions = [
-  { value: "SUPER_ADMIN", label: "Super Admin" },
   { value: "ADMIN", label: "Admin" },
   { value: "STAFF", label: "Staff" },
   { value: "CLIENT", label: "Client" },
@@ -91,11 +90,16 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
       close();
     },
     onError: (error) => {
-      notifications.show({
-        title: "Error",
-        message: error.message,
-        color: "red",
-      });
+      console.log(JSON.parse(JSON.stringify(error)));
+      const zodErrors = error.shape?.data?.zodError;
+
+      if (zodErrors) {
+        const fieldErrors = Object.entries(zodErrors.fieldErrors);
+        console.log("Zod Errors:", fieldErrors);
+        fieldErrors.forEach(([field, messages]) => {
+          form.setFieldError(field, messages ? messages[0] : "Invalid input");
+        });
+      }
       setLoading(false);
     },
   });
@@ -189,9 +193,9 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
                     label: c.name,
                   })) ?? []
                 }
-                value={form.values.clientId ?? null}
-                onChange={(val) => form.setFieldValue("clientId", val ?? "")}
-                required
+                {...form.getInputProps("clientId")}
+                // required
+                searchable
                 disabled={loading || clientsQuery.isLoading}
                 placeholder={
                   clientsQuery.isLoading
@@ -205,7 +209,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
             <PasswordInput
               label="Password"
               {...form.getInputProps("password")}
-              required={mode === "add"}
+              // required={mode === "add"}
               disabled={loading}
             />
           </Grid.Col>

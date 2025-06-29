@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
@@ -87,21 +88,39 @@ export const usersRouter = createTRPCRouter({
 
   create: protectedProcedure
     .input(
-      z.object({
-        name: z.string().nonempty("Name is required"),
-        email: z.string().email("Valid email is required"),
-        role: userRoleEnum,
-        clientId: z.string().optional(),
-        password: z.string().min(6, "Password must be at least 6 characters"),
-        isActive: z.boolean().optional(),
-      }),
+      z
+        .object({
+          name: z.string().nonempty("Name is required"),
+          email: z.string().email("Valid email is required"),
+          role: userRoleEnum,
+          clientId: z.string().optional(),
+          password: z.string().min(6, "Password must be at least 6 characters"),
+          isActive: z.boolean().optional(),
+        })
+        .superRefine((data, ctx) => {
+          if (data.role === userRoleEnum.Values.CLIENT && !data.clientId) {
+            ctx.addIssue({
+              path: ["clientId"],
+              code: z.ZodIssueCode.custom,
+              message: "Client ID is required when role is CLIENT",
+            });
+          }
+        }),
     )
     .mutation(async ({ ctx, input }) => {
       const existingUser = await ctx.db.user.findFirst({
         where: { email: input.email },
       });
       if (existingUser) {
-        throw new Error("User with this email already exists.");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Validation error",
+          cause: {
+            fieldErrors: {
+              email: ["A user with this email already exists"],
+            },
+          },
+        });
       }
       const hashedPassword = await bcrypt.hash(input.password, 10);
       return ctx.db.user.create({
