@@ -1,3 +1,5 @@
+![Preview](https://img001.prntscr.com/file/img001/fXEPKYQmRM60jfSBOBlz_w.png)
+
 # Create T3 App
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
