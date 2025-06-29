@@ -132,7 +132,7 @@ export default function UsersList() {
             setFormOpened(true);
           }}
         >
-          Add
+          Create
         </Button>
       </Group>
       <AppTable<UsersResponse["users"][0]>

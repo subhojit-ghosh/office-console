@@ -123,7 +123,7 @@ export default function ClientsList() {
             setFormOpened(true);
           }}
         >
-          Add
+          Create
         </Button>
       </Group>
       <AppTable
