@@ -37,7 +37,7 @@ export function Layout({
         {/* 🐛 Built by Subhojit Ghosh — free bugs included */}
         {/* 🛠️ In development - Subhojit Ghosh */}
         {/* 🐛 More features coming (and bugs too) — Subhojit Ghosh */}
-        ⚒️ Development in progress
+        ⚒️ Development in progress - Subhojit Ghosh
         {/* <a
           href="https://github.com/subhojit-ghosh/office-console"
           target="_blank"
