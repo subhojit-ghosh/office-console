@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+function parseDate(val: unknown) {
+  if (!val) return undefined;
+  if (val instanceof Date) return val;
+  if (typeof val === "string" && val.length >= 10) {
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) return d;
+  }
+  return undefined;
+}
+
 export const getAllTasksSchema = z.object({
   page: z.number().int().min(1).default(1).optional(),
   pageSize: z.number().int().min(1).max(100).default(10).optional(),
@@ -37,9 +47,9 @@ export const createTaskSchema = z.object({
     .optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
   projectId: z.string(),
-  moduleId: z.string().optional(),
+  moduleId: z.string().optional().nullable(),
   assigneeIds: z.array(z.string()).optional(),
-  dueDate: z.date().optional(),
+  dueDate: z.preprocess(parseDate, z.date().optional().nullable()),
 });
 
 export const updateTaskSchema = z.object({
@@ -59,9 +69,9 @@ export const updateTaskSchema = z.object({
     .optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
   projectId: z.string(),
-  moduleId: z.string().optional(),
+  moduleId: z.string().optional().nullable(),
   assigneeIds: z.array(z.string()).optional(),
-  dueDate: z.date().optional(),
+  dueDate: z.preprocess(parseDate, z.date().optional().nullable()),
 });
 
 export const deleteTaskSchema = z.object({

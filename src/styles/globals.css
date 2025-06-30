@@ -30,8 +30,15 @@ th.mantine-datatable-header-cell-sortable:hover {
 }
 .mantine-Input-input,
 .mantine-Popover-dropdown,
-.mantine-Menu-dropdown {
+.mantine-Menu-dropdown,
+.mantine-RichTextEditor-content {
   @mixin dark {
     background-color: #17181b;
+  }
+}
+
+.mantine-RichTextEditor-content {
+  @mixin light {
+    background-color: #ffffff;
   }
 }

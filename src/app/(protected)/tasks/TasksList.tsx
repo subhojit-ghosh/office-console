@@ -245,22 +245,18 @@ export default function TasksList() {
             render: (t) => t.module?.name ?? "-",
           },
           {
-            accessor: "createdBy.name",
-            title: "Created By",
-            render: (t) => t.createdBy?.name ?? "-",
-          },
-          {
             accessor: "dueDate",
             title: "Due Date",
+            sortable: true,
             render: (row) =>
               row.dueDate ? dayjs(row.dueDate).format("DD MMM YYYY") : "-",
           },
-          {
-            accessor: "createdAt",
-            title: "Created At",
-            sortable: true,
-            render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
-          },
+          // {
+          //   accessor: "createdAt",
+          //   title: "Created At",
+          //   sortable: true,
+          //   render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+          // },
           {
             accessor: "actions",
             title: "",
