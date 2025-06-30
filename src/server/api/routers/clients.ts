@@ -1,19 +1,17 @@
 import type { Prisma } from "@prisma/client";
-import { z } from "zod";
+import {
+  createClientSchema,
+  updateClientSchema,
+  getAllClientsSchema,
+  getClientByIdSchema,
+  deleteClientSchema,
+} from "~/schemas/client.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const clientsRouter = createTRPCRouter({
   getAll: protectedProcedure
-    .input(
-      z.object({
-        page: z.number().int().min(1).default(1).optional(),
-        pageSize: z.number().int().min(1).max(100).default(10).optional(),
-        search: z.string().optional(),
-        sortBy: z.string().default("name").optional(),
-        sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
-      }),
-    )
+    .input(getAllClientsSchema)
     .query(async ({ ctx, input }) => {
       const page = input.page ?? 1;
       const pageSize = input.pageSize ?? 10;
@@ -50,7 +48,7 @@ export const clientsRouter = createTRPCRouter({
     }),
 
   getById: protectedProcedure
-    .input(z.object({ id: z.string().nonempty("ID is required") }))
+    .input(getClientByIdSchema)
     .query(async ({ ctx, input }) => {
       return ctx.db.client.findUnique({
         where: { id: input.id },
@@ -58,7 +56,7 @@ export const clientsRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(z.object({ name: z.string().nonempty("Name is required") }))
+    .input(createClientSchema)
     .mutation(async ({ ctx, input }) => {
       const existingClient = await ctx.db.client.findFirst({
         where: { name: input.name },
@@ -76,12 +74,7 @@ export const clientsRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string().nonempty("ID is required"),
-        name: z.string().nonempty("Name is required"),
-      }),
-    )
+    .input(updateClientSchema)
     .mutation(async ({ ctx, input }) => {
       const existingClient = await ctx.db.client.findFirst({
         where: { name: input.name, id: { not: input.id } },
@@ -98,7 +91,7 @@ export const clientsRouter = createTRPCRouter({
     }),
 
   delete: protectedProcedure
-    .input(z.object({ id: z.string().nonempty("ID is required") }))
+    .input(deleteClientSchema)
     .mutation(async ({ ctx, input }) => {
       const userCount = await ctx.db.user.count({
         where: { clientId: input.id },

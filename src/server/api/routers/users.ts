@@ -1,27 +1,19 @@
 import type { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
-import { z } from "zod";
-import { createUserSchema, updateUserSchema } from "~/schemas/user.schema";
+import {
+  createUserSchema,
+  updateUserSchema,
+  getAllUsersSchema,
+  getUserByIdSchema,
+  deleteUserSchema,
+} from "~/schemas/user.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
-const userRoleEnum = z.enum(["SUPER_ADMIN", "ADMIN", "STAFF", "CLIENT"]);
-
 export const usersRouter = createTRPCRouter({
   getAll: protectedProcedure
-    .input(
-      z.object({
-        page: z.number().int().min(1).default(1).optional(),
-        pageSize: z.number().int().min(1).max(100).default(10).optional(),
-        search: z.string().optional(),
-        sortBy: z.string().default("name").optional(),
-        sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
-        role: userRoleEnum.optional(),
-        isActive: z.boolean().optional(),
-        clientId: z.string().optional(),
-      }),
-    )
+    .input(getAllUsersSchema)
     .query(async ({ ctx, input }) => {
       const page = input.page ?? 1;
       const pageSize = input.pageSize ?? 10;
@@ -73,7 +65,7 @@ export const usersRouter = createTRPCRouter({
     }),
 
   getById: protectedProcedure
-    .input(z.object({ id: z.string().nonempty("ID is required") }))
+    .input(getUserByIdSchema)
     .query(async ({ ctx, input }) => {
       return ctx.db.user.findUnique({
         where: { id: input.id },
@@ -152,7 +144,7 @@ export const usersRouter = createTRPCRouter({
     }),
 
   delete: protectedProcedure
-    .input(z.object({ id: z.string().nonempty("ID is required") }))
+    .input(deleteUserSchema)
     .mutation(async ({ ctx, input }) => {
       const assignedTasksCount = await ctx.db.task.count({
         where: {

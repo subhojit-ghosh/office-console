@@ -6,8 +6,11 @@ import { notifications } from "@mantine/notifications";
 import type { Client } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
-import { z } from "zod";
 
+import {
+  createClientSchema,
+  updateClientSchema,
+} from "~/schemas/client.schema";
 import { api } from "~/trpc/react";
 
 interface Props {
@@ -29,12 +32,11 @@ export default function ClientForm({
 
   const form = useForm({
     initialValues: {
+      id: "",
       name: "",
     },
     validate: zodResolver(
-      z.object({
-        name: z.string().nonempty("Name is required"),
-      }),
+      mode === "add" ? createClientSchema : updateClientSchema,
     ),
   });
 
@@ -45,6 +47,7 @@ export default function ClientForm({
 
     if (mode === "edit" && initialData) {
       form.setValues({
+        id: initialData.id,
         name: initialData.name,
       });
     }
@@ -95,7 +98,7 @@ export default function ClientForm({
       });
     } else if (mode === "edit" && initialData) {
       updateClient.mutate({
-        id: initialData.id,
+        id: form.values.id,
         name: form.values.name,
       });
     }
