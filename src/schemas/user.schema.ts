@@ -24,7 +24,7 @@ export const createUserSchema = z
     role: userRoleEnum,
     clientId: z.string().optional().nullable(),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    isActive: z.boolean().optional().nullable(),
+    isActive: z.boolean().optional().default(true),
   })
   .superRefine((data, ctx) => {
     if (data.role === userRoleEnum.Values.CLIENT && !data.clientId) {
@@ -45,7 +45,8 @@ export const updateUserSchema = z
     clientId: z.string().optional().nullable(),
     password: z
       .string()
-      .optional().nullable()
+      .optional()
+      .nullable()
       .refine((val) => !val || val.length >= 6, {
         message: "Password must be at least 6 characters",
       }),

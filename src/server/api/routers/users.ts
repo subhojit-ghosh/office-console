@@ -132,7 +132,7 @@ export const usersRouter = createTRPCRouter({
                 : { disconnect: true },
             }
           : {}),
-        isActive: input.isActive,
+        isActive: input.isActive ?? undefined,
       };
       if (input.password) {
         data.password = await bcrypt.hash(input.password, 10);

@@ -1,13 +1,14 @@
 "use client";
 
 import {
-  Button,
-  Grid,
-  Group,
-  Modal,
-  Select,
-  TextInput,
-  Textarea,
+    Button,
+    Grid,
+    Group,
+    Modal,
+    MultiSelect,
+    Select,
+    TextInput,
+    Textarea,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
@@ -59,6 +60,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
       form.reset();
     }
     if (mode === "edit" && initialData) {
+        console.log(initialData.assignees);
       form.setValues({
         id: initialData.id,
         title: initialData.title,
@@ -234,7 +236,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
             />
           </Grid.Col>
           <Grid.Col span={12}>
-            <Select
+            <MultiSelect
               label="Assignees"
               data={
                 usersQuery.data?.users.map((u) => ({
@@ -245,7 +247,6 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
               {...form.getInputProps("assigneeIds")}
               disabled={loading || usersQuery.isLoading}
               searchable
-              multiple
               placeholder={
                 usersQuery.isLoading ? "Loading users..." : "Select assignees"
               }
