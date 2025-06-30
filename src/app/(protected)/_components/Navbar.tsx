@@ -4,7 +4,6 @@ import { Anchor, Button, Group, useMantineColorScheme } from "@mantine/core";
 import { IconFoldersFilled, IconHomeFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BiSolidTimer } from "react-icons/bi";
 import { BsBarChartLineFill } from "react-icons/bs";
 import { FaCubes, FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
 
@@ -14,7 +13,7 @@ import { UserButton } from "./UserButton";
 const data = [
   { link: "/dashboard", label: "Dashboard", icon: IconHomeFilled },
   { link: "/reporting", label: "Reporting", icon: BsBarChartLineFill },
-  { link: "/time", label: "Time", icon: BiSolidTimer },
+  // { link: "/time", label: "Time", icon: BiSolidTimer },
   { link: "/tasks", label: "Tasks", icon: FaTasks },
   { link: "/modules", label: "Modules", icon: FaCubes },
   { link: "/projects", label: "Projects", icon: IconFoldersFilled },

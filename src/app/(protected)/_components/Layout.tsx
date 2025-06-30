@@ -37,14 +37,14 @@ export function Layout({
         {/* 🐛 Built by Subhojit Ghosh — free bugs included */}
         {/* 🛠️ In development - Subhojit Ghosh */}
         {/* 🐛 More features coming (and bugs too) — Subhojit Ghosh */}
-        ⚒️ Development in progress -{" "}
-        <a
+        ⚒️ Development in progress
+        {/* <a
           href="https://github.com/subhojit-ghosh/office-console"
           target="_blank"
           style={{ textDecoration: "none" }}
         >
           Subhojit Ghosh
-        </a>
+        </a> */}
       </div>
     </AppShell>
   );
