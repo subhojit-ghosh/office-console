@@ -21,7 +21,7 @@ export function Layout({
       }}
     >
       <AppShell.Navbar>
-        <Navbar name={user.name!} email={user.email!} />
+        <Navbar name={user.name!} email={user.email!} role={user.role!} />
       </AppShell.Navbar>
       <AppShell.Main pt="md">{children}</AppShell.Main>
       <div

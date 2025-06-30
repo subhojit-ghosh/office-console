@@ -1,0 +1,33 @@
+.card {
+  @mixin light {
+    background-color: var(--mantine-color-white);
+  }
+  @mixin dark {
+    background-color: #17181b;
+    color: var(--mantine-color-white);
+  }
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.diff {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-1));
+}
+
+.title {
+  font-weight: 700;
+  text-transform: uppercase;
+  @mixin dark {
+    color: var(--mantine-color-white);
+  }
+}

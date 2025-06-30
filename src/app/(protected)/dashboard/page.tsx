@@ -1,7 +1,10 @@
-import { api } from "~/trpc/server";
+import type { Metadata } from "next";
+import DashboardStats from "./DashboardStats";
+
+export const metadata: Metadata = {
+  title: "Dashboard - Office Console",
+};
 
 export default async function DashboardPage() {
-  const stats = await api.dashboard.stats();
-
-  return <code>{JSON.stringify(stats)}</code>;
+  return <DashboardStats />;
 }

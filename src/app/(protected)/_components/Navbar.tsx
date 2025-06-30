@@ -21,29 +21,35 @@ import { FaCubes, FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
 
 import classes from "./Navbar.module.css";
 import { UserButton } from "./UserButton";
-
-const data = [
-  { link: "/dashboard", label: "Dashboard", icon: IconHomeFilled },
-  { link: "/reporting", label: "Reporting", icon: BsBarChartLineFill },
-  // { link: "/time", label: "Time", icon: BiSolidTimer },
-  { link: "/tasks", label: "Tasks", icon: FaTasks },
-  { link: "/modules", label: "Modules", icon: FaCubes },
-  { link: "/projects", label: "Projects", icon: IconFoldersFilled },
-  { link: "/users", label: "Users", icon: FaUsers },
-  { link: "/clients", label: "Clients", icon: FaUserTie },
-];
+import type { User } from "@prisma/client";
 
 interface Props {
   name: string;
   email: string;
+  role: User["role"];
 }
 
-export function Navbar({ name, email }: Props) {
+export function Navbar({ name, email, role }: Props) {
   const pathname = usePathname();
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("dark", {
     getInitialValueInEffect: true,
   });
+
+  const data = [
+    { link: "/dashboard", label: "Dashboard", icon: IconHomeFilled },
+    { link: "/reporting", label: "Reporting", icon: BsBarChartLineFill },
+    // { link: "/time", label: "Time", icon: BiSolidTimer },
+    { link: "/tasks", label: "Tasks", icon: FaTasks },
+    { link: "/modules", label: "Modules", icon: FaCubes },
+    { link: "/projects", label: "Projects", icon: IconFoldersFilled },
+    ...(role === "CLIENT"
+      ? []
+      : [
+          { link: "/users", label: "Users", icon: FaUsers },
+          { link: "/clients", label: "Clients", icon: FaUserTie },
+        ]),
+  ];
 
   const links = data.map((item) => (
     <Anchor
