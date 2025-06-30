@@ -1,10 +1,10 @@
 import type { Prisma } from "@prisma/client";
 import {
-  createProjectSchema,
-  updateProjectSchema,
-  getAllProjectsSchema,
-  getProjectByIdSchema,
-  deleteProjectSchema,
+    createProjectSchema,
+    deleteProjectSchema,
+    getAllProjectsSchema,
+    getProjectByIdSchema,
+    updateProjectSchema,
 } from "~/schemas/project.schema";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -80,8 +80,8 @@ export const projectsRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           status: input.status ?? "ONGOING",
-          clientId: input.clientId,
-          createdById: ctx.session.user.id, // set from session
+          clientId: !!input.clientId ? input.clientId : null,
+          createdById: ctx.session.user.id,
         },
       });
     }),
@@ -95,7 +95,7 @@ export const projectsRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           status: input.status,
-          clientId: input.clientId,
+          clientId: !!input.clientId ? input.clientId : null,
         },
       });
     }),

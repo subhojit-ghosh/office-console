@@ -1,7 +1,19 @@
 "use client";
 
-import { Anchor, Button, Group, useMantineColorScheme } from "@mantine/core";
-import { IconFoldersFilled, IconHomeFilled } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  Anchor,
+  Group,
+  Title,
+  useComputedColorScheme,
+  useMantineColorScheme,
+} from "@mantine/core";
+import {
+  IconFoldersFilled,
+  IconHomeFilled,
+  IconMoon,
+  IconSun,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BsBarChartLineFill } from "react-icons/bs";
@@ -29,6 +41,9 @@ interface Props {
 export function Navbar({ name, email }: Props) {
   const pathname = usePathname();
   const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme("dark", {
+    getInitialValueInEffect: true,
+  });
 
   const links = data.map((item) => (
     <Anchor
@@ -45,13 +60,21 @@ export function Navbar({ name, email }: Props) {
 
   return (
     <nav className={classes.navbar}>
-      <div className={classes.navbarMain}>{links}</div>
-      <Button variant="subtle" onClick={() => setColorScheme("light")}>
-        Light
-      </Button>
-      <Button variant="subtle" onClick={() => setColorScheme("dark")}>
-        Dark
-      </Button>
+      <div className={classes.navbarMain}>
+        <Group className={classes.header} justify="space-between">
+          <Title size="lg">Office Console</Title>
+          <ActionIcon
+            onClick={() =>
+              setColorScheme(computedColorScheme === "light" ? "dark" : "light")
+            }
+            variant="default"
+          >
+            <IconSun size={18} className={classes.colorSchemeLightIcon} />
+            <IconMoon size={18} className={classes.colorSchemeDarkIcon} />
+          </ActionIcon>
+        </Group>
+        {links}
+      </div>
       <div className={classes.footer}>
         <Group>
           <UserButton name={name} email={email} />

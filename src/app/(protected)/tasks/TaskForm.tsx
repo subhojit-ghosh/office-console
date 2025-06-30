@@ -148,6 +148,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
       onClose={close}
       title={mode === "add" ? "Create Task" : "Edit Task"}
       centered
+      size="lg"
     >
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
@@ -166,7 +167,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
               disabled={loading}
             />
           </Grid.Col>
-          <Grid.Col span={12}>
+          <Grid.Col span={6}>
             <Select
               label="Status"
               data={[
@@ -181,7 +182,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
               withAsterisk
             />
           </Grid.Col>
-          <Grid.Col span={12}>
+          <Grid.Col span={6}>
             <Select
               label="Priority"
               data={[

@@ -5,12 +5,14 @@ import classes from "./LoginForm.module.css";
 import {
   Alert,
   Button,
+  Container,
   Paper,
   PasswordInput,
   TextInput,
   Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { signIn } from "next-auth/react";
@@ -49,17 +51,21 @@ export default function LoginForm() {
     if (res?.error) {
       form.setFieldError("api", "Invalid email or password");
     } else {
+      notifications.show({
+        message: "Login successful. Redirecting to dashboard...",
+        color: "green",
+      });
       router.push("/dashboard");
     }
     setIsLoading(false);
   };
 
   return (
-    <div className={classes.wrapper}>
-      <Paper className={classes.form}>
-        <Title order={2} className={classes.title}>
-          Office Console
-        </Title>
+    <Container size={420} my={40}>
+      <Title ta="center" className={classes.title}>
+        Office Console
+      </Title>
+      <Paper withBorder shadow="sm" p={22} mt={30}>
         <form onSubmit={form.onSubmit(submitHandler)}>
           <TextInput
             label="Email"
@@ -74,11 +80,11 @@ export default function LoginForm() {
             key={form.key("password")}
             {...form.getInputProps("password")}
           />
-          {!!form.errors.apiError && (
+          {!!form.errors.api && (
             <Alert
               variant="light"
               color="red"
-              title={form.errors.apiError}
+              title={form.errors.api}
               icon={<IconInfoCircle />}
               mt="xl"
             />
@@ -94,6 +100,6 @@ export default function LoginForm() {
           </Button>
         </form>
       </Paper>
-    </div>
+    </Container>
   );
 }

@@ -15,7 +15,7 @@ export function Layout({
   return (
     <AppShell
       navbar={{
-        width: 230,
+        width: 200,
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
