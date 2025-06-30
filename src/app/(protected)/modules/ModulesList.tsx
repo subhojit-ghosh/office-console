@@ -2,7 +2,6 @@
 
 import {
   ActionIcon,
-  Anchor,
   Box,
   Button,
   Group,
@@ -14,45 +13,36 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { Project } from "@prisma/client";
+import type { Module } from "@prisma/client";
 import {
   IconDotsVertical,
   IconEdit,
   IconPlus,
   IconSearch,
   IconTrash,
-  IconFoldersFilled,
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "~/server/api/root";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppTable from "~/components/AppTable";
-import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
-import ProjectForm from "./ProjectForm";
-import Link from "next/link";
+import ModuleForm from "./ModuleForm";
+import { FaCubes } from "react-icons/fa";
+import { useSearchParams } from "next/navigation";
 
-const statusOptions = [
-  { value: "ONGOING", label: "Ongoing" },
-  { value: "COMPLETED", label: "Completed" },
-  { value: "CANCELLED", label: "Cancelled" },
-  { value: "ON_HOLD", label: "On Hold" },
-];
+type ModulesResponse = inferRouterOutputs<AppRouter>["modules"]["getAll"];
 
-type ProjectsResponse = inferRouterOutputs<AppRouter>["projects"]["getAll"];
-
-export default function ProjectsList() {
+export default function ModulesList() {
   const utils = api.useUtils();
-  const router = useRouter();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [formData, setFormData] = useState<Project | null>(null);
+  const [formData, setFormData] = useState<Module | null>(null);
   const [sortStatus, setSortStatus] = useState<
-    DataTableSortStatus<ProjectsResponse["projects"][0]>
+    DataTableSortStatus<ModulesResponse["modules"][0]>
   >({
     columnAccessor: "name",
     direction: "asc",
@@ -60,29 +50,40 @@ export default function ProjectsList() {
   const [filters, setFilters] = useDebouncedState(
     {
       search: "",
-      status: "",
-      clientId: "",
+      projectId: "",
     },
     300,
   );
 
-  const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
+  const searchParams = useSearchParams();
+  // Set projectId from query param on mount
+  useEffect(() => {
+    const projectId = searchParams.get("projectId");
+    if (projectId) {
+      setFilters((f) => ({ ...f, projectId }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const { data, isPending } = api.projects.getAll.useQuery({
+  const projectsQuery = api.projects.getAll.useQuery({
+    page: 1,
+    pageSize: 100,
+  });
+
+  const { data, isPending } = api.modules.getAll.useQuery({
     page,
     pageSize,
     search: filters.search,
-    status: (filters.status as Project["status"]) || undefined,
-    clientId: filters.clientId || undefined,
+    projectId: filters.projectId || undefined,
     sortBy: sortStatus.columnAccessor,
     sortOrder: sortStatus.direction,
   });
 
-  const deleteProject = api.projects.delete.useMutation({
+  const deleteModule = api.modules.delete.useMutation({
     onSuccess: async () => {
-      await utils.projects.getAll.invalidate();
+      await utils.modules.getAll.invalidate();
       notifications.show({
-        message: "Project deleted successfully",
+        message: "Module deleted successfully",
         color: "green",
       });
     },
@@ -94,19 +95,19 @@ export default function ProjectsList() {
     },
   });
 
-  const deleteConfirmation = (project: ProjectsResponse["projects"][0]) => {
+  const deleteConfirmation = (module: ModulesResponse["modules"][0]) => {
     modals.openConfirmModal({
-      title: "Delete Project",
+      title: "Delete Module",
       children: (
         <Box>
-          Are you sure you want to delete <strong>{project.name}</strong>? This
+          Are you sure you want to delete <strong>{module.name}</strong>? This
           cannot be undone.
         </Box>
       ),
       labels: { confirm: "Delete", cancel: "Cancel" },
       confirmProps: { color: "red" },
       onConfirm: () => {
-        deleteProject.mutate({ id: project.id });
+        deleteModule.mutate({ id: module.id });
       },
     });
   };
@@ -115,8 +116,8 @@ export default function ProjectsList() {
     <>
       <Group justify="space-between" px="md" mb="md">
         <Group gap="xs">
-          <IconFoldersFilled />
-          <Title size="lg">Projects</Title>
+          <FaCubes />
+          <Title size="lg">Modules</Title>
           <TextInput
             ml="md"
             type="search"
@@ -129,28 +130,20 @@ export default function ProjectsList() {
             }
           />
           <Select
-            placeholder="All Status"
+            placeholder="All Projects"
             clearable
-            data={statusOptions}
-            defaultValue={filters.status}
-            onChange={(value) =>
-              setFilters({ ...filters, status: value ?? "" })
-            }
-          />
-          <Select
-            placeholder="All Clients"
-            clearable
+            searchable
             data={
-              clientsQuery.data?.clients.map((c) => ({
-                value: c.id,
-                label: c.name,
+              projectsQuery.data?.projects.map((p) => ({
+                value: p.id,
+                label: p.name,
               })) ?? []
             }
-            defaultValue={filters.clientId}
+            value={filters.projectId}
             onChange={(value) =>
-              setFilters({ ...filters, clientId: value ?? "" })
+              setFilters({ ...filters, projectId: value ?? "" })
             }
-            disabled={clientsQuery.isLoading}
+            disabled={projectsQuery.isLoading}
             style={{ width: 200 }}
           />
         </Group>
@@ -167,9 +160,9 @@ export default function ProjectsList() {
           Create
         </Button>
       </Group>
-      <AppTable<ProjectsResponse["projects"][0]>
+      <AppTable<ModulesResponse["modules"][0]>
         fetching={isPending}
-        records={data?.projects ?? []}
+        records={data?.modules ?? []}
         totalRecords={data?.total}
         recordsPerPage={pageSize}
         page={page}
@@ -177,42 +170,22 @@ export default function ProjectsList() {
         sortStatus={sortStatus}
         onSortStatusChange={setSortStatus}
         columns={[
-          {
-            accessor: "name",
-            title: "Name",
-            sortable: true,
-            render: (p) => (
-              <Anchor component={Link} href={`/modules?projectId=${p.id}`}>
-                {p.name}
-              </Anchor>
-            ),
-          },
-          {
-            accessor: "modulesCount",
-            title: "Modules",
-            render: (p) =>
-              typeof p.modulesCount === "number" ? p.modulesCount : 0,
-          },
+          { accessor: "name", title: "Name", sortable: true },
           {
             accessor: "tasksCount",
             title: "Tasks",
-            render: (p) =>
-              typeof p.tasksCount === "number" ? p.tasksCount : 0,
+            render: (m) =>
+              typeof m.tasksCount === "number" ? m.tasksCount : 0,
           },
           {
-            accessor: "status",
-            title: "Status",
-            sortable: true,
-          },
-          {
-            accessor: "client.name",
-            title: "Client",
-            render: (p) => p.client?.name ?? "-",
+            accessor: "project.name",
+            title: "Project",
+            render: (m) => m.project?.name ?? "-",
           },
           {
             accessor: "createdBy.name",
             title: "Created By",
-            render: (p) => p.createdBy?.name || "-",
+            render: (m) => m.createdBy?.name ?? "-",
           },
           {
             accessor: "createdAt",
@@ -257,7 +230,7 @@ export default function ProjectsList() {
           },
         ]}
       />
-      <ProjectForm
+      <ModuleForm
         opened={formOpened}
         close={() => setFormOpened(false)}
         mode={formMode}

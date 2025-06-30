@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BiSolidTimer } from "react-icons/bi";
 import { BsBarChartLineFill } from "react-icons/bs";
-import { FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
+import { FaCubes, FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
 
 import classes from "./Navbar.module.css";
 import { UserButton } from "./UserButton";
@@ -16,6 +16,7 @@ const data = [
   { link: "/reporting", label: "Reporting", icon: BsBarChartLineFill },
   { link: "/time", label: "Time", icon: BiSolidTimer },
   { link: "/tasks", label: "Tasks", icon: FaTasks },
+  { link: "/modules", label: "Modules", icon: FaCubes },
   { link: "/projects", label: "Projects", icon: IconFoldersFilled },
   { link: "/users", label: "Users", icon: FaUsers },
   { link: "/clients", label: "Clients", icon: FaUserTie },
