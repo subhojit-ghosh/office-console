@@ -1,10 +1,11 @@
 import type { Prisma } from "@prisma/client";
 import {
   createTaskSchema,
-  updateTaskSchema,
-  getAllTasksSchema,
   deleteTaskSchema,
+  getAllTasksSchema,
+  updateTaskSchema,
 } from "~/schemas/task.schema";
+import { sanitizeInputSchema } from "~/utils/sanitizeInputSchema";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const tasksRouter = createTRPCRouter({
@@ -57,15 +58,16 @@ export const tasksRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(createTaskSchema)
+    .input(sanitizeInputSchema(createTaskSchema))
     .mutation(async ({ ctx, input }) => {
+      const { assigneeIds, ...rest } = input;
       const userId = ctx.session.user.id;
       return ctx.db.task.create({
         data: {
-          ...input,
+          ...rest,
           createdById: userId,
-          assignees: input.assigneeIds
-            ? { connect: input.assigneeIds.map((id) => ({ id })) }
+          assignees: assigneeIds
+            ? { connect: assigneeIds.map((id) => ({ id })) }
             : undefined,
         },
         include: {
@@ -78,7 +80,7 @@ export const tasksRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(updateTaskSchema)
+    .input(sanitizeInputSchema(updateTaskSchema))
     .mutation(async ({ ctx, input }) => {
       const { id, assigneeIds, ...rest } = input;
       return ctx.db.task.update({

@@ -10,7 +10,7 @@ export const env = createEnv({
     AUTH_SECRET:
       process.env.NODE_ENV === "production"
         ? z.string()
-        : z.string().optional(),
+        : z.string().optional().nullable(),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])

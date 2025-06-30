@@ -1,12 +1,13 @@
 import type { Prisma } from "@prisma/client";
 import {
-    createProjectSchema,
-    deleteProjectSchema,
-    getAllProjectsSchema,
-    getProjectByIdSchema,
-    updateProjectSchema,
+  createProjectSchema,
+  deleteProjectSchema,
+  getAllProjectsSchema,
+  getProjectByIdSchema,
+  updateProjectSchema,
 } from "~/schemas/project.schema";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { sanitizeInputSchema } from "~/utils/sanitizeInputSchema";
 
 export const projectsRouter = createTRPCRouter({
   getAll: protectedProcedure
@@ -73,21 +74,21 @@ export const projectsRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(createProjectSchema)
+    .input(sanitizeInputSchema(createProjectSchema))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.project.create({
         data: {
           name: input.name,
           description: input.description,
-          status: input.status ?? "ONGOING",
-          clientId: !!input.clientId ? input.clientId : null,
+          status: input.status,
+          clientId: input.clientId,
           createdById: ctx.session.user.id,
         },
       });
     }),
 
   update: protectedProcedure
-    .input(updateProjectSchema)
+    .input(sanitizeInputSchema(updateProjectSchema))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.project.update({
         where: { id: input.id },
@@ -95,7 +96,7 @@ export const projectsRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           status: input.status,
-          clientId: !!input.clientId ? input.clientId : null,
+          clientId: input.clientId,
         },
       });
     }),

@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const getAllClientsSchema = z.object({
-  page: z.number().int().min(1).default(1).optional(),
-  pageSize: z.number().int().min(1).max(100).default(10).optional(),
-  search: z.string().optional(),
-  sortBy: z.string().default("name").optional(),
-  sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
+  page: z.number().int().min(1).default(1).optional().nullable(),
+  pageSize: z.number().int().min(1).max(100).default(10).optional().nullable(),
+  search: z.string().optional().nullable(),
+  sortBy: z.string().default("name").optional().nullable(),
+  sortOrder: z.enum(["asc", "desc"]).default("asc").optional().nullable(),
 });
 
 export const getClientByIdSchema = z.object({
