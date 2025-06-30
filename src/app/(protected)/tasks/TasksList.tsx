@@ -32,11 +32,13 @@ import TaskForm from "./TaskForm";
 import { FaTasks } from "react-icons/fa";
 
 const statusOptions = [
-  { value: "PENDING", label: "Pending" },
+  { value: "BACKLOG", label: "Backlog" },
+  { value: "TODO", label: "To Do" },
   { value: "IN_PROGRESS", label: "In Progress" },
-  { value: "COMPLETED", label: "Completed" },
+  { value: "IN_REVIEW", label: "In Review" },
   { value: "BLOCKED", label: "Blocked" },
-  { value: "REVIEW", label: "Review" },
+  { value: "DONE", label: "Done" },
+  { value: "CANCELED", label: "Canceled" },
 ];
 
 const priorityOptions = [

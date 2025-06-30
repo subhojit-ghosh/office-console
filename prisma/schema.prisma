@@ -44,7 +44,7 @@ model User {
   projects      Project[]
   createdTasks  Task[]        @relation("CreatedTasks")
   assignedTasks Task[]        @relation("AssignedTasks")
-  modules      Module[]    @relation("CreatedModules")
+  modules       Module[]      @relation("CreatedModules")
 }
 
 enum StaffPosition {
@@ -87,7 +87,7 @@ model Project {
   updatedAt   DateTime      @updatedAt
 
   modules Module[]
-  tasks    Task[]
+  tasks   Task[]
 }
 
 model Module {
@@ -104,11 +104,13 @@ model Module {
 }
 
 enum TaskStatus {
-  PENDING
+  BACKLOG
+  TODO
   IN_PROGRESS
-  COMPLETED
+  IN_REVIEW
   BLOCKED
-  REVIEW
+  DONE
+  CANCELED
 }
 
 enum TaskPriority {
@@ -122,7 +124,7 @@ model Task {
   id          String       @id @default(ulid())
   title       String
   description String?
-  status      TaskStatus   @default(PENDING)
+  status      TaskStatus   @default(TODO)
   priority    TaskPriority @default(MEDIUM)
 
   projectId String

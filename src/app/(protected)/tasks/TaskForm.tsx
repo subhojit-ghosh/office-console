@@ -173,11 +173,13 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
             <Select
               label="Status"
               data={[
-                { value: "PENDING", label: "Pending" },
+                { value: "BACKLOG", label: "Backlog" },
+                { value: "TODO", label: "To Do" },
                 { value: "IN_PROGRESS", label: "In Progress" },
-                { value: "COMPLETED", label: "Completed" },
+                { value: "IN_REVIEW", label: "In Review" },
                 { value: "BLOCKED", label: "Blocked" },
-                { value: "REVIEW", label: "Review" },
+                { value: "DONE", label: "Done" },
+                { value: "CANCELED", label: "Canceled" },
               ]}
               {...form.getInputProps("status")}
               disabled={loading}
