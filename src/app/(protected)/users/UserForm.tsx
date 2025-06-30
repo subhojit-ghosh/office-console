@@ -15,7 +15,7 @@ import { notifications } from "@mantine/notifications";
 import type { User } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
-import { createUserSchema, updateUserSchema } from "~/schemas/user";
+import { createUserSchema, updateUserSchema } from "~/schemas/user.schema";
 
 import { api } from "~/trpc/react";
 

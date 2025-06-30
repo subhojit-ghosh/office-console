@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { createUserSchema, updateUserSchema } from "~/schemas/user";
+import { createUserSchema, updateUserSchema } from "~/schemas/user.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
