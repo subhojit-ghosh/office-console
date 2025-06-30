@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import TasksList from "./TasksList";
 
 export const metadata: Metadata = {
   title: "Tasks - Office Console",
 };
 
-export default async function TasksPage() {
-  return "Under Development";
+export default function TasksPage() {
+  return <TasksList />;
 }
