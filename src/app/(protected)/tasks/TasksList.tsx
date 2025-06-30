@@ -131,6 +131,7 @@ export default function TasksList() {
           <FaTasks />
           <Title size="lg">Tasks</Title>
           <TextInput
+            size="xs"
             ml="md"
             type="search"
             leftSection={<IconSearch size={16} />}
@@ -141,6 +142,7 @@ export default function TasksList() {
             }
           />
           <Select
+            size="xs"
             placeholder="All Status"
             clearable
             data={statusOptions}
@@ -151,6 +153,7 @@ export default function TasksList() {
             style={{ width: 150 }}
           />
           <Select
+            size="xs"
             placeholder="All Priority"
             clearable
             data={priorityOptions}
@@ -161,6 +164,7 @@ export default function TasksList() {
             style={{ width: 150 }}
           />
           <Select
+            size="xs"
             placeholder="All Projects"
             clearable
             data={
@@ -177,6 +181,7 @@ export default function TasksList() {
             style={{ width: 200 }}
           />
           <Select
+            size="xs"
             placeholder="All Modules"
             clearable
             data={
