@@ -16,20 +16,20 @@ import { notifications } from "@mantine/notifications";
 import type { Task } from "@prisma/client";
 import {
   IconDotsVertical,
-  IconEdit,
   IconPlus,
   IconSearch,
   IconTrash,
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
-import type { AppRouter } from "~/server/api/root";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaTasks } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
+import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import TaskForm from "./TaskForm";
-import { FaTasks } from "react-icons/fa";
 
 const statusOptions = [
   { value: "BACKLOG", label: "Backlog" },
@@ -76,11 +76,35 @@ export default function TasksList() {
     300,
   );
 
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const currentFilters = { ...filters };
+
+    const projectId = searchParams.get("projectId");
+    if (projectId) {
+      currentFilters.projectId = projectId;
+    }
+
+    const moduleId = searchParams.get("moduleId");
+    if (moduleId) {
+      currentFilters.moduleId = moduleId;
+    }
+
+    setFilters(currentFilters);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const projectsQuery = api.projects.getAll.useQuery({
     page: 1,
     pageSize: 100,
   });
-  const modulesQuery = api.modules.getAll.useQuery({ page: 1, pageSize: 100 });
+  const modulesQuery = api.modules.getAll.useQuery({
+    page: 1,
+    pageSize: 100,
+    projectId: filters.projectId,
+  });
 
   const { data, isPending } = api.tasks.getAll.useQuery({
     page,
@@ -175,7 +199,7 @@ export default function TasksList() {
                 label: p.name,
               })) ?? []
             }
-            defaultValue={filters.projectId}
+            value={filters.projectId}
             onChange={(value) =>
               setFilters({ ...filters, projectId: value ?? "" })
             }
@@ -192,7 +216,7 @@ export default function TasksList() {
                 label: m.name,
               })) ?? []
             }
-            defaultValue={filters.moduleId}
+            value={filters.moduleId}
             onChange={(value) =>
               setFilters({ ...filters, moduleId: value ?? "" })
             }
@@ -223,7 +247,24 @@ export default function TasksList() {
         sortStatus={sortStatus}
         onSortStatusChange={setSortStatus}
         columns={[
-          { accessor: "title", title: "Title", sortable: true },
+          {
+            accessor: "title",
+            title: "Title",
+            sortable: true,
+            render: (row) => (
+              <Button
+                variant="transparent"
+                p={0}
+                onClick={() => {
+                  setFormMode("edit");
+                  setFormData(row);
+                  setFormOpened(true);
+                }}
+              >
+                {row.title}
+              </Button>
+            ),
+          },
           {
             accessor: "status",
             title: "Status",
@@ -270,17 +311,6 @@ export default function TasksList() {
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item
-                    color="blue"
-                    leftSection={<IconEdit size={14} />}
-                    onClick={() => {
-                      setFormMode("edit");
-                      setFormData(row);
-                      setFormOpened(true);
-                    }}
-                  >
-                    Edit
-                  </Menu.Item>
                   <Menu.Item
                     color="red"
                     leftSection={<IconTrash size={14} />}

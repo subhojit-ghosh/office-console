@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import type { User } from "@prisma/client";
+import { UserRole, type User } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
 import { createUserSchema, updateUserSchema } from "~/schemas/user.schema";
@@ -123,7 +123,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
         role: values.role as User["role"],
         password: values.password,
         isActive: values.isActive,
-        clientId: values.role === "CLIENT" ? values.clientId : undefined,
+        clientId: values.role === UserRole.CLIENT ? values.clientId : undefined,
       });
     } else if (mode === "edit" && initialData) {
       updateUser.mutate({
@@ -133,7 +133,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
         role: values.role as User["role"],
         password: values.password || undefined,
         isActive: values.isActive,
-        clientId: values.role === "CLIENT" ? values.clientId : undefined,
+        clientId: values.role === UserRole.CLIENT ? values.clientId : undefined,
       });
     }
   };
@@ -172,7 +172,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
               disabled={loading}
             />
           </Grid.Col>
-          {form.values.role === "CLIENT" && (
+          {form.values.role === UserRole.CLIENT && (
             <Grid.Col span={12}>
               <Select
                 label="Client"

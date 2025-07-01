@@ -14,25 +14,24 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { Project } from "@prisma/client";
+import { UserRole, type Project } from "@prisma/client";
 import {
   IconDotsVertical,
-  IconEdit,
+  IconFoldersFilled,
   IconPlus,
   IconSearch,
   IconTrash,
-  IconFoldersFilled,
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useState } from "react";
 import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ProjectForm from "./ProjectForm";
-import Link from "next/link";
 
 const statusOptions = [
   { value: "ONGOING", label: "Ongoing" },
@@ -45,7 +44,7 @@ type ProjectsResponse = inferRouterOutputs<AppRouter>["projects"]["getAll"];
 
 export default function ProjectsList() {
   const utils = api.useUtils();
-  const router = useRouter();
+  const { data: session } = useSession();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
@@ -137,22 +136,24 @@ export default function ProjectsList() {
               setFilters({ ...filters, status: value ?? "" })
             }
           />
-          <Select
-            placeholder="All Clients"
-            clearable
-            data={
-              clientsQuery.data?.clients.map((c) => ({
-                value: c.id,
-                label: c.name,
-              })) ?? []
-            }
-            defaultValue={filters.clientId}
-            onChange={(value) =>
-              setFilters({ ...filters, clientId: value ?? "" })
-            }
-            disabled={clientsQuery.isLoading}
-            style={{ width: 200 }}
-          />
+          {session?.user.role !== UserRole.CLIENT && (
+            <Select
+              placeholder="All Clients"
+              clearable
+              data={
+                clientsQuery.data?.clients.map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                })) ?? []
+              }
+              defaultValue={filters.clientId}
+              onChange={(value) =>
+                setFilters({ ...filters, clientId: value ?? "" })
+              }
+              disabled={clientsQuery.isLoading}
+              style={{ width: 200 }}
+            />
+          )}
         </Group>
         <Button
           style={{ float: "right" }}
@@ -181,23 +182,45 @@ export default function ProjectsList() {
             accessor: "name",
             title: "Name",
             sortable: true,
-            render: (p) => (
-              <Anchor component={Link} href={`/modules?projectId=${p.id}`}>
-                {p.name}
-              </Anchor>
+            render: (row) => (
+              <Button
+                variant="transparent"
+                p={0}
+                onClick={() => {
+                  setFormMode("edit");
+                  setFormData(row);
+                  setFormOpened(true);
+                }}
+              >
+                {row.name}
+              </Button>
             ),
           },
           {
             accessor: "modulesCount",
             title: "Modules",
-            render: (p) =>
-              typeof p.modulesCount === "number" ? p.modulesCount : 0,
+            render: (p) => (
+              <Anchor
+                component={Link}
+                href={`/modules?projectId=${p.id}`}
+                underline="never"
+              >
+                {typeof p.modulesCount === "number" ? p.modulesCount : 0}
+              </Anchor>
+            ),
           },
           {
             accessor: "tasksCount",
             title: "Tasks",
-            render: (p) =>
-              typeof p.tasksCount === "number" ? p.tasksCount : 0,
+            render: (p) => (
+              <Anchor
+                component={Link}
+                href={`/tasks?projectId=${p.id}`}
+                underline="never"
+              >
+                {typeof p.tasksCount === "number" ? p.tasksCount : 0}
+              </Anchor>
+            ),
           },
           {
             accessor: "status",
@@ -233,17 +256,6 @@ export default function ProjectsList() {
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item
-                    color="blue"
-                    leftSection={<IconEdit size={14} />}
-                    onClick={() => {
-                      setFormMode("edit");
-                      setFormData(row);
-                      setFormOpened(true);
-                    }}
-                  >
-                    Edit
-                  </Menu.Item>
                   <Menu.Item
                     color="red"
                     leftSection={<IconTrash size={14} />}

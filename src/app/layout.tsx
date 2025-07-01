@@ -43,7 +43,7 @@ export default function RootLayout({
       <head>
         <ColorSchemeScript defaultColorScheme="auto" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <TRPCReactProvider>
           <HydrateClient>
             <MantineProvider theme={theme} defaultColorScheme="auto">

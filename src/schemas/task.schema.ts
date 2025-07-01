@@ -33,7 +33,7 @@ export const getAllTasksSchema = z.object({
 
 export const createTaskSchema = z.object({
   title: z.string().nonempty("Title is required"),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   status: z
     .enum([
       "BACKLOG",
@@ -55,7 +55,7 @@ export const createTaskSchema = z.object({
 export const updateTaskSchema = z.object({
   id: z.string().nonempty("ID is required"),
   title: z.string().nonempty("Title is required"),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   status: z
     .enum([
       "BACKLOG",

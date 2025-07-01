@@ -3,9 +3,9 @@
 import { Group, Paper, SimpleGrid, Skeleton, Text, Title } from "@mantine/core";
 import { IconFoldersFilled, IconHomeFilled } from "@tabler/icons-react";
 
-import classes from "./DashboardStats.module.css";
 import { FaTasks } from "react-icons/fa";
 import { api } from "~/trpc/react";
+import classes from "./DashboardStats.module.css";
 
 export default function DashboardStats() {
   const dashboardQuery = api.dashboard.stats.useQuery();
@@ -27,13 +27,13 @@ export default function DashboardStats() {
           </Group>
 
           <Group align="flex-end" gap="xs" mt={15}>
-            <Text className={classes.value}>
-              {dashboardQuery.isLoading || !dashboardQuery.data ? (
-                <Skeleton height={20} width={100} />
-              ) : (
-                dashboardQuery.data.projects
-              )}
-            </Text>
+            {dashboardQuery.isLoading || !dashboardQuery.data ? (
+              <Skeleton height={20} width={100} />
+            ) : (
+              <Text className={classes.value}>
+                {dashboardQuery.data.projects}
+              </Text>
+            )}
           </Group>
         </Paper>
         <Paper withBorder p="md" radius="md" className={classes.card}>
@@ -43,13 +43,11 @@ export default function DashboardStats() {
           </Group>
 
           <Group align="flex-end" gap="xs" mt={15}>
-            <Text className={classes.value}>
-              {dashboardQuery.isLoading || !dashboardQuery.data ? (
-                <Skeleton height={20} width={100} />
-              ) : (
-                dashboardQuery.data.tasks
-              )}
-            </Text>
+            {dashboardQuery.isLoading || !dashboardQuery.data ? (
+              <Skeleton height={20} width={100} />
+            ) : (
+              <Text className={classes.value}>{dashboardQuery.data.tasks}</Text>
+            )}
           </Group>
         </Paper>
       </SimpleGrid>

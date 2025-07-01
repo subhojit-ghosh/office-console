@@ -11,8 +11,9 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import type { Project } from "@prisma/client";
+import { UserRole, type Project } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
   createProjectSchema,
@@ -41,6 +42,7 @@ export default function ProjectForm({
   initialData,
 }: Props) {
   const utils = api.useUtils();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
 
   const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
@@ -61,6 +63,9 @@ export default function ProjectForm({
   useEffect(() => {
     if (mode === "add") {
       form.reset();
+      if (session?.user.clientId) {
+        form.setFieldValue("clientId", session.user.clientId);
+      }
     }
     if (mode === "edit" && initialData) {
       form.setValues({
@@ -167,24 +172,28 @@ export default function ProjectForm({
               disabled={loading}
             />
           </Grid.Col>
-          <Grid.Col span={12}>
-            <Select
-              label="Client"
-              data={
-                clientsQuery.data?.clients.map((c) => ({
-                  value: c.id,
-                  label: c.name,
-                })) ?? []
-              }
-              {...form.getInputProps("clientId")}
-              disabled={loading || clientsQuery.isLoading}
-              searchable
-              clearable
-              placeholder={
-                clientsQuery.isLoading ? "Loading clients..." : "Select client"
-              }
-            />
-          </Grid.Col>
+          {session?.user.role !== UserRole.CLIENT && (
+            <Grid.Col span={12}>
+              <Select
+                label="Client"
+                data={
+                  clientsQuery.data?.clients.map((c) => ({
+                    value: c.id,
+                    label: c.name,
+                  })) ?? []
+                }
+                {...form.getInputProps("clientId")}
+                disabled={loading || clientsQuery.isLoading}
+                searchable
+                clearable
+                placeholder={
+                  clientsQuery.isLoading
+                    ? "Loading clients..."
+                    : "Select client"
+                }
+              />
+            </Grid.Col>
+          )}
           <Grid.Col span={12}>
             <Group justify="space-between">
               <Button variant="subtle" onClick={() => close()}>

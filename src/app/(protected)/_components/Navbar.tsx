@@ -14,6 +14,7 @@ import {
   IconMoon,
   IconSun,
 } from "@tabler/icons-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BsBarChartLineFill } from "react-icons/bs";
@@ -21,16 +22,11 @@ import { FaCubes, FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
 
 import classes from "./Navbar.module.css";
 import { UserButton } from "./UserButton";
-import type { User } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 
-interface Props {
-  name: string;
-  email: string;
-  role: User["role"];
-}
-
-export function Navbar({ name, email, role }: Props) {
+export function Navbar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("dark", {
     getInitialValueInEffect: true,
@@ -43,7 +39,7 @@ export function Navbar({ name, email, role }: Props) {
     { link: "/tasks", label: "Tasks", icon: FaTasks },
     { link: "/modules", label: "Modules", icon: FaCubes },
     { link: "/projects", label: "Projects", icon: IconFoldersFilled },
-    ...(role === "CLIENT"
+    ...(session?.user?.role === UserRole.CLIENT
       ? []
       : [
           { link: "/users", label: "Users", icon: FaUsers },
@@ -83,7 +79,7 @@ export function Navbar({ name, email, role }: Props) {
       </div>
       <div className={classes.footer}>
         <Group>
-          <UserButton name={name} email={email} />
+          <UserButton />
         </Group>
       </div>
     </nav>

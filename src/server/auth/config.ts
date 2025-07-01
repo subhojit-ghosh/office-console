@@ -17,11 +17,13 @@ declare module "next-auth" {
     user: {
       id: string;
       role: UserRole;
+      clientId?: string;
     } & DefaultSession["user"];
   }
 
   interface User {
     role?: UserRole;
+    clientId?: string;
   }
 }
 
@@ -71,6 +73,7 @@ export const authConfig = {
           name: user.name,
           email: user.email,
           role: user.role,
+          clientId: user.clientId ?? undefined,
         };
       },
     }),
@@ -86,6 +89,9 @@ export const authConfig = {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
+        if (token.clientId) {
+          session.user.clientId = token.clientId as string;
+        }
       }
       return session;
     },
@@ -93,6 +99,9 @@ export const authConfig = {
       if (user) {
         token.id = user.id!;
         token.role = user.role!;
+        if (user.clientId) {
+          token.clientId = user.clientId;
+        }
       }
       return token;
     },

@@ -19,7 +19,7 @@ export const projectsRouter = createTRPCRouter({
       const sortBy = input.sortBy ?? "name";
       const sortOrder = input.sortOrder ?? "asc";
       const status = input.status;
-      const clientId = input.clientId;
+      const clientId = ctx.session.user.clientId ?? input.clientId;
 
       const where: Prisma.ProjectWhereInput = {
         ...(search

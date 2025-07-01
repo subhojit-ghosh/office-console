@@ -2,13 +2,9 @@
 
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import type { User } from "next-auth";
 import { Navbar } from "./Navbar";
 
-export function Layout({
-  children,
-  user,
-}: Readonly<{ children: React.ReactNode; user: User }>) {
+export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
@@ -21,7 +17,7 @@ export function Layout({
       }}
     >
       <AppShell.Navbar>
-        <Navbar name={user.name!} email={user.email!} role={user.role!} />
+        <Navbar />
       </AppShell.Navbar>
       <AppShell.Main pt="md">{children}</AppShell.Main>
       <div

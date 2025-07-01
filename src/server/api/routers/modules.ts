@@ -19,13 +19,25 @@ export const modulesRouter = createTRPCRouter({
       const sortOrder = input.sortOrder ?? "asc";
       const projectId = input.projectId;
 
+      let projectIds: string[] = [];
+
+      if (projectId) {
+        projectIds.push(projectId);
+      } else if (ctx.session.user.clientId) {
+        const clientProjects = await ctx.db.project.findMany({
+          where: { clientId: ctx.session.user.clientId },
+          select: { id: true },
+        });
+        projectIds = clientProjects.map((p) => p.id);
+      }
+
       const where: Prisma.ModuleWhereInput = {
         ...(search
           ? {
               name: { contains: search, mode: "insensitive" },
             }
           : {}),
-        ...(projectId ? { projectId } : {}),
+        ...(projectIds.length ? { projectId: { in: projectIds } } : {}),
       };
 
       const [modules, total] = await Promise.all([

@@ -1,32 +1,23 @@
 import classes from "./UserButton.module.css";
 
-import { Avatar, Group, Menu, Text, UnstyledButton } from "@mantine/core";
-import {
-  IconChevronDown,
-  IconChevronRight,
-  IconLogout,
-} from "@tabler/icons-react";
-import { signOut } from "next-auth/react";
+import { Group, Menu, Text, UnstyledButton } from "@mantine/core";
+import { IconChevronRight, IconLogout } from "@tabler/icons-react";
+import { signOut, useSession } from "next-auth/react";
 
-interface Props {
-  name: string;
-  email: string;
-}
+export function UserButton() {
+  const { data: session } = useSession();
 
-export function UserButton({ name, email }: Props) {
   return (
     <Menu shadow="md" width={200} withArrow position="right-end">
       <Menu.Target>
         <UnstyledButton className={classes.user}>
           <Group>
-            {/* <Avatar name={name} /> */}
-
             <div style={{ flex: 1 }}>
               <Text size="sm" fw={500}>
-                {name}
+                {session?.user?.name}
               </Text>
               <Text c="dimmed" size="xs">
-                {email}
+                {session?.user?.email}
               </Text>
             </div>
 

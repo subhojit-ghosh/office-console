@@ -2,6 +2,7 @@
 
 import {
   ActionIcon,
+  Anchor,
   Box,
   Button,
   Group,
@@ -31,6 +32,7 @@ import { api } from "~/trpc/react";
 import ModuleForm from "./ModuleForm";
 import { FaCubes } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 type ModulesResponse = inferRouterOutputs<AppRouter>["modules"]["getAll"];
 
@@ -56,7 +58,7 @@ export default function ModulesList() {
   );
 
   const searchParams = useSearchParams();
-  // Set projectId from query param on mount
+
   useEffect(() => {
     const projectId = searchParams.get("projectId");
     if (projectId) {
@@ -174,8 +176,15 @@ export default function ModulesList() {
           {
             accessor: "tasksCount",
             title: "Tasks",
-            render: (m) =>
-              typeof m.tasksCount === "number" ? m.tasksCount : 0,
+            render: (m) => (
+              <Anchor
+                component={Link}
+                href={`/tasks?projectId=${m.projectId}&moduleId=${m.id}`}
+                underline="never"
+              >
+                {typeof m.tasksCount === "number" ? m.tasksCount : 0}
+              </Anchor>
+            ),
           },
           {
             accessor: "project.name",

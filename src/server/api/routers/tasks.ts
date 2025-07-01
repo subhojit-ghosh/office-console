@@ -21,6 +21,18 @@ export const tasksRouter = createTRPCRouter({
       const projectId = input.projectId;
       const moduleId = input.moduleId;
 
+      let projectIds: string[] = [];
+
+      if (projectId) {
+        projectIds.push(projectId);
+      } else if (ctx.session.user.clientId) {
+        const clientProjects = await ctx.db.project.findMany({
+          where: { clientId: ctx.session.user.clientId },
+          select: { id: true },
+        });
+        projectIds = clientProjects.map((p) => p.id);
+      }
+
       const where: Prisma.TaskWhereInput = {
         ...(search
           ? {
@@ -28,7 +40,7 @@ export const tasksRouter = createTRPCRouter({
             }
           : {}),
         ...(status ? { status } : {}),
-        ...(projectId ? { projectId } : {}),
+        ...(projectIds.length ? { projectId: { in: projectIds } } : {}),
         ...(moduleId ? { moduleId } : {}),
       };
 
