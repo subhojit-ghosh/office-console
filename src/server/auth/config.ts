@@ -1,7 +1,11 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { type DefaultSession, type NextAuthConfig } from "next-auth";
+import {
+  type DefaultSession,
+  type NextAuthConfig,
+  type Session,
+} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "~/server/db";
@@ -18,12 +22,22 @@ declare module "next-auth" {
       id: string;
       role: UserRole;
       clientId?: string;
+      client?: {
+        id: string;
+        name: string;
+        showAssignees: boolean;
+      };
     } & DefaultSession["user"];
   }
 
   interface User {
     role?: UserRole;
     clientId?: string;
+    client?: {
+      id: string;
+      name: string;
+      showAssignees: boolean;
+    };
   }
 }
 
@@ -56,6 +70,9 @@ export const authConfig = {
             email,
             isActive: true,
           },
+          include: {
+            client: true,
+          },
         });
 
         if (!user) {
@@ -74,6 +91,13 @@ export const authConfig = {
           email: user.email,
           role: user.role,
           clientId: user.clientId ?? undefined,
+          client: user.client
+            ? {
+                id: user.client.id,
+                name: user.client.name,
+                showAssignees: user.client.showAssignees,
+              }
+            : undefined,
         };
       },
     }),
@@ -92,6 +116,9 @@ export const authConfig = {
         if (token.clientId) {
           session.user.clientId = token.clientId as string;
         }
+        if (token.client) {
+          session.user.client = token.client as Session["user"]["client"];
+        }
       }
       return session;
     },
@@ -101,6 +128,9 @@ export const authConfig = {
         token.role = user.role!;
         if (user.clientId) {
           token.clientId = user.clientId;
+        }
+        if (user.client) {
+          token.client = user.client;
         }
       }
       return token;

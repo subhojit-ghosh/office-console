@@ -16,7 +16,7 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { Task } from "@prisma/client";
+import { UserRole, type Task } from "@prisma/client";
 import {
   IconDotsVertical,
   IconPlus,
@@ -26,8 +26,9 @@ import {
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
+import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaTasks } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
@@ -55,6 +56,7 @@ type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
 
 export default function TasksList() {
   const utils = api.useUtils();
+  const { data: session } = useSession();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
@@ -78,6 +80,13 @@ export default function TasksList() {
     },
     300,
   );
+
+  const shouldHideAssignees = useMemo(() => {
+    return (
+      session?.user.role === UserRole.CLIENT &&
+      !session?.user.client?.showAssignees
+    );
+  }, [session?.user]);
 
   const searchParams = useSearchParams();
 
@@ -329,6 +338,7 @@ export default function TasksList() {
           {
             accessor: "assignees",
             title: "Assignees",
+            hidden: shouldHideAssignees,
             render: (row) => (
               <Avatar.Group>
                 {row.assignees.map((assignee) => (

@@ -12,10 +12,11 @@ import {
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import type { Task } from "@prisma/client";
+import { UserRole, type Task } from "@prisma/client";
 import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useEffect, useMemo, useState } from "react";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
 import { createTaskSchema, updateTaskSchema } from "~/schemas/task.schema";
 import type { AppRouter } from "~/server/api/root";
@@ -32,6 +33,7 @@ interface Props {
 
 export default function TaskForm({ mode, opened, close, initialData }: Props) {
   const utils = api.useUtils();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
@@ -59,6 +61,13 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
     projectId: form.values.projectId,
   });
   const usersQuery = api.users.getAll.useQuery({ page: 1, pageSize: 100 });
+
+  const shouldHideAssignees = useMemo(() => {
+    return (
+      session?.user.role === UserRole.CLIENT &&
+      !session?.user.client?.showAssignees
+    );
+  }, [session?.user]);
 
   useEffect(() => {
     if (mode === "add") {
@@ -259,25 +268,27 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
                   }
                 />
               </Grid.Col>
-              <Grid.Col span={12}>
-                <MultiSelect
-                  label="Assignees"
-                  data={
-                    usersQuery.data?.users.map((u) => ({
-                      value: u.id,
-                      label: u.name,
-                    })) ?? []
-                  }
-                  {...form.getInputProps("assigneeIds")}
-                  disabled={loading || usersQuery.isLoading}
-                  searchable
-                  placeholder={
-                    usersQuery.isLoading
-                      ? "Loading users..."
-                      : "Select assignees"
-                  }
-                />
-              </Grid.Col>
+              {!shouldHideAssignees && (
+                <Grid.Col span={12}>
+                  <MultiSelect
+                    label="Assignees"
+                    data={
+                      usersQuery.data?.users.map((u) => ({
+                        value: u.id,
+                        label: u.name,
+                      })) ?? []
+                    }
+                    {...form.getInputProps("assigneeIds")}
+                    disabled={loading || usersQuery.isLoading}
+                    searchable
+                    placeholder={
+                      usersQuery.isLoading
+                        ? "Loading users..."
+                        : "Select assignees"
+                    }
+                  />
+                </Grid.Col>
+              )}
               <Grid.Col span={12}>
                 <DateInput
                   label="Due Date"
