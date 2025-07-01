@@ -27,9 +27,7 @@ export function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { setColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme("dark", {
-    getInitialValueInEffect: true,
-  });
+  const computedColorScheme = useComputedColorScheme();
 
   const data = [
     { link: "/dashboard", label: "Dashboard", icon: IconHomeFilled },
