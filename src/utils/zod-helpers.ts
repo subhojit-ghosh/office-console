@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, type ZodTypeAny } from "zod";
 
 function sanitize(value: unknown): unknown {
   if (typeof value === "string") {
@@ -24,3 +24,11 @@ export const sanitizeInputSchema = <T extends z.ZodTypeAny>(
 ): z.ZodEffects<T, T["_output"], unknown> => {
   return z.preprocess(sanitize, schema);
 };
+
+export function zOptionalInput<T extends ZodTypeAny>(schema: T) {
+  return z.preprocess((val) => {
+    if (val === "") return null;
+    if (val === undefined) return null;
+    return val;
+  }, schema);
+}

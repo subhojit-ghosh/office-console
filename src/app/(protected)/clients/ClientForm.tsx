@@ -143,9 +143,6 @@ export default function ClientForm({
             <NumberInput
               label="Time Display Multiplier"
               description="This multiplier adjusts how tracked time is shown for this client. For example: 1 shows the actual time, 2 doubles it, 0.5 shows half, and 3 triples it."
-              withAsterisk
-              min={0.1}
-              max={10}
               decimalScale={2}
               {...form.getInputProps("timeDisplayMultiplier")}
             />

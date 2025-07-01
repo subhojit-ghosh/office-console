@@ -89,6 +89,7 @@ export const modulesRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           projectId: input.projectId,
+          timeDisplayMultiplier: input.timeDisplayMultiplier,
           createdById: ctx.session.user.id,
         },
       });
@@ -103,6 +104,7 @@ export const modulesRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           projectId: input.projectId,
+          timeDisplayMultiplier: input.timeDisplayMultiplier,
         },
       });
     }),

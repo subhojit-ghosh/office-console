@@ -7,7 +7,7 @@ import {
   updateProjectSchema,
 } from "~/schemas/project.schema";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { sanitizeInputSchema } from "~/utils/sanitizeInputSchema";
+import { sanitizeInputSchema } from "~/utils/zod-helpers";
 
 export const projectsRouter = createTRPCRouter({
   getAll: protectedProcedure
@@ -82,6 +82,7 @@ export const projectsRouter = createTRPCRouter({
           description: input.description,
           status: input.status,
           clientId: input.clientId,
+          timeDisplayMultiplier: input.timeDisplayMultiplier,
           createdById: ctx.session.user.id,
         },
       });
@@ -97,6 +98,7 @@ export const projectsRouter = createTRPCRouter({
           description: input.description,
           status: input.status,
           clientId: input.clientId,
+          timeDisplayMultiplier: input.timeDisplayMultiplier,
         },
       });
     }),

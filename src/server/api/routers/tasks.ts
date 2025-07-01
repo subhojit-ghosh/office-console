@@ -5,7 +5,7 @@ import {
   getAllTasksSchema,
   updateTaskSchema,
 } from "~/schemas/task.schema";
-import { sanitizeInputSchema } from "~/utils/sanitizeInputSchema";
+import { sanitizeInputSchema } from "~/utils/zod-helpers";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const tasksRouter = createTRPCRouter({

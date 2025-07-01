@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zOptionalInput } from "~/utils/zod-helpers";
 
 export const getAllModulesSchema = z.object({
   page: z.number().int().min(1).default(1).optional().nullable(),
@@ -17,6 +18,14 @@ export const createModuleSchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z.string().optional().nullable(),
   projectId: z.string().nonempty("Project is required"),
+  timeDisplayMultiplier: zOptionalInput(
+    z
+      .number()
+      .min(0.1, "Too small (0.1 is the min)")
+      .max(10, "Too large (10 is the max)")
+      .optional()
+      .nullable(),
+  ),
 });
 
 export const updateModuleSchema = z.object({
@@ -24,6 +33,14 @@ export const updateModuleSchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z.string().optional().nullable(),
   projectId: z.string().nonempty("Project is required"),
+  timeDisplayMultiplier: zOptionalInput(
+    z
+      .number()
+      .min(0.1, "Too small (0.1 is the min)")
+      .max(10, "Too large (10 is the max)")
+      .optional()
+      .nullable(),
+  ),
 });
 
 export const deleteModuleSchema = z.object({

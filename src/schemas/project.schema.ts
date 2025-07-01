@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zOptionalInput } from "~/utils/zod-helpers";
 
 export const getAllProjectsSchema = z.object({
   page: z.number().int().min(1).default(1).optional().nullable(),
@@ -22,6 +23,14 @@ export const createProjectSchema = z.object({
   description: z.string().optional().nullable().nullable(),
   status: z.enum(["ONGOING", "COMPLETED", "CANCELLED", "ON_HOLD"]),
   clientId: z.string().optional().nullable(),
+  timeDisplayMultiplier: zOptionalInput(
+    z
+      .number()
+      .min(0.1, "Too small (0.1 is the min)")
+      .max(10, "Too large (10 is the max)")
+      .optional()
+      .nullable(),
+  ),
 });
 
 export const updateProjectSchema = z.object({
@@ -30,6 +39,14 @@ export const updateProjectSchema = z.object({
   description: z.string().optional().nullable(),
   status: z.enum(["ONGOING", "COMPLETED", "CANCELLED", "ON_HOLD"]),
   clientId: z.string().optional().nullable(),
+  timeDisplayMultiplier: zOptionalInput(
+    z
+      .number()
+      .min(0.1, "Too small (0.1 is the min)")
+      .max(10, "Too large (10 is the max)")
+      .optional()
+      .nullable(),
+  ),
 });
 
 export const deleteProjectSchema = z.object({

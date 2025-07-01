@@ -5,6 +5,7 @@ import {
   Grid,
   Group,
   Modal,
+  NumberInput,
   Select,
   TextInput,
   Textarea,
@@ -54,6 +55,7 @@ export default function ProjectForm({
       description: "",
       status: "ONGOING",
       clientId: "",
+      timeDisplayMultiplier: null as number | null,
     },
     validate: zodResolver(
       mode === "add" ? createProjectSchema : updateProjectSchema,
@@ -74,6 +76,9 @@ export default function ProjectForm({
         description: initialData.description ?? "",
         status: initialData.status,
         clientId: initialData.clientId ?? "",
+        timeDisplayMultiplier: initialData.timeDisplayMultiplier
+          ? Number(initialData.timeDisplayMultiplier)
+          : null,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,6 +132,7 @@ export default function ProjectForm({
         description: values.description,
         status: values.status as Project["status"],
         clientId: values.clientId ?? undefined,
+        timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
     } else if (mode === "edit" && initialData) {
       updateProject.mutate({
@@ -135,6 +141,7 @@ export default function ProjectForm({
         description: values.description,
         status: values.status as Project["status"],
         clientId: values.clientId ?? undefined,
+        timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
     }
   };
@@ -173,26 +180,36 @@ export default function ProjectForm({
             />
           </Grid.Col>
           {session?.user.role !== UserRole.CLIENT && (
-            <Grid.Col span={12}>
-              <Select
-                label="Client"
-                data={
-                  clientsQuery.data?.clients.map((c) => ({
-                    value: c.id,
-                    label: c.name,
-                  })) ?? []
-                }
-                {...form.getInputProps("clientId")}
-                disabled={loading || clientsQuery.isLoading}
-                searchable
-                clearable
-                placeholder={
-                  clientsQuery.isLoading
-                    ? "Loading clients..."
-                    : "Select client"
-                }
-              />
-            </Grid.Col>
+            <>
+              <Grid.Col span={12}>
+                <Select
+                  label="Client"
+                  data={
+                    clientsQuery.data?.clients.map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                    })) ?? []
+                  }
+                  {...form.getInputProps("clientId")}
+                  disabled={loading || clientsQuery.isLoading}
+                  searchable
+                  clearable
+                  placeholder={
+                    clientsQuery.isLoading
+                      ? "Loading clients..."
+                      : "Select client"
+                  }
+                />
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <NumberInput
+                  label="Time Display Multiplier"
+                  description="This multiplier adjusts how tracked time is shown in the client view. For example: 1 shows the actual time, 2 doubles it, 0.5 shows half, and 3 triples it."
+                  decimalScale={2}
+                  {...form.getInputProps("timeDisplayMultiplier")}
+                />
+              </Grid.Col>
+            </>
           )}
           <Grid.Col span={12}>
             <Group justify="space-between">

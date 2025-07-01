@@ -5,14 +5,16 @@ import {
   Grid,
   Group,
   Modal,
+  NumberInput,
   Select,
   TextInput,
   Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import type { Module } from "@prisma/client";
+import { UserRole, type Module } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
   createModuleSchema,
@@ -34,9 +36,13 @@ export default function ModuleForm({
   initialData,
 }: Props) {
   const utils = api.useUtils();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
 
-  const projectsQuery = api.projects.getAll.useQuery({ page: 1, pageSize: 100 });
+  const projectsQuery = api.projects.getAll.useQuery({
+    page: 1,
+    pageSize: 100,
+  });
 
   const form = useForm({
     initialValues: {
@@ -44,6 +50,7 @@ export default function ModuleForm({
       name: "",
       description: "",
       projectId: "",
+      timeDisplayMultiplier: null as number | null,
     },
     validate: zodResolver(
       mode === "add" ? createModuleSchema : updateModuleSchema,
@@ -60,6 +67,9 @@ export default function ModuleForm({
         name: initialData.name,
         description: initialData.description ?? "",
         projectId: initialData.projectId ?? "",
+        timeDisplayMultiplier: initialData.timeDisplayMultiplier
+          ? Number(initialData.timeDisplayMultiplier)
+          : null,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,6 +122,7 @@ export default function ModuleForm({
         name: values.name,
         description: values.description,
         projectId: values.projectId,
+        timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
     } else if (mode === "edit" && initialData) {
       updateModule.mutate({
@@ -119,6 +130,7 @@ export default function ModuleForm({
         name: values.name,
         description: values.description,
         projectId: values.projectId,
+        timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
     }
   };
@@ -161,10 +173,22 @@ export default function ModuleForm({
               searchable
               withAsterisk
               placeholder={
-                projectsQuery.isLoading ? "Loading projects..." : "Select project"
+                projectsQuery.isLoading
+                  ? "Loading projects..."
+                  : "Select project"
               }
             />
           </Grid.Col>
+          {session?.user.role !== UserRole.CLIENT && (
+            <Grid.Col span={12}>
+              <NumberInput
+                label="Time Display Multiplier"
+                description="This multiplier adjusts how tracked time is shown in the client view. For example: 1 shows the actual time, 2 doubles it, 0.5 shows half, and 3 triples it."
+                decimalScale={2}
+                {...form.getInputProps("timeDisplayMultiplier")}
+              />
+            </Grid.Col>
+          )}
           <Grid.Col span={12}>
             <Group justify="space-between">
               <Button variant="subtle" onClick={() => close()}>
