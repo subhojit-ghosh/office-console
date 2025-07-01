@@ -5,6 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "ci:build": "pnpm run db:migrate:deploy && pnpm run build",
     "build": "next build",
     "check": "next lint && tsc --noEmit",
     "db:generate": "prisma migrate dev",
