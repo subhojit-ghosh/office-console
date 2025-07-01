@@ -1,10 +1,10 @@
 import type { Prisma } from "@prisma/client";
 import {
   createClientSchema,
-  updateClientSchema,
+  deleteClientSchema,
   getAllClientsSchema,
   getClientByIdSchema,
-  deleteClientSchema,
+  updateClientSchema,
 } from "~/schemas/client.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -67,7 +67,9 @@ export const clientsRouter = createTRPCRouter({
     .input(createClientSchema)
     .mutation(async ({ ctx, input }) => {
       const existingClient = await ctx.db.client.findFirst({
-        where: { name: input.name },
+        where: {
+          name: input.name,
+        },
       });
 
       if (existingClient) {
@@ -77,6 +79,8 @@ export const clientsRouter = createTRPCRouter({
       return ctx.db.client.create({
         data: {
           name: input.name,
+          timeDisplayMultiplier: input.timeDisplayMultiplier,
+          showAssignees: input.showAssignees,
         },
       });
     }),
@@ -94,7 +98,11 @@ export const clientsRouter = createTRPCRouter({
 
       return ctx.db.client.update({
         where: { id: input.id },
-        data: { name: input.name },
+        data: {
+          name: input.name,
+          timeDisplayMultiplier: input.timeDisplayMultiplier,
+          showAssignees: input.showAssignees,
+        },
       });
     }),
 

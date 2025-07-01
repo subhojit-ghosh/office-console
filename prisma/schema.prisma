@@ -11,11 +11,13 @@ datasource db {
 }
 
 model Client {
-  id        String   @id @default(ulid())
-  name      String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                    String   @id @default(ulid())
+  name                  String   @unique
+  timeDisplayMultiplier Decimal  @default(1.00) @db.Decimal(4, 2)
+  showAssignees         Boolean  @default(true)
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   users    User[]
   projects Project[]
@@ -75,32 +77,34 @@ enum ProjectStatus {
 }
 
 model Project {
-  id          String        @id @default(ulid())
-  name        String
-  description String?
-  status      ProjectStatus @default(ONGOING)
-  clientId    String?
-  client      Client?       @relation(fields: [clientId], references: [id])
-  createdById String
-  createdBy   User          @relation(fields: [createdById], references: [id])
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id                    String        @id @default(ulid())
+  name                  String
+  description           String?
+  status                ProjectStatus @default(ONGOING)
+  clientId              String?
+  client                Client?       @relation(fields: [clientId], references: [id])
+  timeDisplayMultiplier Decimal       @default(1.00) @db.Decimal(4, 2)
+  createdById           String
+  createdBy             User          @relation(fields: [createdById], references: [id])
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 
   modules Module[]
   tasks   Task[]
 }
 
 model Module {
-  id          String   @id @default(ulid())
-  name        String
-  description String?
-  projectId   String
-  project     Project  @relation(fields: [projectId], references: [id])
-  createdById String
-  createdBy   User     @relation("CreatedModules", fields: [createdById], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tasks       Task[]
+  id                    String   @id @default(ulid())
+  name                  String
+  description           String?
+  projectId             String
+  project               Project  @relation(fields: [projectId], references: [id])
+  timeDisplayMultiplier Decimal  @default(1.00) @db.Decimal(4, 2)
+  createdById           String
+  createdBy             User     @relation("CreatedModules", fields: [createdById], references: [id])
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  tasks                 Task[]
 }
 
 enum TaskStatus {

@@ -1,6 +1,14 @@
 "use client";
 
-import { Button, Grid, Group, Modal, TextInput } from "@mantine/core";
+import {
+  Button,
+  Grid,
+  Group,
+  Modal,
+  NumberInput,
+  Switch,
+  TextInput,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import type { Client } from "@prisma/client";
@@ -34,6 +42,8 @@ export default function ClientForm({
     initialValues: {
       id: "",
       name: "",
+      timeDisplayMultiplier: 1,
+      showAssignees: true,
     },
     validate: zodResolver(
       mode === "add" ? createClientSchema : updateClientSchema,
@@ -49,6 +59,8 @@ export default function ClientForm({
       form.setValues({
         id: initialData.id,
         name: initialData.name,
+        timeDisplayMultiplier: Number(initialData.timeDisplayMultiplier),
+        showAssignees: initialData.showAssignees,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,11 +107,15 @@ export default function ClientForm({
     if (mode === "add") {
       createClient.mutate({
         name: form.values.name,
+        timeDisplayMultiplier: form.values.timeDisplayMultiplier,
+        showAssignees: form.values.showAssignees,
       });
     } else if (mode === "edit" && initialData) {
       updateClient.mutate({
         id: form.values.id,
         name: form.values.name,
+        timeDisplayMultiplier: form.values.timeDisplayMultiplier,
+        showAssignees: form.values.showAssignees,
       });
     }
   };
@@ -121,6 +137,24 @@ export default function ClientForm({
               label="Name"
               withAsterisk
               {...form.getInputProps("name")}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <NumberInput
+              label="Time Display Multiplier"
+              description="This multiplier adjusts how tracked time is shown for this client. For example: 1 shows the actual time, 2 doubles it, 0.5 shows half, and 3 triples it."
+              withAsterisk
+              min={0.1}
+              max={10}
+              decimalScale={2}
+              {...form.getInputProps("timeDisplayMultiplier")}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Switch
+              defaultChecked
+              label="Show Assignees"
+              {...form.getInputProps("showAssignees", { type: "checkbox" })}
             />
           </Grid.Col>
           <Grid.Col span={12}>

@@ -16,7 +16,6 @@ import type { Client } from "@prisma/client";
 import {
   IconBriefcase,
   IconDotsVertical,
-  IconEdit,
   IconPlus,
   IconSearch,
   IconTrash,
@@ -141,6 +140,19 @@ export default function ClientsList() {
             accessor: "name",
             title: "Name",
             sortable: true,
+            render: (row) => (
+              <Button
+                variant="transparent"
+                p={0}
+                onClick={() => {
+                  setFormMode("edit");
+                  setFormData(row);
+                  setFormOpened(true);
+                }}
+              >
+                {row.name}
+              </Button>
+            ),
           },
           {
             accessor: "projectsCount",
@@ -156,6 +168,16 @@ export default function ClientsList() {
             ),
           },
           {
+            accessor: "timeDisplayMultiplier",
+            title: "Time Display Multiplier",
+            sortable: true,
+          },
+          {
+            accessor: "showAssignees",
+            title: "Show Assignees",
+            render: (row) => <span>{row.showAssignees ? "Yes" : "No"}</span>,
+          },
+          {
             accessor: "actions",
             title: "",
             textAlign: "center",
@@ -168,17 +190,6 @@ export default function ClientsList() {
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item
-                    color="blue"
-                    leftSection={<IconEdit size={14} />}
-                    onClick={() => {
-                      setFormMode("edit");
-                      setFormData(row);
-                      setFormOpened(true);
-                    }}
-                  >
-                    Edit
-                  </Menu.Item>
                   <Menu.Item
                     color="red"
                     leftSection={<IconTrash size={14} />}
