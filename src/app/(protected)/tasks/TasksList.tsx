@@ -35,18 +35,18 @@ import { api } from "~/trpc/react";
 import TaskForm from "./TaskForm";
 
 const statusOptions = [
-  { value: "BACKLOG", label: "Backlog" },
-  { value: "TODO", label: "To Do" },
-  { value: "IN_PROGRESS", label: "In Progress" },
-  { value: "IN_REVIEW", label: "In Review" },
-  { value: "BLOCKED", label: "Blocked" },
-  { value: "DONE", label: "Done" },
-  { value: "CANCELED", label: "Canceled" },
+  { value: "BACKLOG", label: "Backlog", color: "gray" },
+  { value: "TODO", label: "To Do", color: "violet" },
+  { value: "IN_PROGRESS", label: "In Progress", color: "yellow" },
+  { value: "IN_REVIEW", label: "In Review", color: "violet" },
+  { value: "BLOCKED", label: "Blocked", color: "red" },
+  { value: "DONE", label: "Done", color: "green" },
+  { value: "CANCELED", label: "Canceled", color: "pink" },
 ];
 
 const priorityOptions = [
   { value: "LOW", label: "Low", color: "gray" },
-  { value: "MEDIUM", label: "Medium", color: "yellow" },
+  { value: "MEDIUM", label: "Medium", color: "teal" },
   { value: "HIGH", label: "High", color: "orange" },
   { value: "URGENT", label: "Urgent", color: "red" },
 ];
@@ -254,24 +254,38 @@ export default function TasksList() {
             accessor: "title",
             title: "Title",
             sortable: true,
-            render: (row) => (
-              <Button
-                variant="transparent"
-                p={0}
-                onClick={() => {
-                  setFormMode("edit");
-                  setFormData(row);
-                  setFormOpened(true);
-                }}
-              >
-                {row.title}
-              </Button>
-            ),
+            render: (row) => {
+              const priority = priorityOptions.find(
+                (p) => p.value === row.priority,
+              );
+              return (
+                <Button
+                  variant="transparent"
+                  color={priority?.color}
+                  p={0}
+                  onClick={() => {
+                    setFormMode("edit");
+                    setFormData(row);
+                    setFormOpened(true);
+                  }}
+                >
+                  {row.title}
+                </Button>
+              );
+            },
           },
           {
             accessor: "status",
             title: "Status",
             sortable: true,
+            render: (row) => {
+              const status = statusOptions.find((p) => p.value === row.status);
+              return (
+                <Badge color={status?.color} variant="transparent">
+                  {row.status}
+                </Badge>
+              );
+            },
           },
           {
             accessor: "priority",
