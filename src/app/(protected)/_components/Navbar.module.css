@@ -6,6 +6,10 @@
   flex-direction: column;
   background-color: light-dark(#ffffff, #090909);
   border-right: 1px solid light-dark(#e7e7e7, light-dark(#e7e7e7, #191b1f));
+
+  @media (max-width: 48em) {
+    width: 100%;
+  }
 }
 
 .navbarMain {

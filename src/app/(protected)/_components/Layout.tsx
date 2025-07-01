@@ -2,11 +2,14 @@
 
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import MobileHeader from "./MobileHeader";
 import { Navbar } from "./Navbar";
+
+import classes from "./Layout.module.css";
 
 export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  const [desktopOpened] = useDisclosure(true);
 
   return (
     <AppShell
@@ -16,10 +19,16 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
     >
+      <AppShell.Header className={classes.headerMobileOnly}>
+        <MobileHeader toggleMobile={toggleMobile} />
+      </AppShell.Header>
+
       <AppShell.Navbar>
-        <Navbar />
+        <Navbar toggleMobile={toggleMobile} />
       </AppShell.Navbar>
-      <AppShell.Main pt="md">{children}</AppShell.Main>
+      <AppShell.Main pt="md" className={classes.mainWithMobileHeader}>
+        {children}
+      </AppShell.Main>
       <div
         style={{
           position: "fixed",
