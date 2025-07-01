@@ -17,12 +17,11 @@ import {
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BsBarChartLineFill } from "react-icons/bs";
 import { FaCubes, FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
 
+import { UserRole } from "@prisma/client";
 import classes from "./Navbar.module.css";
 import { UserButton } from "./UserButton";
-import { UserRole } from "@prisma/client";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -34,17 +33,17 @@ export function Navbar() {
 
   const data = [
     { link: "/dashboard", label: "Dashboard", icon: IconHomeFilled },
-    { link: "/reporting", label: "Reporting", icon: BsBarChartLineFill },
+    // { link: "/reporting", label: "Reporting", icon: BsBarChartLineFill },
     // { link: "/time", label: "Time", icon: BiSolidTimer },
     { link: "/tasks", label: "Tasks", icon: FaTasks },
     { link: "/modules", label: "Modules", icon: FaCubes },
     { link: "/projects", label: "Projects", icon: IconFoldersFilled },
-    ...(session?.user?.role === UserRole.CLIENT
-      ? []
-      : [
+    ...(session?.user?.role === UserRole.ADMIN
+      ? [
           { link: "/users", label: "Users", icon: FaUsers },
           { link: "/clients", label: "Clients", icon: FaUserTie },
-        ]),
+        ]
+      : []),
   ];
 
   const links = data.map((item) => (

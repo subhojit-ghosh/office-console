@@ -2,12 +2,13 @@
 
 import {
   ActionIcon,
+  Anchor,
   Box,
   Button,
   Group,
   Menu,
   TextInput,
-  Title
+  Title,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -21,11 +22,11 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
-import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
 import { useState } from "react";
 
 import { useDebouncedState } from "@mantine/hooks";
+import Link from "next/link";
 import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
@@ -142,10 +143,17 @@ export default function ClientsList() {
             sortable: true,
           },
           {
-            accessor: "createdAt",
-            title: "Created At",
-            sortable: true,
-            render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
+            accessor: "projectsCount",
+            title: "Projects",
+            render: (row) => (
+              <Anchor
+                component={Link}
+                href={`/projects?clientId=${row.id}`}
+                underline="never"
+              >
+                {typeof row.projectsCount === "number" ? row.projectsCount : 0}
+              </Anchor>
+            ),
           },
           {
             accessor: "actions",

@@ -34,12 +34,20 @@ export const clientsRouter = createTRPCRouter({
           orderBy: { [sortBy]: sortOrder },
           skip: (page - 1) * pageSize,
           take: pageSize,
+          include: {
+            _count: {
+              select: { projects: true },
+            },
+          },
         }),
         ctx.db.client.count({ where }),
       ]);
 
       return {
-        clients,
+        clients: clients.map((c) => ({
+          ...c,
+          projectsCount: c._count.projects,
+        })),
         total,
         page,
         pageSize,

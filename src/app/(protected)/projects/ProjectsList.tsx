@@ -27,7 +27,8 @@ import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
@@ -64,6 +65,17 @@ export default function ProjectsList() {
     },
     300,
   );
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const clientId = searchParams.get("clientId");
+    if (clientId) {
+      setFilters((f) => ({ ...f, clientId }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
 
