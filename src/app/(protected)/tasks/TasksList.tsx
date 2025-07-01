@@ -2,6 +2,8 @@
 
 import {
   ActionIcon,
+  Avatar,
+  Badge,
   Box,
   Button,
   Group,
@@ -9,6 +11,7 @@ import {
   Select,
   TextInput,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -42,10 +45,10 @@ const statusOptions = [
 ];
 
 const priorityOptions = [
-  { value: "LOW", label: "Low" },
-  { value: "MEDIUM", label: "Medium" },
-  { value: "HIGH", label: "High" },
-  { value: "URGENT", label: "Urgent" },
+  { value: "LOW", label: "Low", color: "gray" },
+  { value: "MEDIUM", label: "Medium", color: "yellow" },
+  { value: "HIGH", label: "High", color: "orange" },
+  { value: "URGENT", label: "Urgent", color: "red" },
 ];
 
 type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
@@ -274,6 +277,16 @@ export default function TasksList() {
             accessor: "priority",
             title: "Priority",
             sortable: true,
+            render: (row) => {
+              const priority = priorityOptions.find(
+                (p) => p.value === row.priority,
+              );
+              return (
+                <Badge color={priority?.color} variant="transparent">
+                  {row.priority}
+                </Badge>
+              );
+            },
           },
           {
             accessor: "project.name",
@@ -292,12 +305,19 @@ export default function TasksList() {
             render: (row) =>
               row.dueDate ? dayjs(row.dueDate).format("DD MMM YYYY") : "-",
           },
-          // {
-          //   accessor: "createdAt",
-          //   title: "Created At",
-          //   sortable: true,
-          //   render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
-          // },
+          {
+            accessor: "assignees",
+            title: "Assignees",
+            render: (row) => (
+              <Avatar.Group>
+                {row.assignees.map((assignee) => (
+                  <Tooltip key={assignee.id} label={assignee.name} withArrow>
+                    <Avatar key={assignee.id} name={assignee.name} size="sm" />
+                  </Tooltip>
+                ))}
+              </Avatar.Group>
+            ),
+          },
           {
             accessor: "actions",
             title: "",
