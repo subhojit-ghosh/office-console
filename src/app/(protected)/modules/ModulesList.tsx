@@ -172,7 +172,24 @@ export default function ModulesList() {
         sortStatus={sortStatus}
         onSortStatusChange={setSortStatus}
         columns={[
-          { accessor: "name", title: "Name", sortable: true },
+          {
+            accessor: "name",
+            title: "Name",
+            sortable: true,
+            render: (row) => (
+              <Button
+                variant="transparent"
+                p={0}
+                onClick={() => {
+                  setFormMode("edit");
+                  setFormData(row);
+                  setFormOpened(true);
+                }}
+              >
+                {row.name}
+              </Button>
+            ),
+          },
           {
             accessor: "tasksCount",
             title: "Tasks",
