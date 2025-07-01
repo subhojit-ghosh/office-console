@@ -63,6 +63,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
   useEffect(() => {
     if (mode === "add") {
       form.reset();
+      form.setFieldValue("status", "TODO");
     }
     if (mode === "edit" && initialData) {
       console.log(initialData.assignees);

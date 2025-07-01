@@ -316,8 +316,15 @@ export default function TasksList() {
             accessor: "dueDate",
             title: "Due Date",
             sortable: true,
-            render: (row) =>
-              row.dueDate ? dayjs(row.dueDate).format("DD MMM YYYY") : "-",
+            render: (row) => {
+              if (!row.dueDate) return "-";
+              const isOverdue = dayjs(row.dueDate).isBefore(dayjs(), "day");
+              return (
+                <span style={isOverdue ? { color: "red" } : undefined}>
+                  {dayjs(row.dueDate).format("DD MMM YYYY")}
+                </span>
+              );
+            },
           },
           {
             accessor: "assignees",

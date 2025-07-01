@@ -233,17 +233,6 @@ export default function ModulesList() {
                 </Menu.Target>
                 <Menu.Dropdown>
                   <Menu.Item
-                    color="blue"
-                    leftSection={<IconEdit size={14} />}
-                    onClick={() => {
-                      setFormMode("edit");
-                      setFormData(row);
-                      setFormOpened(true);
-                    }}
-                  >
-                    Edit
-                  </Menu.Item>
-                  <Menu.Item
                     color="red"
                     leftSection={<IconTrash size={14} />}
                     onClick={() => deleteConfirmation(row)}
