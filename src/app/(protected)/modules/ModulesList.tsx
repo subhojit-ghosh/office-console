@@ -17,22 +17,21 @@ import { notifications } from "@mantine/notifications";
 import type { Module } from "@prisma/client";
 import {
   IconDotsVertical,
-  IconEdit,
   IconPlus,
   IconSearch,
   IconTrash,
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
-import type { AppRouter } from "~/server/api/root";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { FaCubes } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
+import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ModuleForm from "./ModuleForm";
-import { FaCubes } from "react-icons/fa";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 type ModulesResponse = inferRouterOutputs<AppRouter>["modules"]["getAll"];
 

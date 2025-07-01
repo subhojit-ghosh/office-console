@@ -66,7 +66,6 @@ export default function ProjectsList() {
     300,
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const searchParams = useSearchParams();
 
   useEffect(() => {
