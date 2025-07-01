@@ -20,6 +20,7 @@ export const tasksRouter = createTRPCRouter({
       const status = input.status;
       const projectId = input.projectId;
       const moduleId = input.moduleId;
+      const assignedToMe = input.assignedToMe;
 
       let projectIds: string[] = [];
 
@@ -42,6 +43,13 @@ export const tasksRouter = createTRPCRouter({
         ...(status ? { status } : {}),
         ...(projectIds.length ? { projectId: { in: projectIds } } : {}),
         ...(moduleId ? { moduleId } : {}),
+        ...(assignedToMe
+          ? {
+              assignees: {
+                some: { id: ctx.session.user.id },
+              },
+            }
+          : {}),
       };
 
       const [tasks, total] = await Promise.all([

@@ -29,6 +29,7 @@ export const getAllTasksSchema = z.object({
     .optional(),
   projectId: z.string().optional(),
   moduleId: z.string().optional(),
+  assignedToMe: z.boolean().default(false).optional(),
 });
 
 export const createTaskSchema = z.object({
