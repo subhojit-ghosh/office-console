@@ -203,7 +203,7 @@ export default function ProjectForm({
               </Grid.Col>
               <Grid.Col span={12}>
                 <NumberInput
-                  label="Time Display Multiplier"
+                  label="Time Display Multiplier (Leave empty to inherit)"
                   description="This multiplier adjusts how tracked time is shown in the client view. For example: 1 shows the actual time, 2 doubles it, 0.5 shows half, and 3 triples it."
                   decimalScale={2}
                   {...form.getInputProps("timeDisplayMultiplier")}
