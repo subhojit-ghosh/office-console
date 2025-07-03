@@ -75,21 +75,30 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
 
   const loadDataForEdit = async () => {
     if (!id) return;
-    setEditDataLoading(true);
-    const projectDetail = await apiClient.projects.getById.query({ id });
-    if (projectDetail) {
-      form.setValues({
-        id: projectDetail.id,
-        name: projectDetail.name,
-        description: projectDetail.description ?? "",
-        status: projectDetail.status,
-        clientId: projectDetail.clientId ?? "",
-        timeDisplayMultiplier: projectDetail.timeDisplayMultiplier
-          ? Number(projectDetail.timeDisplayMultiplier)
-          : null,
+    try {
+      setEditDataLoading(true);
+      const projectDetail = await apiClient.projects.getById.query({ id });
+      if (projectDetail) {
+        form.setValues({
+          id: projectDetail.id,
+          name: projectDetail.name,
+          description: projectDetail.description ?? "",
+          status: projectDetail.status,
+          clientId: projectDetail.clientId ?? "",
+          timeDisplayMultiplier: projectDetail.timeDisplayMultiplier
+            ? Number(projectDetail.timeDisplayMultiplier)
+            : null,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading project details:", error);
+      notifications.show({
+        message: "Failed to load project details.",
+        color: "red",
       });
+    } finally {
+      setEditDataLoading(false);
     }
-    setEditDataLoading(false);
   };
 
   const createProject = api.projects.create.useMutation({

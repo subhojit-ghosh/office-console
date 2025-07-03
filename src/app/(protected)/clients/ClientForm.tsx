@@ -60,17 +60,26 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
 
   const loadDataForEdit = async () => {
     if (!id) return;
-    setEditDataLoading(true);
-    const clientDetail = await apiClient.clients.getById.query({ id });
-    if (clientDetail) {
-      form.setValues({
-        id: clientDetail.id,
-        name: clientDetail.name,
-        timeDisplayMultiplier: Number(clientDetail.timeDisplayMultiplier),
-        showAssignees: clientDetail.showAssignees,
+    try {
+      setEditDataLoading(true);
+      const clientDetail = await apiClient.clients.getById.query({ id });
+      if (clientDetail) {
+        form.setValues({
+          id: clientDetail.id,
+          name: clientDetail.name,
+          timeDisplayMultiplier: Number(clientDetail.timeDisplayMultiplier),
+          showAssignees: clientDetail.showAssignees,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading client details:", error);
+      notifications.show({
+        message: "Failed to load client details.",
+        color: "red",
       });
+    } finally {
+      setEditDataLoading(false);
     }
-    setEditDataLoading(false);
   };
 
   const createClient = api.clients.create.useMutation({

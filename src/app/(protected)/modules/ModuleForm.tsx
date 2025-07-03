@@ -82,6 +82,12 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
             : null,
         });
       }
+    } catch (error) {
+      console.error("Error loading module details:", error);
+      notifications.show({
+        message: "Failed to load module details.",
+        color: "red",
+      });
     } finally {
       setEditDataLoading(false);
     }

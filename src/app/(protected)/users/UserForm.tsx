@@ -109,19 +109,28 @@ export default function UserForm({ mode, opened, close, id }: Props) {
 
   const loadDataForEdit = async () => {
     if (!id) return;
-    setEditDataLoading(true);
-    const userDetail = await apiClient.users.getById.query({ id });
-    if (userDetail) {
-      form.setValues({
-        id: userDetail.id,
-        name: userDetail.name,
-        email: userDetail.email,
-        role: userDetail.role,
-        isActive: userDetail.isActive,
-        clientId: userDetail.clientId ?? "",
+    try {
+      setEditDataLoading(true);
+      const userDetail = await apiClient.users.getById.query({ id });
+      if (userDetail) {
+        form.setValues({
+          id: userDetail.id,
+          name: userDetail.name,
+          email: userDetail.email,
+          role: userDetail.role,
+          clientId: userDetail.clientId ?? "",
+          isActive: userDetail.isActive,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading user details:", error);
+      notifications.show({
+        message: "Failed to load user details.",
+        color: "red",
       });
+    } finally {
+      setEditDataLoading(false);
     }
-    setEditDataLoading(false);
   };
 
   const handleSubmit = (values: typeof form.values) => {
