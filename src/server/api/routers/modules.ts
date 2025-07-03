@@ -47,7 +47,12 @@ export const modulesRouter = createTRPCRouter({
           skip: (page - 1) * pageSize,
           take: pageSize,
           include: {
-            project: true,
+            project: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             createdBy: true,
             _count: {
               select: { tasks: true },

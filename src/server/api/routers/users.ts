@@ -44,13 +44,6 @@ export const usersRouter = createTRPCRouter({
           orderBy: { [sortBy]: sortOrder },
           skip: (page - 1) * pageSize,
           take: pageSize,
-          include: {
-            staffProfile: true,
-            projects: true,
-            createdTasks: true,
-            assignedTasks: true,
-            client: true,
-          },
         }),
         ctx.db.user.count({ where }),
       ]);
