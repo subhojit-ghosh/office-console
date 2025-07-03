@@ -41,8 +41,8 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       description: "",
       status: "PENDING",
       priority: "MEDIUM",
-      projectId: "",
-      moduleId: "",
+      projectId: null as string | null,
+      moduleId: null as string | null,
       assigneeIds: [] as string[],
       dueDate: undefined,
     },
@@ -110,20 +110,15 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
     }
   };
 
-  useEffect(() => {
-    form.setFieldValue("moduleId", "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.values.projectId]);
-
   const createTask = api.tasks.create.useMutation({
     onSuccess: async () => {
       notifications.show({
         message: "Task has been created successfully.",
         color: "green",
       });
-      await utils.tasks.getAll.invalidate();
       setLoading(false);
       close();
+      void utils.tasks.getAll.invalidate();
     },
     onError: (error) => {
       notifications.show({
@@ -141,7 +136,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
         message: "Task has been updated successfully.",
         color: "green",
       });
-      await utils.tasks.getAll.invalidate();
+      void utils.tasks.getAll.invalidate();
       setLoading(false);
       close();
     },
@@ -257,6 +252,10 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                     })) ?? []
                   }
                   {...form.getInputProps("projectId")}
+                  onChange={(value) => {
+                    form.setFieldValue("moduleId", null);
+                    form.setFieldValue("projectId", value);
+                  }}
                   disabled={loading || projectsQuery.isLoading}
                   searchable
                   withAsterisk
@@ -278,7 +277,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   }
                   {...form.getInputProps("moduleId")}
                   disabled={loading || modulesQuery.isLoading}
-                  searchable
+                  // searchable
                   placeholder={
                     modulesQuery.isLoading
                       ? "Loading modules..."

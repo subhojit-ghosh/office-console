@@ -65,7 +65,7 @@ export default function UsersList() {
 
   const deleteUser = api.users.delete.useMutation({
     onSuccess: async () => {
-      await utils.users.getAll.invalidate();
+      void utils.users.getAll.invalidate();
       notifications.show({
         message: "User deleted successfully",
         color: "green",

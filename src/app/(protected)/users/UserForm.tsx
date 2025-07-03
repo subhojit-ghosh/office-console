@@ -70,7 +70,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
         message: "User has been created successfully.",
         color: "green",
       });
-      await utils.users.getAll.invalidate();
+      void utils.users.getAll.invalidate();
       setLoading(false);
       close();
     },
@@ -93,7 +93,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
         message: "User has been updated successfully.",
         color: "green",
       });
-      await utils.users.getAll.invalidate();
+      void utils.users.getAll.invalidate();
       setLoading(false);
       close();
     },

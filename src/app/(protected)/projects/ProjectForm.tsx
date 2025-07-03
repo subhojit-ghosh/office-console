@@ -107,7 +107,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
         message: "Project has been created successfully.",
         color: "green",
       });
-      await utils.projects.getAll.invalidate();
+      void utils.projects.getAll.invalidate();
       setLoading(false);
       close();
     },
@@ -127,7 +127,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
         message: "Project has been updated successfully.",
         color: "green",
       });
-      await utils.projects.getAll.invalidate();
+      void utils.projects.getAll.invalidate();
       setLoading(false);
       close();
     },

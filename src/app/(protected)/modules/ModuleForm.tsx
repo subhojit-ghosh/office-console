@@ -99,7 +99,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
         message: "Module has been created successfully.",
         color: "green",
       });
-      await utils.modules.getAll.invalidate();
+      void utils.modules.getAll.invalidate();
       setLoading(false);
       close();
     },
@@ -119,7 +119,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
         message: "Module has been updated successfully.",
         color: "green",
       });
-      await utils.modules.getAll.invalidate();
+      void utils.modules.getAll.invalidate();
       setLoading(false);
       close();
     },

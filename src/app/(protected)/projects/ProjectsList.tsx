@@ -90,7 +90,7 @@ export default function ProjectsList() {
 
   const deleteProject = api.projects.delete.useMutation({
     onSuccess: async () => {
-      await utils.projects.getAll.invalidate();
+      void utils.projects.getAll.invalidate();
       notifications.show({
         message: "Project deleted successfully",
         color: "green",

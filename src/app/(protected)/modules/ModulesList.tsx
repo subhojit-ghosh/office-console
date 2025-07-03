@@ -81,7 +81,7 @@ export default function ModulesList() {
 
   const deleteModule = api.modules.delete.useMutation({
     onSuccess: async () => {
-      await utils.modules.getAll.invalidate();
+      void utils.modules.getAll.invalidate();
       notifications.show({
         message: "Module deleted successfully",
         color: "green",

@@ -88,7 +88,7 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
         message: "Client has been created successfully.",
         color: "green",
       });
-      await utils.clients.getAll.invalidate();
+      void utils.clients.getAll.invalidate();
       form.reset();
       close();
     },
@@ -106,7 +106,7 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
         message: "Client has been updated successfully.",
         color: "green",
       });
-      await utils.clients.getAll.invalidate();
+      void utils.clients.getAll.invalidate();
       form.reset();
       close();
     },

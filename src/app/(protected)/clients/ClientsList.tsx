@@ -62,7 +62,7 @@ export default function ClientsList() {
 
   const deleteClient = api.clients.delete.useMutation({
     onSuccess: async () => {
-      await utils.clients.getAll.invalidate();
+      void utils.clients.getAll.invalidate();
       notifications.show({
         message: "Client deleted successfully",
         color: "green",

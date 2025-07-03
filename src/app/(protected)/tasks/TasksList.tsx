@@ -135,7 +135,7 @@ export default function TasksList() {
 
   const deleteTask = api.tasks.delete.useMutation({
     onSuccess: async () => {
-      await utils.tasks.getAll.invalidate();
+      void utils.tasks.getAll.invalidate();
       notifications.show({
         message: "Task deleted successfully",
         color: "green",
