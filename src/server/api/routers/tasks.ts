@@ -3,6 +3,7 @@ import {
   createTaskSchema,
   deleteTaskSchema,
   getAllTasksSchema,
+  getTaskByIdSchema,
   updateTaskSchema,
 } from "~/schemas/task.schema";
 import { sanitizeInputSchema } from "~/utils/zod-helpers";
@@ -92,7 +93,6 @@ export const tasksRouter = createTRPCRouter({
                 name: true,
               },
             },
-            // description is intentionally omitted
           },
         }),
         ctx.db.task.count({ where }),
@@ -105,6 +105,20 @@ export const tasksRouter = createTRPCRouter({
         pageSize,
         totalPages: Math.ceil(total / pageSize),
       };
+    }),
+
+  getById: protectedProcedure
+    .input(getTaskByIdSchema)
+    .query(async ({ ctx, input }) => {
+      return ctx.db.task.findUnique({
+        where: { id: input.id },
+        include: {
+          project: true,
+          module: true,
+          createdBy: true,
+          assignees: true,
+        },
+      });
     }),
 
   create: protectedProcedure

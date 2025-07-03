@@ -64,9 +64,7 @@ export default function TasksList() {
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [formData, setFormData] = useState<TasksResponse["tasks"][0] | null>(
-    null,
-  );
+  const [editId, setEditId] = useState<string | null>(null);
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<TasksResponse["tasks"][0]>
   >({
@@ -295,7 +293,7 @@ export default function TasksList() {
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             setFormMode("add");
-            setFormData(null);
+            setEditId(null);
             setFormOpened(true);
           }}
         >
@@ -327,7 +325,7 @@ export default function TasksList() {
                   p={0}
                   onClick={() => {
                     setFormMode("edit");
-                    setFormData(row);
+                    setEditId(row.id);
                     setFormOpened(true);
                   }}
                 >
@@ -430,9 +428,12 @@ export default function TasksList() {
       />
       <TaskForm
         opened={formOpened}
-        close={() => setFormOpened(false)}
+        close={() => {
+          setFormOpened(false);
+          setEditId(null);
+        }}
         mode={formMode}
-        initialData={formData}
+        id={editId}
       />
     </>
   );

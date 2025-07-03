@@ -4,6 +4,7 @@ import {
   Button,
   Grid,
   Group,
+  LoadingOverlay,
   Modal,
   MultiSelect,
   Select,
@@ -13,28 +14,25 @@ import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { UserRole, type Task } from "@prisma/client";
-import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
 import { createTaskSchema, updateTaskSchema } from "~/schemas/task.schema";
-import type { AppRouter } from "~/server/api/root";
-import { api } from "~/trpc/react";
-
-type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
+import { api, apiClient } from "~/trpc/react";
 
 interface Props {
   mode: "add" | "edit";
   opened: boolean;
   close: () => void;
-  initialData?: TasksResponse["tasks"][0] | null;
+  id?: string | null;
 }
 
-export default function TaskForm({ mode, opened, close, initialData }: Props) {
+export default function TaskForm({ mode, opened, close, id }: Props) {
   const utils = api.useUtils();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
+  const [editDataLoading, setEditDataLoading] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -45,7 +43,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
       priority: "MEDIUM",
       projectId: "",
       moduleId: "",
-      assigneeIds: [],
+      assigneeIds: [] as string[],
       dueDate: undefined,
     },
     validate: zodResolver(mode === "add" ? createTaskSchema : updateTaskSchema),
@@ -74,22 +72,43 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
       form.reset();
       form.setFieldValue("status", "TODO");
     }
-    if (mode === "edit" && initialData) {
-      console.log(initialData.assignees);
-      form.setValues({
-        id: initialData.id,
-        title: initialData.title,
-        description: initialData.description ?? "",
-        status: initialData.status ?? "PENDING",
-        priority: initialData.priority ?? "MEDIUM",
-        projectId: initialData.projectId,
-        moduleId: initialData.moduleId ?? "",
-        assigneeIds: (initialData.assignees.map((u) => u.id) as never[]) ?? [],
-        dueDate: initialData.dueDate as never,
-      });
+    if (mode === "edit") {
+      form.reset();
+      void loadDataForEdit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, initialData, opened]);
+  }, [mode, id, opened]);
+
+  const loadDataForEdit = async () => {
+    if (!id) return;
+    try {
+      setEditDataLoading(true);
+      const taskDetail = await apiClient.tasks.getById.query({ id });
+      if (taskDetail) {
+        form.setValues({
+          id: taskDetail.id,
+          title: taskDetail.title,
+          description: taskDetail.description ?? "",
+          status: taskDetail.status ?? "PENDING",
+          priority: taskDetail.priority ?? "MEDIUM",
+          projectId: taskDetail.projectId,
+          moduleId: taskDetail.moduleId ?? "",
+          assigneeIds: Array.isArray(taskDetail.assignees)
+            ? taskDetail.assignees.map((u: { id: string }) => u.id)
+            : [],
+          dueDate: taskDetail.dueDate as never,
+        });
+      }
+    } catch (error) {
+      notifications.show({
+        title: "Error",
+        message: "Failed to load task details.",
+        color: "red",
+      });
+    } finally {
+      setEditDataLoading(false);
+    }
+  };
 
   useEffect(() => {
     form.setFieldValue("moduleId", "");
@@ -149,7 +168,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
         assigneeIds: values.assigneeIds,
         dueDate: values.dueDate,
       });
-    } else if (mode === "edit" && initialData) {
+    } else if (mode === "edit" && id) {
       updateTask.mutate({
         id: values.id,
         title: values.title,
@@ -172,6 +191,7 @@ export default function TaskForm({ mode, opened, close, initialData }: Props) {
       centered
       size="80%"
     >
+      <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
           <Grid.Col span={9}>

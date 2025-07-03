@@ -33,6 +33,10 @@ export const getAllTasksSchema = z.object({
   assignedToMe: z.boolean().default(false).optional(),
 });
 
+export const getTaskByIdSchema = z.object({
+  id: z.string().nonempty("ID is required"),
+});
+
 export const createTaskSchema = z.object({
   title: z.string().nonempty("Title is required"),
   description: z.string().optional().nullable(),
