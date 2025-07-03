@@ -4,6 +4,7 @@ import {
   Button,
   Grid,
   Group,
+  LoadingOverlay,
   Modal,
   PasswordInput,
   Select,
@@ -17,7 +18,7 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
 import { createUserSchema, updateUserSchema } from "~/schemas/user.schema";
 
-import { api } from "~/trpc/react";
+import { api, apiClient } from "~/trpc/react";
 
 export const userRoleOptions = [
   { value: "ADMIN", label: "Admin" },
@@ -29,11 +30,12 @@ interface Props {
   mode: "add" | "edit";
   opened: boolean;
   close: () => void;
-  initialData?: User | null;
+  id?: string | null;
 }
 
-export default function UserForm({ mode, opened, close, initialData }: Props) {
+export default function UserForm({ mode, opened, close, id }: Props) {
   const utils = api.useUtils();
+  const [editDataLoading, setEditDataLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
@@ -55,19 +57,11 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
     if (mode === "add") {
       form.reset();
     }
-    if (mode === "edit" && initialData) {
-      form.setValues({
-        id: initialData.id,
-        name: initialData.name,
-        email: initialData.email,
-        role: initialData.role,
-        password: "",
-        isActive: initialData.isActive,
-        clientId: initialData.clientId ?? undefined,
-      });
+    if (mode === "edit") {
+      void loadDataForEdit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, initialData, opened]);
+  }, [mode, id, opened]);
 
   const createUser = api.users.create.useMutation({
     onSuccess: async () => {
@@ -80,12 +74,10 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
       close();
     },
     onError: (error) => {
-      console.log(JSON.parse(JSON.stringify(error)));
       const zodErrors = error.shape?.data?.zodError;
 
       if (zodErrors) {
         const fieldErrors = Object.entries(zodErrors.fieldErrors);
-        console.log("Zod Errors:", fieldErrors);
         fieldErrors.forEach(([field, messages]) => {
           form.setFieldError(field, messages ? messages[0] : "Invalid input");
         });
@@ -114,6 +106,23 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
     },
   });
 
+  const loadDataForEdit = async () => {
+    if (!id) return;
+    setEditDataLoading(true);
+    const userDetail = await apiClient.users.getById.query({ id });
+    if (userDetail) {
+      form.setValues({
+        id: userDetail.id,
+        name: userDetail.name,
+        email: userDetail.email,
+        role: userDetail.role,
+        isActive: userDetail.isActive,
+        clientId: userDetail.clientId ?? "",
+      });
+    }
+    setEditDataLoading(false);
+  };
+
   const handleSubmit = (values: typeof form.values) => {
     setLoading(true);
     if (mode === "add") {
@@ -125,7 +134,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
         isActive: values.isActive,
         clientId: values.role === UserRole.CLIENT ? values.clientId : undefined,
       });
-    } else if (mode === "edit" && initialData) {
+    } else if (mode === "edit" && id) {
       updateUser.mutate({
         id: values.id,
         name: values.name,
@@ -145,6 +154,7 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
       title={mode === "add" ? "Add User" : "Edit User"}
       centered
     >
+      <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
           <Grid.Col span={12}>
@@ -197,6 +207,9 @@ export default function UserForm({ mode, opened, close, initialData }: Props) {
           <Grid.Col span={12}>
             <PasswordInput
               label="Password"
+              placeholder={
+                mode === "edit" ? "Leave blank to keep current password" : ""
+              }
               {...form.getInputProps("password")}
               withAsterisk={mode === "add"}
               disabled={loading}

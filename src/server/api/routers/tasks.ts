@@ -20,6 +20,7 @@ export const tasksRouter = createTRPCRouter({
       const status = input.status;
       const projectId = input.projectId;
       const moduleId = input.moduleId;
+      const priority = input.priority;
       const assignedToMe = input.assignedToMe;
 
       let projectIds: string[] = [];
@@ -43,6 +44,7 @@ export const tasksRouter = createTRPCRouter({
         ...(status ? { status } : {}),
         ...(projectIds.length ? { projectId: { in: projectIds } } : {}),
         ...(moduleId ? { moduleId } : {}),
+        ...(priority ? { priority } : {}),
         ...(assignedToMe
           ? {
               assignees: {
@@ -58,7 +60,14 @@ export const tasksRouter = createTRPCRouter({
           orderBy: { [sortBy]: sortOrder },
           skip: (page - 1) * pageSize,
           take: pageSize,
-          include: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            priority: true,
+            dueDate: true,
+            createdAt: true,
+            updatedAt: true,
             project: {
               select: {
                 id: true,
@@ -83,6 +92,7 @@ export const tasksRouter = createTRPCRouter({
                 name: true,
               },
             },
+            // description is intentionally omitted
           },
         }),
         ctx.db.task.count({ where }),

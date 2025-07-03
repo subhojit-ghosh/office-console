@@ -40,7 +40,7 @@ export default function UsersList() {
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [formData, setFormData] = useState<User | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<UsersResponse["users"][0]>
   >({
@@ -128,7 +128,7 @@ export default function UsersList() {
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             setFormMode("add");
-            setFormData(null);
+            setEditId(null);
             setFormOpened(true);
           }}
         >
@@ -177,7 +177,7 @@ export default function UsersList() {
                     leftSection={<IconEdit size={14} />}
                     onClick={() => {
                       setFormMode("edit");
-                      setFormData(row);
+                      setEditId(row.id);
                       setFormOpened(true);
                     }}
                   >
@@ -200,7 +200,7 @@ export default function UsersList() {
         opened={formOpened}
         close={() => setFormOpened(false)}
         mode={formMode}
-        initialData={formData}
+        id={editId}
       />
     </>
   );

@@ -27,6 +27,7 @@ export const getAllTasksSchema = z.object({
       "CANCELED",
     ])
     .optional(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
   projectId: z.string().optional(),
   moduleId: z.string().optional(),
   assignedToMe: z.boolean().default(false).optional(),

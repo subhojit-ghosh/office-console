@@ -70,7 +70,7 @@ export default function TasksList() {
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<TasksResponse["tasks"][0]>
   >({
-    columnAccessor: "title",
+    columnAccessor: "dueDate",
     direction: "asc",
   });
   const [filters, setFilters] = useDebouncedState(
@@ -129,6 +129,7 @@ export default function TasksList() {
     status: (filters.status as Task["status"]) || undefined,
     projectId: filters.projectId || undefined,
     moduleId: filters.moduleId || undefined,
+    priority: (filters.priority as Task["priority"]) || undefined,
     assignedToMe: filters.assignedToMe,
     sortBy: sortStatus.columnAccessor,
     sortOrder: sortStatus.direction,
@@ -173,6 +174,14 @@ export default function TasksList() {
         <Group gap="xs">
           <FaTasks />
           <Title size="lg">Tasks</Title>
+          {/* <Button.Group ml="md">
+            <Button variant="filled" size="xs">
+              Pending
+            </Button>
+            <Button variant="default" size="xs">
+              Completed
+            </Button>
+          </Button.Group> */}
           <TextInput
             size="xs"
             ml="md"
@@ -356,14 +365,14 @@ export default function TasksList() {
             },
           },
           {
-            accessor: "project.name",
-            title: "Project",
-            render: (t) => t.project?.name ?? "-",
-          },
-          {
             accessor: "module.name",
             title: "Module",
             render: (t) => t.module?.name ?? "-",
+          },
+          {
+            accessor: "project.name",
+            title: "Project",
+            render: (t) => t.project?.name ?? "-",
           },
           {
             accessor: "dueDate",

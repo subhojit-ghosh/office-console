@@ -3,10 +3,10 @@ import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import {
   createUserSchema,
-  updateUserSchema,
+  deleteUserSchema,
   getAllUsersSchema,
   getUserByIdSchema,
-  deleteUserSchema,
+  updateUserSchema,
 } from "~/schemas/user.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -44,6 +44,15 @@ export const usersRouter = createTRPCRouter({
           orderBy: { [sortBy]: sortOrder },
           skip: (page - 1) * pageSize,
           take: pageSize,
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+          },
         }),
         ctx.db.user.count({ where }),
       ]);
@@ -62,7 +71,15 @@ export const usersRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return ctx.db.user.findUnique({
         where: { id: input.id },
-        include: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          clientId: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
           staffProfile: true,
           projects: true,
           createdTasks: true,
