@@ -4,6 +4,7 @@ import {
   Button,
   Grid,
   Group,
+  LoadingOverlay,
   Modal,
   NumberInput,
   Select,
@@ -20,7 +21,7 @@ import {
   createProjectSchema,
   updateProjectSchema,
 } from "~/schemas/project.schema";
-import { api } from "~/trpc/react";
+import { api, apiClient } from "~/trpc/react";
 
 const statusOptions = [
   { value: "ONGOING", label: "Ongoing" },
@@ -33,18 +34,14 @@ interface Props {
   mode: "add" | "edit";
   opened: boolean;
   close: () => void;
-  initialData?: Project | null;
+  id?: string | null;
 }
 
-export default function ProjectForm({
-  mode,
-  opened,
-  close,
-  initialData,
-}: Props) {
+export default function ProjectForm({ mode, opened, close, id }: Props) {
   const utils = api.useUtils();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
+  const [editDataLoading, setEditDataLoading] = useState(false);
 
   const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
 
@@ -69,20 +66,31 @@ export default function ProjectForm({
         form.setFieldValue("clientId", session.user.clientId);
       }
     }
-    if (mode === "edit" && initialData) {
+    if (mode === "edit") {
+      form.reset();
+      void loadDataForEdit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, id, opened]);
+
+  const loadDataForEdit = async () => {
+    if (!id) return;
+    setEditDataLoading(true);
+    const projectDetail = await apiClient.projects.getById.query({ id });
+    if (projectDetail) {
       form.setValues({
-        id: initialData.id,
-        name: initialData.name,
-        description: initialData.description ?? "",
-        status: initialData.status,
-        clientId: initialData.clientId ?? "",
-        timeDisplayMultiplier: initialData.timeDisplayMultiplier
-          ? Number(initialData.timeDisplayMultiplier)
+        id: projectDetail.id,
+        name: projectDetail.name,
+        description: projectDetail.description ?? "",
+        status: projectDetail.status,
+        clientId: projectDetail.clientId ?? "",
+        timeDisplayMultiplier: projectDetail.timeDisplayMultiplier
+          ? Number(projectDetail.timeDisplayMultiplier)
           : null,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, initialData, opened]);
+    setEditDataLoading(false);
+  };
 
   const createProject = api.projects.create.useMutation({
     onSuccess: async () => {
@@ -134,7 +142,7 @@ export default function ProjectForm({
         clientId: values.clientId ?? undefined,
         timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
-    } else if (mode === "edit" && initialData) {
+    } else if (mode === "edit" && id) {
       updateProject.mutate({
         id: values.id,
         name: values.name,
@@ -148,11 +156,15 @@ export default function ProjectForm({
 
   return (
     <Modal
-      opened={opened}
-      onClose={close}
-      title={mode === "add" ? "Add Project" : "Edit Project"}
       centered
+      opened={opened}
+      onClose={() => {
+        form.reset();
+        close();
+      }}
+      title={mode === "add" ? "Add Project" : "Edit Project"}
     >
+      <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
           <Grid.Col span={12}>

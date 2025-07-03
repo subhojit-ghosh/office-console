@@ -50,7 +50,7 @@ export default function ProjectsList() {
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [formData, setFormData] = useState<Project | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<ProjectsResponse["projects"][0]>
   >({
@@ -172,7 +172,7 @@ export default function ProjectsList() {
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             setFormMode("add");
-            setFormData(null);
+            setEditId(null);
             setFormOpened(true);
           }}
         >
@@ -199,7 +199,7 @@ export default function ProjectsList() {
                 p={0}
                 onClick={() => {
                   setFormMode("edit");
-                  setFormData(row);
+                  setEditId(row.id);
                   setFormOpened(true);
                 }}
               >
@@ -285,7 +285,7 @@ export default function ProjectsList() {
         opened={formOpened}
         close={() => setFormOpened(false)}
         mode={formMode}
-        initialData={formData}
+        id={editId}
       />
     </>
   );
