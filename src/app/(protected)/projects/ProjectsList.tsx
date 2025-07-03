@@ -241,6 +241,7 @@ export default function ProjectsList() {
           {
             accessor: "client.name",
             title: "Client",
+            hidden: session?.user.role === UserRole.CLIENT,
             render: (p) => p.client?.name ?? "-",
           },
           {
