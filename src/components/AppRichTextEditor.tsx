@@ -8,6 +8,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useEffect } from "react";
 
 interface Props {
   content?: string;
@@ -35,6 +36,12 @@ export default function AppRichTextEditor(props: Props) {
       }
     },
   });
+
+  useEffect(() => {
+    if (props.content && editor) {
+      editor.commands.setContent(props.content);
+    }
+  }, [props.content, editor]);
 
   return (
     <RichTextEditor editor={editor}>
