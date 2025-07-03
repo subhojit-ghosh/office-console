@@ -100,8 +100,8 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
         });
       }
     } catch (error) {
+      console.error("Error loading task details:", error);
       notifications.show({
-        title: "Error",
         message: "Failed to load task details.",
         color: "red",
       });
