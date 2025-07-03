@@ -4,6 +4,7 @@ import {
   Button,
   Grid,
   Group,
+  LoadingOverlay,
   Modal,
   NumberInput,
   Select,
@@ -12,7 +13,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { UserRole, type Module } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -21,23 +22,20 @@ import {
   updateModuleSchema,
 } from "~/schemas/module.schema";
 import { api } from "~/trpc/react";
+import { apiClient } from "~/trpc/react";
 
 interface Props {
   mode: "add" | "edit";
   opened: boolean;
   close: () => void;
-  initialData?: Module | null;
+  id?: string | null;
 }
 
-export default function ModuleForm({
-  mode,
-  opened,
-  close,
-  initialData,
-}: Props) {
+export default function ModuleForm({ mode, opened, close, id }: Props) {
   const utils = api.useUtils();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
+  const [editDataLoading, setEditDataLoading] = useState(false);
 
   const projectsQuery = api.projects.getAll.useQuery({
     page: 1,
@@ -61,19 +59,33 @@ export default function ModuleForm({
     if (mode === "add") {
       form.reset();
     }
-    if (mode === "edit" && initialData) {
-      form.setValues({
-        id: initialData.id,
-        name: initialData.name,
-        description: initialData.description ?? "",
-        projectId: initialData.projectId ?? "",
-        timeDisplayMultiplier: initialData.timeDisplayMultiplier
-          ? Number(initialData.timeDisplayMultiplier)
-          : null,
-      });
+    if (mode === "edit") {
+      form.reset();
+      void loadDataForEdit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, initialData, opened]);
+  }, [mode, id, opened]);
+
+  const loadDataForEdit = async () => {
+    if (!id) return;
+    try {
+      setEditDataLoading(true);
+      const moduleDetail = await apiClient.modules.getById.query({ id });
+      if (moduleDetail) {
+        form.setValues({
+          id: moduleDetail.id,
+          name: moduleDetail.name,
+          description: moduleDetail.description ?? "",
+          projectId: moduleDetail.projectId ?? "",
+          timeDisplayMultiplier: moduleDetail.timeDisplayMultiplier
+            ? Number(moduleDetail.timeDisplayMultiplier)
+            : null,
+        });
+      }
+    } finally {
+      setEditDataLoading(false);
+    }
+  };
 
   const createModule = api.modules.create.useMutation({
     onSuccess: async () => {
@@ -124,7 +136,7 @@ export default function ModuleForm({
         projectId: values.projectId,
         timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
-    } else if (mode === "edit" && initialData) {
+    } else if (mode === "edit" && id) {
       updateModule.mutate({
         id: values.id,
         name: values.name,
@@ -142,6 +154,7 @@ export default function ModuleForm({
       title={mode === "add" ? "Add Module" : "Edit Module"}
       centered
     >
+      <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
           <Grid.Col span={12}>

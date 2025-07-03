@@ -14,7 +14,6 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { Module } from "@prisma/client";
 import {
   IconDotsVertical,
   IconPlus,
@@ -41,7 +40,7 @@ export default function ModulesList() {
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [formData, setFormData] = useState<Module | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<ModulesResponse["modules"][0]>
   >({
@@ -154,7 +153,7 @@ export default function ModulesList() {
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             setFormMode("add");
-            setFormData(null);
+            setEditId(null);
             setFormOpened(true);
           }}
         >
@@ -181,7 +180,7 @@ export default function ModulesList() {
                 p={0}
                 onClick={() => {
                   setFormMode("edit");
-                  setFormData(row);
+                  setEditId(row.id);
                   setFormOpened(true);
                 }}
               >
@@ -246,9 +245,12 @@ export default function ModulesList() {
       />
       <ModuleForm
         opened={formOpened}
-        close={() => setFormOpened(false)}
+        close={() => {
+          setFormOpened(false);
+          setEditId(null);
+        }}
         mode={formMode}
-        initialData={formData}
+        id={editId}
       />
     </>
   );
