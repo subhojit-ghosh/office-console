@@ -13,12 +13,13 @@ import {
 } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
+import { Analytics } from "@vercel/analytics/next";
 import { type Metadata } from "next";
 import { Outfit } from "next/font/google";
 
+import { env } from "~/env";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
-import { env } from "~/env";
 
 const theme = createTheme({
   fontFamily: "var(--font-outfit-sans)",
@@ -55,6 +56,7 @@ export default function RootLayout({
             </MantineProvider>
           </HydrateClient>
         </TRPCReactProvider>
+        <Analytics />
       </body>
     </html>
   );
