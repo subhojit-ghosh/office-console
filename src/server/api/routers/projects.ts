@@ -38,8 +38,18 @@ export const projectsRouter = createTRPCRouter({
           skip: (page - 1) * pageSize,
           take: pageSize,
           include: {
-            client: true,
-            createdBy: true,
+            client: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            createdBy: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             _count: {
               select: { modules: true, tasks: true },
             },

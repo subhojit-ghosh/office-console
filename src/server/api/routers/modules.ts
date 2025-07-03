@@ -53,7 +53,12 @@ export const modulesRouter = createTRPCRouter({
                 name: true,
               },
             },
-            createdBy: true,
+            createdBy: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             _count: {
               select: { tasks: true },
             },

@@ -59,10 +59,30 @@ export const tasksRouter = createTRPCRouter({
           skip: (page - 1) * pageSize,
           take: pageSize,
           include: {
-            project: true,
-            module: true,
-            createdBy: true,
-            assignees: true,
+            project: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            module: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            createdBy: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            assignees: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         }),
         ctx.db.task.count({ where }),
