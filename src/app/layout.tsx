@@ -18,6 +18,7 @@ import { Outfit } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
+import { env } from "~/env";
 
 const theme = createTheme({
   fontFamily: "var(--font-outfit-sans)",
@@ -25,7 +26,7 @@ const theme = createTheme({
 });
 
 export const metadata: Metadata = {
-  title: "Office Console",
+  title: env.NEXT_PUBLIC_APP_TITLE,
   description: "",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };

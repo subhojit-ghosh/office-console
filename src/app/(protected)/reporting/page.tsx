@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { env } from "~/env";
 
 export const metadata: Metadata = {
-  title: "Reporting - Office Console",
+  title: `Reporting - ${env.NEXT_PUBLIC_APP_TITLE}`,
 };
 
 export default async function ReportingPage() {

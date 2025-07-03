@@ -14,7 +14,7 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <AppShell
       navbar={{
-        width: 200,
+        width: 225,
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}

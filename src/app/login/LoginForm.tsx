@@ -19,6 +19,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
+import { env } from "~/env";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function LoginForm() {
   return (
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
-        Office Console
+        {env.NEXT_PUBLIC_APP_TITLE}
       </Title>
       <Paper withBorder shadow="sm" p={22} mt={30}>
         <form onSubmit={form.onSubmit(submitHandler)}>

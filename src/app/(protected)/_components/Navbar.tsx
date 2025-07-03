@@ -25,6 +25,7 @@ import { UserRole } from "@prisma/client";
 import classes from "./Navbar.module.css";
 import { UserButton } from "./UserButton";
 import { useMediaQuery } from "@mantine/hooks";
+import { env } from "~/env";
 
 interface NavbarProps {
   toggleMobile?: () => void;
@@ -40,7 +41,7 @@ export function Navbar({ toggleMobile }: NavbarProps) {
   const data = [
     { link: "/dashboard", label: "Dashboard", icon: IconHomeFilled },
     // { link: "/reporting", label: "Reporting", icon: BsBarChartLineFill },
-    { link: "/time", label: "Time", icon: BiSolidTimer },
+    // { link: "/time", label: "Time", icon: BiSolidTimer },
     { link: "/tasks", label: "Tasks", icon: FaTasks },
     { link: "/modules", label: "Modules", icon: FaCubes },
     { link: "/projects", label: "Projects", icon: IconFoldersFilled },
@@ -74,7 +75,7 @@ export function Navbar({ toggleMobile }: NavbarProps) {
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
         <Group className={classes.header} justify="space-between">
-          <Title size="lg">Office Console</Title>
+          <Title size="lg">{env.NEXT_PUBLIC_APP_TITLE}</Title>
           {isMobile ? (
             <ActionIcon onClick={toggleMobile} variant="default">
               <IconX size={18} />
