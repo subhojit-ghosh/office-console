@@ -4,6 +4,7 @@ import {
   Button,
   Grid,
   Group,
+  LoadingOverlay,
   Modal,
   NumberInput,
   Switch,
@@ -11,7 +12,6 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import type { Client } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
 
@@ -19,24 +19,20 @@ import {
   createClientSchema,
   updateClientSchema,
 } from "~/schemas/client.schema";
-import { api } from "~/trpc/react";
+import { api, apiClient } from "~/trpc/react";
 
 interface Props {
   mode: "add" | "edit";
   opened: boolean;
   close: () => void;
-  initialData?: Client | null;
+  id?: string | null;
 }
 
-export default function ClientForm({
-  mode,
-  opened,
-  close,
-  initialData,
-}: Props) {
+export default function ClientForm({ mode, opened, close, id }: Props) {
   const utils = api.useUtils();
 
   const [loading, setLoading] = useState(false);
+  const [editDataLoading, setEditDataLoading] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -55,16 +51,27 @@ export default function ClientForm({
       form.reset();
     }
 
-    if (mode === "edit" && initialData) {
-      form.setValues({
-        id: initialData.id,
-        name: initialData.name,
-        timeDisplayMultiplier: Number(initialData.timeDisplayMultiplier),
-        showAssignees: initialData.showAssignees,
-      });
+    if (mode === "edit") {
+      form.reset();
+      void loadDataForEdit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialData, mode, opened]);
+  }, [id, mode, opened]);
+
+  const loadDataForEdit = async () => {
+    if (!id) return;
+    setEditDataLoading(true);
+    const clientDetail = await apiClient.clients.getById.query({ id });
+    if (clientDetail) {
+      form.setValues({
+        id: clientDetail.id,
+        name: clientDetail.name,
+        timeDisplayMultiplier: Number(clientDetail.timeDisplayMultiplier),
+        showAssignees: clientDetail.showAssignees,
+      });
+    }
+    setEditDataLoading(false);
+  };
 
   const createClient = api.clients.create.useMutation({
     onSuccess: async () => {
@@ -110,7 +117,7 @@ export default function ClientForm({
         timeDisplayMultiplier: form.values.timeDisplayMultiplier,
         showAssignees: form.values.showAssignees,
       });
-    } else if (mode === "edit" && initialData) {
+    } else if (mode === "edit" && id) {
       updateClient.mutate({
         id: form.values.id,
         name: form.values.name,
@@ -130,6 +137,7 @@ export default function ClientForm({
       }}
       title={mode === "add" ? "Add Client" : "Edit Client"}
     >
+      <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(submitHandler)}>
         <Grid>
           <Grid.Col span={12}>

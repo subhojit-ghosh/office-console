@@ -58,6 +58,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
       form.reset();
     }
     if (mode === "edit") {
+      form.reset();
       void loadDataForEdit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

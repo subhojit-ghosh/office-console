@@ -12,7 +12,6 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { Client } from "@prisma/client";
 import {
   IconBriefcase,
   IconDotsVertical,
@@ -39,7 +38,7 @@ export default function ClientsList() {
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [formData, setFormData] = useState<Client | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<ClientsResponse["clients"][0]>
   >({
@@ -119,7 +118,7 @@ export default function ClientsList() {
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             setFormMode("add");
-            setFormData(null);
+            setEditId(null);
             setFormOpened(true);
           }}
         >
@@ -146,7 +145,7 @@ export default function ClientsList() {
                 p={0}
                 onClick={() => {
                   setFormMode("edit");
-                  setFormData(row);
+                  setEditId(row.id);
                   setFormOpened(true);
                 }}
               >
@@ -207,7 +206,7 @@ export default function ClientsList() {
         opened={formOpened}
         close={() => setFormOpened(false)}
         mode={formMode}
-        initialData={formData}
+        id={editId}
       />
     </>
   );

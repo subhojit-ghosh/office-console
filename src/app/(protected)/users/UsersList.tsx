@@ -16,7 +16,6 @@ import { notifications } from "@mantine/notifications";
 import type { User } from "@prisma/client";
 import {
   IconDotsVertical,
-  IconEdit,
   IconPlus,
   IconSearch,
   IconTrash,
@@ -145,7 +144,24 @@ export default function UsersList() {
         sortStatus={sortStatus}
         onSortStatusChange={setSortStatus}
         columns={[
-          { accessor: "name", title: "Name", sortable: true },
+          {
+            accessor: "name",
+            title: "Name",
+            sortable: true,
+            render: (row) => (
+              <Button
+                variant="transparent"
+                p={0}
+                onClick={() => {
+                  setFormMode("edit");
+                  setEditId(row.id);
+                  setFormOpened(true);
+                }}
+              >
+                {row.name}
+              </Button>
+            ),
+          },
           { accessor: "email", title: "Email", sortable: true },
           { accessor: "role", title: "Role", sortable: true },
           {
@@ -172,17 +188,6 @@ export default function UsersList() {
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item
-                    color="blue"
-                    leftSection={<IconEdit size={14} />}
-                    onClick={() => {
-                      setFormMode("edit");
-                      setEditId(row.id);
-                      setFormOpened(true);
-                    }}
-                  >
-                    Edit
-                  </Menu.Item>
                   <Menu.Item
                     color="red"
                     leftSection={<IconTrash size={14} />}
