@@ -3,4 +3,9 @@ onlyBuiltDependencies:
   - '@prisma/engines'
   - '@tailwindcss/oxide'
   - esbuild
+  - optipng-bin
+  - pngquant-bin
   - prisma
+  - sharp
+  - unrs-resolver
+  - zopflipng-bin
