@@ -37,23 +37,12 @@ import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import TaskForm from "./TaskForm";
-
-const statusOptions = [
-  { value: "BACKLOG", label: "Backlog", color: "gray" },
-  { value: "TODO", label: "To Do", color: "violet" },
-  { value: "IN_PROGRESS", label: "In Progress", color: "yellow" },
-  { value: "IN_REVIEW", label: "In Review", color: "violet" },
-  { value: "BLOCKED", label: "Blocked", color: "red" },
-  { value: "DONE", label: "Done", color: "green" },
-  { value: "CANCELED", label: "Canceled", color: "pink" },
-];
-
-const priorityOptions = [
-  { value: "LOW", label: "Low", color: "gray" },
-  { value: "MEDIUM", label: "Medium", color: "teal" },
-  { value: "HIGH", label: "High", color: "orange" },
-  { value: "URGENT", label: "Urgent", color: "red" },
-];
+import {
+  TASK_PRIORITY_OPTIONS,
+  TASK_STATUS_FILTERS,
+  TASK_STATUS_OPTIONS,
+  type TaskStatus,
+} from "~/constants/task.constant";
 
 type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
 
@@ -65,6 +54,8 @@ export default function TasksList() {
   const [formOpened, setFormOpened] = useState(false);
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
   const [editId, setEditId] = useState<string | null>(null);
+  const [selectedStatusGroup, setSelectedStatusGroup] =
+    useState<keyof typeof TASK_STATUS_FILTERS>("PENDING");
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<TasksResponse["tasks"][0]>
   >({
@@ -124,7 +115,9 @@ export default function TasksList() {
     page,
     pageSize,
     search: filters.search,
-    status: (filters.status as Task["status"]) || undefined,
+    statuses: filters.status
+      ? [filters.status as TaskStatus]
+      : TASK_STATUS_FILTERS[selectedStatusGroup],
     projectId: filters.projectId || undefined,
     moduleId: filters.moduleId || undefined,
     priority: (filters.priority as Task["priority"]) || undefined,
@@ -172,14 +165,25 @@ export default function TasksList() {
         <Group gap="xs">
           <FaTasks />
           <Title size="lg">Tasks</Title>
-          {/* <Button.Group ml="md">
-            <Button variant="filled" size="xs">
+          <Button.Group ml="md">
+            <Button
+              variant={selectedStatusGroup == "PENDING" ? "filled" : "default"}
+              onClick={() => setSelectedStatusGroup("PENDING")}
+              size="xs"
+            >
               Pending
             </Button>
-            <Button variant="default" size="xs">
+            <Button
+              variant={
+                selectedStatusGroup == "COMPLETED" ? "filled" : "default"
+              }
+              onClick={() => setSelectedStatusGroup("COMPLETED")}
+              size="xs"
+              color="green"
+            >
               Completed
             </Button>
-          </Button.Group> */}
+          </Button.Group>
           <TextInput
             size="xs"
             ml="md"
@@ -195,21 +199,12 @@ export default function TasksList() {
             size="xs"
             placeholder="All Status"
             clearable
-            data={statusOptions}
+            data={TASK_STATUS_OPTIONS.filter((v) =>
+              TASK_STATUS_FILTERS[selectedStatusGroup].includes(v.value),
+            )}
             defaultValue={filters.status}
             onChange={(value) =>
               setFilters({ ...filters, status: value ?? "" })
-            }
-            style={{ width: 150 }}
-          />
-          <Select
-            size="xs"
-            placeholder="All Priority"
-            clearable
-            data={priorityOptions}
-            defaultValue={filters.priority}
-            onChange={(value) =>
-              setFilters({ ...filters, priority: value ?? "" })
             }
             style={{ width: 150 }}
           />
@@ -234,6 +229,7 @@ export default function TasksList() {
                 leftSection={<IconFilter2 size={14} />}
                 rightSection={(() => {
                   const activeFilters = [
+                    filters.priority,
                     filters.projectId,
                     filters.moduleId,
                   ].filter(Boolean);
@@ -249,6 +245,17 @@ export default function TasksList() {
               </Button>
             </Popover.Target>
             <Popover.Dropdown bg="var(--mantine-color-body)">
+              <Select
+                label="Priority"
+                placeholder="All Priority"
+                clearable
+                mb="sm"
+                data={TASK_PRIORITY_OPTIONS}
+                defaultValue={filters.priority}
+                onChange={(value) =>
+                  setFilters({ ...filters, priority: value ?? "" })
+                }
+              />
               <Select
                 label="Project"
                 placeholder="All Projects"
@@ -315,7 +322,7 @@ export default function TasksList() {
             title: "Title",
             sortable: true,
             render: (row) => {
-              const priority = priorityOptions.find(
+              const priority = TASK_PRIORITY_OPTIONS.find(
                 (p) => p.value === row.priority,
               );
               return (
@@ -339,7 +346,9 @@ export default function TasksList() {
             title: "Status",
             sortable: true,
             render: (row) => {
-              const status = statusOptions.find((p) => p.value === row.status);
+              const status = TASK_STATUS_OPTIONS.find(
+                (p) => p.value === row.status,
+              );
               return (
                 <Badge color={status?.color} variant="transparent">
                   {row.status}
@@ -352,7 +361,7 @@ export default function TasksList() {
             title: "Priority",
             sortable: true,
             render: (row) => {
-              const priority = priorityOptions.find(
+              const priority = TASK_PRIORITY_OPTIONS.find(
                 (p) => p.value === row.priority,
               );
               return (
@@ -378,7 +387,9 @@ export default function TasksList() {
             sortable: true,
             render: (row) => {
               if (!row.dueDate) return "-";
-              const isOverdue = dayjs(row.dueDate).isBefore(dayjs(), "day");
+              const isOverdue =
+                dayjs(row.dueDate).isBefore(dayjs(), "day") &&
+                TASK_STATUS_FILTERS.PENDING.includes(row.status);
               return (
                 <span style={isOverdue ? { color: "red" } : undefined}>
                   {dayjs(row.dueDate).format("DD MMM YYYY")}

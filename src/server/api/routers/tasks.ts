@@ -18,7 +18,7 @@ export const tasksRouter = createTRPCRouter({
       const search = input?.search?.trim();
       const sortBy = input.sortBy ?? "title";
       const sortOrder = input.sortOrder ?? "asc";
-      const status = input.status;
+      const statuses = input.statuses;
       const projectId = input.projectId;
       const moduleId = input.moduleId;
       const priority = input.priority;
@@ -42,7 +42,7 @@ export const tasksRouter = createTRPCRouter({
               title: { contains: search, mode: "insensitive" },
             }
           : {}),
-        ...(status ? { status } : {}),
+        ...(statuses ? { status: { in: statuses } } : {}),
         ...(projectIds.length ? { projectId: { in: projectIds } } : {}),
         ...(moduleId ? { moduleId } : {}),
         ...(priority ? { priority } : {}),

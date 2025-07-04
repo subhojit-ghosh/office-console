@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TASK_PRIORITIES, TASK_STATUSES } from "~/constants/task.constant";
 
 function parseDate(val: unknown) {
   if (!val) return undefined;
@@ -16,18 +17,8 @@ export const getAllTasksSchema = z.object({
   search: z.string().optional(),
   sortBy: z.string().default("title").optional(),
   sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
-  status: z
-    .enum([
-      "BACKLOG",
-      "TODO",
-      "IN_PROGRESS",
-      "IN_REVIEW",
-      "BLOCKED",
-      "DONE",
-      "CANCELED",
-    ])
-    .optional(),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+  statuses: z.array(z.enum(TASK_STATUSES)).optional(),
+  priority: z.enum(TASK_PRIORITIES).optional(),
   projectId: z.string().optional(),
   moduleId: z.string().optional(),
   assignedToMe: z.boolean().default(false).optional(),
@@ -40,18 +31,8 @@ export const getTaskByIdSchema = z.object({
 export const createTaskSchema = z.object({
   title: z.string().nonempty("Title is required"),
   description: z.string().optional().nullable(),
-  status: z
-    .enum([
-      "BACKLOG",
-      "TODO",
-      "IN_PROGRESS",
-      "IN_REVIEW",
-      "BLOCKED",
-      "DONE",
-      "CANCELED",
-    ])
-    .optional(),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+  status: z.enum(TASK_STATUSES).optional(),
+  priority: z.enum(TASK_PRIORITIES).optional(),
   projectId: z.string(),
   moduleId: z.string().optional().nullable(),
   assigneeIds: z.array(z.string()).optional(),
@@ -62,18 +43,8 @@ export const updateTaskSchema = z.object({
   id: z.string().nonempty("ID is required"),
   title: z.string().nonempty("Title is required"),
   description: z.string().optional().nullable(),
-  status: z
-    .enum([
-      "BACKLOG",
-      "TODO",
-      "IN_PROGRESS",
-      "IN_REVIEW",
-      "BLOCKED",
-      "DONE",
-      "CANCELED",
-    ])
-    .optional(),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+  status: z.enum(TASK_STATUSES).optional(),
+  priority: z.enum(TASK_PRIORITIES).optional(),
   projectId: z.string(),
   moduleId: z.string().optional().nullable(),
   assigneeIds: z.array(z.string()).optional(),

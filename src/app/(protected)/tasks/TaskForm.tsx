@@ -18,6 +18,10 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
+import {
+  TASK_PRIORITY_OPTIONS,
+  TASK_STATUS_OPTIONS,
+} from "~/constants/task.constant";
 import { createTaskSchema, updateTaskSchema } from "~/schemas/task.schema";
 import { api, apiClient } from "~/trpc/react";
 
@@ -214,15 +218,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               <Grid.Col span={12}>
                 <Select
                   label="Status"
-                  data={[
-                    { value: "BACKLOG", label: "Backlog" },
-                    { value: "TODO", label: "To Do" },
-                    { value: "IN_PROGRESS", label: "In Progress" },
-                    { value: "IN_REVIEW", label: "In Review" },
-                    { value: "BLOCKED", label: "Blocked" },
-                    { value: "DONE", label: "Done" },
-                    { value: "CANCELED", label: "Canceled" },
-                  ]}
+                  data={TASK_STATUS_OPTIONS}
                   {...form.getInputProps("status")}
                   disabled={loading}
                   withAsterisk
@@ -231,12 +227,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               <Grid.Col span={12}>
                 <Select
                   label="Priority"
-                  data={[
-                    { value: "LOW", label: "Low" },
-                    { value: "MEDIUM", label: "Medium" },
-                    { value: "HIGH", label: "High" },
-                    { value: "URGENT", label: "Urgent" },
-                  ]}
+                  data={TASK_PRIORITY_OPTIONS}
                   {...form.getInputProps("priority")}
                   disabled={loading}
                   withAsterisk
