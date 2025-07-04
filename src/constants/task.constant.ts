@@ -12,9 +12,9 @@ export type TaskStatus = (typeof TASK_STATUSES)[number];
 
 export const TASK_STATUS_MAP = {
   BACKLOG: { label: "Backlog", color: "gray" },
-  TODO: { label: "To Do", color: "violet" },
+  TODO: { label: "To Do", color: "blue" },
   IN_PROGRESS: { label: "In Progress", color: "yellow" },
-  IN_REVIEW: { label: "In Review", color: "violet" },
+  IN_REVIEW: { label: "In Review", color: "cyan" },
   BLOCKED: { label: "Blocked", color: "red" },
   DONE: { label: "Done", color: "green" },
   CANCELED: { label: "Canceled", color: "pink" },
@@ -42,7 +42,7 @@ export const TASK_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
 export type TaskPriority = (typeof TASK_PRIORITIES)[number];
 
 export const TASK_PRIORITY_MAP = {
-  LOW: { label: "Low", color: "green" },
+  LOW: { label: "Low", color: "gray" },
   MEDIUM: { label: "Medium", color: "yellow" },
   HIGH: { label: "High", color: "orange" },
   URGENT: { label: "Urgent", color: "red" },

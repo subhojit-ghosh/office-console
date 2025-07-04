@@ -34,15 +34,15 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaTasks } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
-import type { AppRouter } from "~/server/api/root";
-import { api } from "~/trpc/react";
-import TaskForm from "./TaskForm";
 import {
   TASK_PRIORITY_OPTIONS,
   TASK_STATUS_FILTERS,
   TASK_STATUS_OPTIONS,
   type TaskStatus,
 } from "~/constants/task.constant";
+import type { AppRouter } from "~/server/api/root";
+import { api } from "~/trpc/react";
+import TaskForm from "./TaskForm";
 
 type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
 
@@ -186,7 +186,6 @@ export default function TasksList() {
           </Button.Group>
           <TextInput
             size="xs"
-            ml="md"
             type="search"
             leftSection={<IconSearch size={16} />}
             placeholder="Search by title"
@@ -206,7 +205,7 @@ export default function TasksList() {
             onChange={(value) =>
               setFilters({ ...filters, status: value ?? "" })
             }
-            style={{ width: 150 }}
+            style={{ width: 100 }}
           />
           {!shouldHideAssignees && (
             <Switch
@@ -322,13 +321,13 @@ export default function TasksList() {
             title: "Title",
             sortable: true,
             render: (row) => {
-              const priority = TASK_PRIORITY_OPTIONS.find(
-                (p) => p.value === row.priority,
+              const status = TASK_STATUS_OPTIONS.find(
+                (p) => p.value === row.status,
               );
               return (
                 <Button
                   variant="transparent"
-                  color={priority?.color}
+                  color={status?.color}
                   p={0}
                   onClick={() => {
                     setFormMode("edit");
@@ -351,7 +350,9 @@ export default function TasksList() {
               );
               return (
                 <Badge color={status?.color} variant="transparent">
-                  {row.status}
+                  {status
+                    ? status.label.toUpperCase()
+                    : row.status.replace(/_/g, " ")}
                 </Badge>
               );
             },
@@ -366,7 +367,9 @@ export default function TasksList() {
               );
               return (
                 <Badge color={priority?.color} variant="transparent">
-                  {row.priority}
+                  {priority
+                    ? priority.label.toUpperCase()
+                    : row.priority.replace(/_/g, " ")}
                 </Badge>
               );
             },
