@@ -28,6 +28,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaCubes } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
+import { TaskProgressRing } from "~/components/TaskProgressRing";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ModuleForm from "./ModuleForm";
@@ -196,9 +197,22 @@ export default function ModulesList() {
               <Anchor
                 component={Link}
                 href={`/tasks?projectId=${m.projectId}&moduleId=${m.id}`}
+                c={m.tasksCount === 0 ? "dimmed" : "blue"}
               >
-                {typeof m.tasksCount === "number" ? m.tasksCount : 0}
+                {m.tasksCount === 0
+                  ? "No Tasks"
+                  : `${m.completedTasksCount}/${m.tasksCount}`}
               </Anchor>
+            ),
+          },
+          {
+            accessor: "completedTasksCount",
+            title: "Progress",
+            render: (m) => (
+              <TaskProgressRing
+                completed={m.completedTasksCount}
+                total={m.tasksCount}
+              />
             ),
           },
           {

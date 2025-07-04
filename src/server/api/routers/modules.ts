@@ -1,10 +1,11 @@
 import type { Prisma } from "@prisma/client";
+import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import {
   createModuleSchema,
-  updateModuleSchema,
+  deleteModuleSchema,
   getAllModulesSchema,
   getModuleByIdSchema,
-  deleteModuleSchema,
+  updateModuleSchema,
 } from "~/schemas/module.schema";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -67,10 +68,24 @@ export const modulesRouter = createTRPCRouter({
         ctx.db.module.count({ where }),
       ]);
 
+      const completedCounts = await ctx.db.task.groupBy({
+        by: ["moduleId"],
+        where: {
+          status: { in: TASK_STATUS_FILTERS.COMPLETED },
+          moduleId: { in: modules.map((m) => m.id) },
+        },
+        _count: { moduleId: true },
+      });
+
+      const completedCountMap = new Map(
+        completedCounts.map((item) => [item.moduleId, item._count.moduleId]),
+      );
+
       return {
         modules: modules.map((m) => ({
           ...m,
           tasksCount: m._count.tasks,
+          completedTasksCount: completedCountMap.get(m.id) ?? 0,
         })),
         total,
         page,

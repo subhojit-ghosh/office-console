@@ -23,13 +23,13 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
-import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AppTable from "~/components/AppTable";
+import { TaskProgressRing } from "~/components/TaskProgressRing";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ProjectForm from "./ProjectForm";
@@ -212,8 +212,12 @@ export default function ProjectsList() {
             accessor: "modulesCount",
             title: "Modules",
             render: (p) => (
-              <Anchor component={Link} href={`/modules?projectId=${p.id}`}>
-                {typeof p.modulesCount === "number" ? p.modulesCount : 0}
+              <Anchor
+                component={Link}
+                href={`/modules?projectId=${p.id}`}
+                c={p.modulesCount === 0 ? "dimmed" : "blue"}
+              >
+                {p.modulesCount === 0 ? "No Modules" : p.modulesCount}
               </Anchor>
             ),
           },
@@ -221,9 +225,25 @@ export default function ProjectsList() {
             accessor: "tasksCount",
             title: "Tasks",
             render: (p) => (
-              <Anchor component={Link} href={`/tasks?projectId=${p.id}`}>
-                {typeof p.tasksCount === "number" ? p.tasksCount : 0}
+              <Anchor
+                component={Link}
+                href={`/tasks?projectId=${p.id}`}
+                c={p.tasksCount === 0 ? "dimmed" : "blue"}
+              >
+                {p.tasksCount === 0
+                  ? "No Tasks"
+                  : `${p.completedTasksCount}/${p.tasksCount}`}
               </Anchor>
+            ),
+          },
+          {
+            accessor: "completedTasksCount",
+            title: "Progress",
+            render: (p) => (
+              <TaskProgressRing
+                completed={p.completedTasksCount}
+                total={p.tasksCount}
+              />
             ),
           },
           {
@@ -236,17 +256,6 @@ export default function ProjectsList() {
             title: "Client",
             hidden: session?.user.role === UserRole.CLIENT,
             render: (p) => p.client?.name ?? "-",
-          },
-          {
-            accessor: "createdBy.name",
-            title: "Created By",
-            render: (p) => p.createdBy?.name || "-",
-          },
-          {
-            accessor: "createdAt",
-            title: "Created At",
-            sortable: true,
-            render: (row) => dayjs(row.createdAt).format("DD MMM YYYY hh:mm A"),
           },
           {
             accessor: "actions",

@@ -3,7 +3,6 @@
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import {
   createTRPCProxyClient,
-  httpBatchLink,
   httpBatchStreamLink,
   loggerLink,
 } from "@trpc/client";
@@ -36,7 +35,7 @@ export const apiClient = createTRPCProxyClient<AppRouter>({
         process.env.NODE_ENV === "development" ||
         (op.direction === "down" && op.result instanceof Error),
     }),
-    httpBatchLink({
+    httpBatchStreamLink({
       transformer: SuperJSON,
       url: getBaseUrl() + "/api/trpc",
       headers: () => {
