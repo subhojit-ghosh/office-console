@@ -51,6 +51,19 @@ export const updateTaskSchema = z.object({
   dueDate: z.preprocess(parseDate, z.date().optional().nullable()),
 });
 
+export const updateTaskFieldSchema = z.discriminatedUnion("key", [
+  z.object({
+    id: z.string().nonempty("ID is required"),
+    key: z.literal("status"),
+    value: z.enum(TASK_STATUSES),
+  }),
+  z.object({
+    id: z.string().nonempty("ID is required"),
+    key: z.literal("priority"),
+    value: z.enum(TASK_PRIORITIES),
+  }),
+]);
+
 export const deleteTaskSchema = z.object({
   id: z.string().nonempty("ID is required"),
 });

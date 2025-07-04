@@ -1,9 +1,10 @@
-import type { Prisma } from "@prisma/client";
+import { TaskStatus, type Prisma } from "@prisma/client";
 import {
   createTaskSchema,
   deleteTaskSchema,
   getAllTasksSchema,
   getTaskByIdSchema,
+  updateTaskFieldSchema,
   updateTaskSchema,
 } from "~/schemas/task.schema";
 import { sanitizeInputSchema } from "~/utils/zod-helpers";
@@ -67,6 +68,7 @@ export const tasksRouter = createTRPCRouter({
             status: true,
             priority: true,
             dueDate: true,
+            completedAt: true,
             createdAt: true,
             updatedAt: true,
             project: {
@@ -154,7 +156,34 @@ export const tasksRouter = createTRPCRouter({
           assignees: assigneeIds
             ? { set: assigneeIds.map((id) => ({ id })) }
             : undefined,
+          completedAt: rest.status === TaskStatus.DONE ? new Date() : null,
         },
+        include: {
+          project: true,
+          module: true,
+          createdBy: true,
+          assignees: true,
+        },
+      });
+    }),
+
+  updateField: protectedProcedure
+    .input(updateTaskFieldSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { id, key, value } = input;
+
+      const data: Prisma.TaskUpdateInput = {};
+
+      if (key === "status") {
+        data.status = value;
+        data.completedAt = value === TaskStatus.DONE ? new Date() : null;
+      } else if (key === "priority") {
+        data.priority = value;
+      }
+
+      return ctx.db.task.update({
+        where: { id },
+        data,
         include: {
           project: true,
           module: true,

@@ -176,6 +176,7 @@ export default function ModulesList() {
             sortable: true,
             render: (row) => (
               <Button
+                className="button-hover-underline"
                 variant="transparent"
                 p={0}
                 onClick={() => {
@@ -195,7 +196,6 @@ export default function ModulesList() {
               <Anchor
                 component={Link}
                 href={`/tasks?projectId=${m.projectId}&moduleId=${m.id}`}
-                underline="never"
               >
                 {typeof m.tasksCount === "number" ? m.tasksCount : 0}
               </Anchor>

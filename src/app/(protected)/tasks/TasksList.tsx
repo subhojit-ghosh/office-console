@@ -18,7 +18,7 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { UserRole, type Task } from "@prisma/client";
+import { UserRole, type Task, type TaskStatus } from "@prisma/client";
 import {
   IconDotsVertical,
   IconFilter2,
@@ -34,14 +34,14 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaTasks } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
+import { EditableBadgeDropdown } from "~/components/TaskStatusBadge";
 import {
   TASK_PRIORITY_OPTIONS,
   TASK_STATUS_FILTERS,
   TASK_STATUS_OPTIONS,
-  type TaskStatus,
 } from "~/constants/task.constant";
 import type { AppRouter } from "~/server/api/root";
-import { api } from "~/trpc/react";
+import { api, apiClient } from "~/trpc/react";
 import TaskForm from "./TaskForm";
 
 type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
@@ -326,6 +326,7 @@ export default function TasksList() {
               );
               return (
                 <Button
+                  className="button-hover-underline"
                   variant="transparent"
                   color={status?.color}
                   p={0}
@@ -344,35 +345,47 @@ export default function TasksList() {
             accessor: "status",
             title: "Status",
             sortable: true,
-            render: (row) => {
-              const status = TASK_STATUS_OPTIONS.find(
-                (p) => p.value === row.status,
-              );
-              return (
-                <Badge color={status?.color} variant="transparent">
-                  {status
-                    ? status.label.toUpperCase()
-                    : row.status.replace(/_/g, " ")}
-                </Badge>
-              );
-            },
+            render: (row) => (
+              <EditableBadgeDropdown
+                value={row.status}
+                options={TASK_STATUS_OPTIONS}
+                onChange={async (value) => {
+                  await apiClient.tasks.updateField.mutate({
+                    id: row.id,
+                    key: "status",
+                    value,
+                  });
+                  void utils.tasks.getAll.invalidate();
+                  notifications.show({
+                    message: "Status updated successfully",
+                    color: "green",
+                  });
+                }}
+              />
+            ),
           },
           {
             accessor: "priority",
             title: "Priority",
             sortable: true,
-            render: (row) => {
-              const priority = TASK_PRIORITY_OPTIONS.find(
-                (p) => p.value === row.priority,
-              );
-              return (
-                <Badge color={priority?.color} variant="transparent">
-                  {priority
-                    ? priority.label.toUpperCase()
-                    : row.priority.replace(/_/g, " ")}
-                </Badge>
-              );
-            },
+            render: (row) => (
+              <EditableBadgeDropdown
+                value={row.priority}
+                options={TASK_PRIORITY_OPTIONS}
+                onChange={async (value) => {
+                  await apiClient.tasks.updateField.mutate({
+                    id: row.id,
+                    key: "priority",
+                    value,
+                  });
+                  void utils.tasks.getAll.invalidate();
+                  notifications.show({
+                    message: "Priority updated successfully",
+                    color: "green",
+                  });
+                }}
+              />
+            ),
           },
           {
             accessor: "module.name",
@@ -398,6 +411,16 @@ export default function TasksList() {
                   {dayjs(row.dueDate).format("DD MMM YYYY")}
                 </span>
               );
+            },
+          },
+          {
+            accessor: "completedAt",
+            title: "Completed At",
+            hidden: selectedStatusGroup !== "COMPLETED",
+            sortable: true,
+            render: (row) => {
+              if (!row.completedAt) return "-";
+              return dayjs(row.completedAt).format("DD MMM YYYY");
             },
           },
           {

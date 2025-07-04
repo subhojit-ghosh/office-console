@@ -195,6 +195,7 @@ export default function ProjectsList() {
             sortable: true,
             render: (row) => (
               <Button
+                className="button-hover-underline"
                 variant="transparent"
                 p={0}
                 onClick={() => {
@@ -211,11 +212,7 @@ export default function ProjectsList() {
             accessor: "modulesCount",
             title: "Modules",
             render: (p) => (
-              <Anchor
-                component={Link}
-                href={`/modules?projectId=${p.id}`}
-                underline="never"
-              >
+              <Anchor component={Link} href={`/modules?projectId=${p.id}`}>
                 {typeof p.modulesCount === "number" ? p.modulesCount : 0}
               </Anchor>
             ),
@@ -224,11 +221,7 @@ export default function ProjectsList() {
             accessor: "tasksCount",
             title: "Tasks",
             render: (p) => (
-              <Anchor
-                component={Link}
-                href={`/tasks?projectId=${p.id}`}
-                underline="never"
-              >
+              <Anchor component={Link} href={`/tasks?projectId=${p.id}`}>
                 {typeof p.tasksCount === "number" ? p.tasksCount : 0}
               </Anchor>
             ),

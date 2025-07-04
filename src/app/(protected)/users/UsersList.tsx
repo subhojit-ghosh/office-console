@@ -150,6 +150,7 @@ export default function UsersList() {
             sortable: true,
             render: (row) => (
               <Button
+                className="button-hover-underline"
                 variant="transparent"
                 p={0}
                 onClick={() => {

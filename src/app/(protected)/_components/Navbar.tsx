@@ -19,13 +19,12 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaCubes, FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
-import { BiSolidTimer } from "react-icons/bi";
 
+import { useMediaQuery } from "@mantine/hooks";
 import { UserRole } from "@prisma/client";
+import { env } from "~/env";
 import classes from "./Navbar.module.css";
 import { UserButton } from "./UserButton";
-import { useMediaQuery } from "@mantine/hooks";
-import { env } from "~/env";
 
 interface NavbarProps {
   toggleMobile?: () => void;

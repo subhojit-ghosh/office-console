@@ -141,6 +141,7 @@ export default function ClientsList() {
             sortable: true,
             render: (row) => (
               <Button
+                className="button-hover-underline"
                 variant="transparent"
                 p={0}
                 onClick={() => {
@@ -160,7 +161,6 @@ export default function ClientsList() {
               <Anchor
                 component={Link}
                 href={`/projects?clientId=${row.id}`}
-                underline="never"
               >
                 {typeof row.projectsCount === "number" ? row.projectsCount : 0}
               </Anchor>

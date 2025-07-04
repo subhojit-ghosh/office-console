@@ -42,3 +42,7 @@ th.mantine-datatable-header-cell-sortable:hover {
     background-color: #ffffff;
   }
 }
+
+.button-hover-underline:hover {
+  text-decoration: underline;
+}

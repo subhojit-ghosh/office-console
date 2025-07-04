@@ -42,7 +42,7 @@ export const TASK_PRIORITIES = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
 export type TaskPriority = (typeof TASK_PRIORITIES)[number];
 
 export const TASK_PRIORITY_MAP = {
-  LOW: { label: "Low", color: "gray" },
+  LOW: { label: "Low", color: "blue" },
   MEDIUM: { label: "Medium", color: "yellow" },
   HIGH: { label: "High", color: "orange" },
   URGENT: { label: "Urgent", color: "red" },
