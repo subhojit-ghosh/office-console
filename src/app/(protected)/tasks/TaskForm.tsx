@@ -15,8 +15,8 @@ import { notifications } from "@mantine/notifications";
 import { UserRole, type Task } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
-import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
+import AppRichTextEditor from "~/components/AppRichTextEditor";
 import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
 import {
   TASK_PRIORITY_OPTIONS,
@@ -24,13 +24,6 @@ import {
 } from "~/constants/task.constant";
 import { createTaskSchema, updateTaskSchema } from "~/schemas/task.schema";
 import { api, apiClient } from "~/trpc/react";
-
-const AppRichTextEditor = dynamic(
-  () => import("~/components/AppRichTextEditor"),
-  {
-    ssr: false,
-  },
-);
 
 interface Props {
   mode: "add" | "edit";
