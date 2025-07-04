@@ -3,7 +3,6 @@
 import {
   Button,
   Grid,
-  Group,
   LoadingOverlay,
   Modal,
   MultiSelect,
@@ -18,6 +17,7 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
+import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
 import {
   TASK_PRIORITY_OPTIONS,
   TASK_STATUS_OPTIONS,
@@ -186,9 +186,9 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
     <Modal
       opened={opened}
       onClose={close}
-      title={mode === "add" ? "Create Task" : "Edit Task"}
       centered
-      size="80%"
+      size="90%"
+      withCloseButton={false}
     >
       <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -197,7 +197,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
             <Grid>
               <Grid.Col span={12}>
                 <TextInput
-                  label="Title"
+                  placeholder="Title"
                   {...form.getInputProps("title")}
                   withAsterisk
                   disabled={loading}
@@ -215,22 +215,24 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
           </Grid.Col>
           <Grid.Col span={3}>
             <Grid>
-              <Grid.Col span={12}>
-                <Select
-                  label="Status"
-                  data={TASK_STATUS_OPTIONS}
-                  {...form.getInputProps("status")}
-                  disabled={loading}
-                  withAsterisk
+              <Grid.Col span={6}>
+                <EditableBadgeDropdown
+                  value={form.values.status}
+                  options={TASK_STATUS_OPTIONS}
+                  onChange={(value) => form.setFieldValue("status", value)}
+                  compact={false}
+                  hoverEffect={false}
+                  fullWidth={true}
                 />
               </Grid.Col>
-              <Grid.Col span={12}>
-                <Select
-                  label="Priority"
-                  data={TASK_PRIORITY_OPTIONS}
-                  {...form.getInputProps("priority")}
-                  disabled={loading}
-                  withAsterisk
+              <Grid.Col span={6}>
+                <EditableBadgeDropdown
+                  value={form.values.priority}
+                  options={TASK_PRIORITY_OPTIONS}
+                  onChange={(value) => form.setFieldValue("priority", value)}
+                  compact={false}
+                  hoverEffect={false}
+                  fullWidth={true}
                 />
               </Grid.Col>
               <Grid.Col span={12}>
@@ -307,18 +309,22 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   disabled={loading}
                 />
               </Grid.Col>
+              <Grid.Col span={6}>
+                <Button
+                  variant="default"
+                  onClick={close}
+                  type="button"
+                  fullWidth
+                >
+                  Close
+                </Button>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Button loading={loading} type="submit" fullWidth>
+                  Save
+                </Button>
+              </Grid.Col>
             </Grid>
-          </Grid.Col>
-
-          <Grid.Col span={12}>
-            <Group justify="space-between">
-              <Button variant="subtle" onClick={close} type="button">
-                Cancel
-              </Button>
-              <Button loading={loading} type="submit">
-                Save
-              </Button>
-            </Group>
           </Grid.Col>
         </Grid>
       </form>

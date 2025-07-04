@@ -44,7 +44,15 @@ export default function AppRichTextEditor(props: Props) {
   }, [props.content, editor]);
 
   return (
-    <RichTextEditor editor={editor}>
+    <RichTextEditor
+      editor={editor}
+      styles={{
+        content: {
+          maxHeight: 400,
+          overflowY: "auto",
+        },
+      }}
+    >
       <RichTextEditor.Toolbar sticky stickyOffset="var(--docs-header-height)">
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Bold />

@@ -34,7 +34,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaTasks } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
-import { EditableBadgeDropdown } from "~/components/TaskStatusBadge";
+import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
 import {
   TASK_PRIORITY_OPTIONS,
   TASK_STATUS_FILTERS,
