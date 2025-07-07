@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import { UserRole, type Prisma } from "@prisma/client";
 import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import {
   createModuleSchema,
@@ -30,6 +30,16 @@ export const modulesRouter = createTRPCRouter({
           select: { id: true },
         });
         projectIds = clientProjects.map((p) => p.id);
+      } else if (ctx.session.user.role === UserRole.STAFF) {
+        const staffProjects = await ctx.db.project.findMany({
+          where: {
+            members: {
+              some: { id: ctx.session.user.id },
+            },
+          },
+          select: { id: true },
+        });
+        projectIds = staffProjects.map((p) => p.id);
       }
 
       const where: Prisma.ModuleWhereInput = {
