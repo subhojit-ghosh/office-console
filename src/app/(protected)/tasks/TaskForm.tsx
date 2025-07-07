@@ -63,13 +63,8 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
     validate: zodResolver(mode === "add" ? createTaskSchema : updateTaskSchema),
   });
 
-  const projectsQuery = api.projects.getAll.useQuery({
-    page: 1,
-    pageSize: 100,
-  });
-  const modulesQuery = api.modules.getAll.useQuery({
-    page: 1,
-    pageSize: 100,
+  const projectsQuery = api.projects.getAllMinimal.useQuery();
+  const modulesQuery = api.modules.getAllMinimal.useQuery({
     projectId: form.values.projectId,
   });
   const projectMembersQuery = api.projects.getById.useQuery(
@@ -277,7 +272,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                 <Select
                   label="Project"
                   data={
-                    projectsQuery.data?.projects.map((p) => ({
+                    projectsQuery.data?.map((p) => ({
                       value: p.id,
                       label: p.name,
                     })) ?? []
@@ -285,6 +280,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   {...form.getInputProps("projectId")}
                   onChange={(value) => {
                     form.setFieldValue("moduleId", null);
+                    form.setFieldValue("assigneeIds", []);
                     form.setFieldValue("projectId", value);
                   }}
                   disabled={loading || projectsQuery.isLoading}
@@ -293,7 +289,9 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   placeholder={
                     projectsQuery.isLoading
                       ? "Loading projects..."
-                      : "Select project"
+                      : projectsQuery.data?.length
+                        ? "Select project"
+                        : "No projects available"
                   }
                 />
               </Grid.Col>
@@ -301,7 +299,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                 <Select
                   label="Module"
                   data={
-                    modulesQuery.data?.modules.map((m) => ({
+                    modulesQuery.data?.map((m) => ({
                       value: m.id,
                       label: m.name,
                     })) ?? []
@@ -312,7 +310,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   placeholder={
                     modulesQuery.isLoading
                       ? "Loading modules..."
-                      : modulesQuery.data?.modules.length
+                      : modulesQuery.data?.length
                         ? "Select module"
                         : "No modules available"
                   }

@@ -3,6 +3,7 @@ import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import {
   createModuleSchema,
   deleteModuleSchema,
+  getAllMinimalModulesSchema,
   getAllModulesSchema,
   getModuleByIdSchema,
   updateModuleSchema,
@@ -102,6 +103,48 @@ export const modulesRouter = createTRPCRouter({
         pageSize,
         totalPages: Math.ceil(total / pageSize),
       };
+    }),
+
+  getAllMinimal: protectedProcedure
+    .input(getAllMinimalModulesSchema)
+    .query(async ({ ctx, input }) => {
+      const projectId = input.projectId;
+
+      let projectIds: string[] = [];
+
+      if (projectId) {
+        projectIds.push(projectId);
+      } else if (ctx.session.user.clientId) {
+        const clientProjects = await ctx.db.project.findMany({
+          where: { clientId: ctx.session.user.clientId },
+          select: { id: true },
+        });
+        projectIds = clientProjects.map((p) => p.id);
+      } else if (ctx.session.user.role === UserRole.STAFF) {
+        const staffProjects = await ctx.db.project.findMany({
+          where: {
+            members: {
+              some: { id: ctx.session.user.id },
+            },
+          },
+          select: { id: true },
+        });
+        projectIds = staffProjects.map((p) => p.id);
+      }
+
+      const where: Prisma.ModuleWhereInput = {
+        ...(projectIds.length ? { projectId: { in: projectIds } } : {}),
+      };
+
+      return ctx.db.module.findMany({
+        where,
+        orderBy: { name: "asc" },
+        select: {
+          id: true,
+          name: true,
+          projectId: true,
+        },
+      });
     }),
 
   getById: protectedProcedure

@@ -10,6 +10,10 @@ export const getAllModulesSchema = z.object({
   projectId: z.string().optional().nullable(),
 });
 
+export const getAllMinimalModulesSchema = z.object({
+  projectId: z.string().optional().nullable(),
+});
+
 export const getModuleByIdSchema = z.object({
   id: z.string().nonempty("ID is required"),
 });
