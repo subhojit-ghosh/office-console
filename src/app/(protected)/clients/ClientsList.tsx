@@ -29,11 +29,13 @@ import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ClientForm from "./ClientForm";
+import { useSession } from "next-auth/react";
 
 type ClientsResponse = inferRouterOutputs<AppRouter>["clients"]["getAll"];
 
 export default function ClientsList() {
   const utils = api.useUtils();
+  const { data: session } = useSession();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
@@ -158,10 +160,7 @@ export default function ClientsList() {
             accessor: "projectsCount",
             title: "Projects",
             render: (row) => (
-              <Anchor
-                component={Link}
-                href={`/projects?clientId=${row.id}`}
-              >
+              <Anchor component={Link} href={`/projects?clientId=${row.id}`}>
                 {typeof row.projectsCount === "number" ? row.projectsCount : 0}
               </Anchor>
             ),
@@ -181,6 +180,7 @@ export default function ClientsList() {
             title: "",
             textAlign: "center",
             width: 100,
+            hidden: session?.user.role !== "ADMIN",
             render: (row) => (
               <Menu withArrow position="bottom-end">
                 <Menu.Target>

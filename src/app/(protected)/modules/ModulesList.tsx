@@ -32,11 +32,13 @@ import { TaskProgressRing } from "~/components/TaskProgressRing";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ModuleForm from "./ModuleForm";
+import { useSession } from "next-auth/react";
 
 type ModulesResponse = inferRouterOutputs<AppRouter>["modules"]["getAll"];
 
 export default function ModulesList() {
   const utils = api.useUtils();
+  const { data: session } = useSession();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
@@ -236,6 +238,7 @@ export default function ModulesList() {
             title: "",
             textAlign: "center",
             width: 100,
+            hidden: session?.user.role !== "ADMIN",
             render: (row) => (
               <Menu withArrow position="bottom-end">
                 <Menu.Target>

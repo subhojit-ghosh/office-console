@@ -458,6 +458,7 @@ export default function TasksList() {
             title: "",
             textAlign: "center",
             width: 100,
+            hidden: session?.user.role !== "ADMIN",
             render: (row) => (
               <Menu withArrow position="bottom-end">
                 <Menu.Target>

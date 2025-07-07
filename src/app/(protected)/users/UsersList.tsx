@@ -30,11 +30,13 @@ import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import UserForm, { userRoleOptions } from "./UserForm";
+import { useSession } from "next-auth/react";
 
 type UsersResponse = inferRouterOutputs<AppRouter>["users"]["getAll"];
 
 export default function UsersList() {
   const utils = api.useUtils();
+  const { data: session } = useSession();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [formOpened, setFormOpened] = useState(false);
@@ -181,6 +183,7 @@ export default function UsersList() {
             title: "",
             textAlign: "center",
             width: 100,
+            hidden: session?.user.role !== "ADMIN",
             render: (row) => (
               <Menu withArrow position="bottom-end">
                 <Menu.Target>
