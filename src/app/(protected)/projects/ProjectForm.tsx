@@ -6,6 +6,7 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  MultiSelect,
   NumberInput,
   Select,
   TextInput,
@@ -44,6 +45,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
   const [editDataLoading, setEditDataLoading] = useState(false);
 
   const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
+  const membersQuery = api.users.getAll.useQuery({ page: 1, pageSize: 100 });
 
   const form = useForm({
     initialValues: {
@@ -53,6 +55,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
       status: "ONGOING",
       clientId: "",
       timeDisplayMultiplier: null as number | null,
+      memberIds: [] as string[],
     },
     validate: zodResolver(
       mode === "add" ? createProjectSchema : updateProjectSchema,
@@ -64,6 +67,9 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
       form.reset();
       if (session?.user.clientId) {
         form.setFieldValue("clientId", session.user.clientId);
+      }
+      if (session?.user.id) {
+        form.setFieldValue("memberIds", [session.user.id]);
       }
     }
     if (mode === "edit") {
@@ -88,6 +94,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
           timeDisplayMultiplier: projectDetail.timeDisplayMultiplier
             ? Number(projectDetail.timeDisplayMultiplier)
             : null,
+          memberIds: projectDetail.members.map((member) => member.id) ?? [],
         });
       }
     } catch (error) {
@@ -143,6 +150,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
 
   const handleSubmit = (values: typeof form.values) => {
     setLoading(true);
+
     if (mode === "add") {
       createProject.mutate({
         name: values.name,
@@ -150,6 +158,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
         status: values.status as Project["status"],
         clientId: values.clientId ?? undefined,
         timeDisplayMultiplier: values.timeDisplayMultiplier,
+        memberIds: values.memberIds,
       });
     } else if (mode === "edit" && id) {
       updateProject.mutate({
@@ -159,6 +168,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
         status: values.status as Project["status"],
         clientId: values.clientId ?? undefined,
         timeDisplayMultiplier: values.timeDisplayMultiplier,
+        memberIds: values.memberIds,
       });
     }
   };
@@ -179,9 +189,9 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
           <Grid.Col span={12}>
             <TextInput
               label="Name"
-              {...form.getInputProps("name")}
               withAsterisk
               disabled={loading}
+              {...form.getInputProps("name")}
             />
           </Grid.Col>
           <Grid.Col span={12}>
@@ -197,6 +207,20 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
               data={statusOptions}
               {...form.getInputProps("status")}
               withAsterisk
+              disabled={loading}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <MultiSelect
+              label="Members"
+              data={
+                membersQuery.data?.users.map((user) => ({
+                  value: user.id,
+                  label: user.name,
+                })) ?? []
+              }
+              value={form.values.memberIds}
+              onChange={(value) => form.setFieldValue("memberIds", value)}
               disabled={loading}
             />
           </Grid.Col>

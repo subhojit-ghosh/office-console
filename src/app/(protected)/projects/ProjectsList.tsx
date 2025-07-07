@@ -3,6 +3,7 @@
 import {
   ActionIcon,
   Anchor,
+  Avatar,
   Box,
   Button,
   Group,
@@ -10,6 +11,7 @@ import {
   Select,
   TextInput,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -256,6 +258,19 @@ export default function ProjectsList() {
             title: "Client",
             hidden: session?.user.role === UserRole.CLIENT,
             render: (p) => p.client?.name ?? "-",
+          },
+          {
+            accessor: "members",
+            title: "Members",
+            render: (row) => (
+              <Avatar.Group spacing="xs">
+                {row.members.map((member) => (
+                  <Tooltip key={member.id} label={member.name} withArrow>
+                    <Avatar key={member.id} name={member.name} size="sm" />
+                  </Tooltip>
+                ))}
+              </Avatar.Group>
+            ),
           },
           {
             accessor: "actions",

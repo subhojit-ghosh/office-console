@@ -22,6 +22,7 @@ export const createProjectSchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z.string().optional().nullable().nullable(),
   status: z.enum(["ONGOING", "COMPLETED", "CANCELLED", "ON_HOLD"]),
+  memberIds: z.array(z.string()).optional(),
   clientId: z.string().optional().nullable(),
   timeDisplayMultiplier: zOptionalInput(
     z
@@ -38,6 +39,7 @@ export const updateProjectSchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z.string().optional().nullable(),
   status: z.enum(["ONGOING", "COMPLETED", "CANCELLED", "ON_HOLD"]),
+  memberIds: z.array(z.string()).optional(),
   clientId: z.string().optional().nullable(),
   timeDisplayMultiplier: zOptionalInput(
     z

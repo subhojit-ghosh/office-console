@@ -51,6 +51,12 @@ export const projectsRouter = createTRPCRouter({
                 name: true,
               },
             },
+            members: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             _count: {
               select: { modules: true, tasks: true },
             },
@@ -94,6 +100,12 @@ export const projectsRouter = createTRPCRouter({
         include: {
           client: true,
           createdBy: true,
+          members: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
     }),
@@ -109,6 +121,9 @@ export const projectsRouter = createTRPCRouter({
           clientId: input.clientId,
           timeDisplayMultiplier: input.timeDisplayMultiplier,
           createdById: ctx.session.user.id,
+          members: {
+            connect: input.memberIds?.map((id) => ({ id })) ?? [],
+          },
         },
       });
     }),
@@ -124,6 +139,9 @@ export const projectsRouter = createTRPCRouter({
           status: input.status,
           clientId: input.clientId,
           timeDisplayMultiplier: input.timeDisplayMultiplier,
+          members: {
+            set: input.memberIds?.map((id) => ({ id })) ?? [],
+          },
         },
       });
     }),

@@ -161,6 +161,24 @@ export const tasksRouter = createTRPCRouter({
     .input(sanitizeInputSchema(createTaskSchema))
     .mutation(async ({ ctx, input }) => {
       const { assigneeIds, ...rest } = input;
+
+      // Validate assignees against project members
+      const projectMembers = await ctx.db.project.findUnique({
+        where: { id: input.projectId },
+        select: { members: { select: { id: true } } },
+      });
+
+      if (
+        assigneeIds?.some(
+          (assigneeId) =>
+            !projectMembers?.members.some((member) => member.id === assigneeId),
+        )
+      ) {
+        throw new Error(
+          "One or more assignees are not members of the project.",
+        );
+      }
+
       const userId = ctx.session.user.id;
       const task = await ctx.db.task.create({
         data: {

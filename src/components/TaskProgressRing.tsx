@@ -1,4 +1,4 @@
-import { RingProgress, Text, Center, ActionIcon } from "@mantine/core";
+import { Center, RingProgress, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 
 interface TaskProgressRingProps {

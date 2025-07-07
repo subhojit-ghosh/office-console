@@ -72,7 +72,14 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
     pageSize: 100,
     projectId: form.values.projectId,
   });
-  const usersQuery = api.users.getAll.useQuery({ page: 1, pageSize: 100 });
+  const projectMembersQuery = api.projects.getById.useQuery(
+    {
+      id: form.values.projectId!,
+    },
+    {
+      enabled: !!form.values.projectId,
+    },
+  );
 
   const shouldHideAssignees = useMemo(() => {
     return (
@@ -301,7 +308,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   }
                   {...form.getInputProps("moduleId")}
                   disabled={loading || modulesQuery.isLoading}
-                  // searchable
+                  searchable
                   placeholder={
                     modulesQuery.isLoading
                       ? "Loading modules..."
@@ -316,18 +323,20 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   <MultiSelect
                     label="Assignees"
                     data={
-                      usersQuery.data?.users.map((u) => ({
-                        value: u.id,
-                        label: u.name,
+                      projectMembersQuery.data?.members.map((member) => ({
+                        value: member.id,
+                        label: member.name,
                       })) ?? []
                     }
                     {...form.getInputProps("assigneeIds")}
-                    disabled={loading || usersQuery.isLoading}
+                    disabled={loading || projectMembersQuery.isLoading}
                     searchable
                     placeholder={
-                      usersQuery.isLoading
-                        ? "Loading users..."
-                        : "Select assignees"
+                      projectMembersQuery.isLoading
+                        ? "Loading project members..."
+                        : projectMembersQuery.data?.members.length
+                          ? "Select assignees"
+                          : "No project members available"
                     }
                   />
                 </Grid.Col>
