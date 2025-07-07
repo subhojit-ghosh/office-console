@@ -366,15 +366,25 @@ export default function TasksList() {
                 value={row.status}
                 options={TASK_STATUS_OPTIONS}
                 onChange={async (value) => {
+                  const id = notifications.show({
+                    loading: true,
+                    message: "Updating status...",
+                    autoClose: false,
+                    withCloseButton: false,
+                  });
                   await apiClient.tasks.updateField.mutate({
                     id: row.id,
                     key: "status",
                     value,
                   });
-                  void utils.tasks.getAll.invalidate();
-                  notifications.show({
+                  await utils.tasks.getAll.invalidate();
+                  notifications.update({
+                    id,
                     message: "Status updated successfully",
                     color: "green",
+                    loading: false,
+                    autoClose: 2000,
+                    withCloseButton: true,
                   });
                 }}
               />
@@ -389,15 +399,25 @@ export default function TasksList() {
                 value={row.priority}
                 options={TASK_PRIORITY_OPTIONS}
                 onChange={async (value) => {
+                  const id = notifications.show({
+                    loading: true,
+                    message: "Updating priority...",
+                    autoClose: false,
+                    withCloseButton: false,
+                  });
                   await apiClient.tasks.updateField.mutate({
                     id: row.id,
                     key: "priority",
                     value,
                   });
-                  void utils.tasks.getAll.invalidate();
-                  notifications.show({
+                  await utils.tasks.getAll.invalidate();
+                  notifications.update({
+                    id,
                     message: "Priority updated successfully",
                     color: "green",
+                    loading: false,
+                    autoClose: 2000,
+                    withCloseButton: true,
                   });
                 }}
               />

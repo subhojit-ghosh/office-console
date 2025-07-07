@@ -13,6 +13,7 @@ interface EditableBadgeDropdownProps<T extends string> {
   compact?: boolean;
   hoverEffect?: boolean;
   fullWidth?: boolean;
+  loading?: boolean;
 }
 
 export function EditableBadgeDropdown<T extends string>({
@@ -22,6 +23,7 @@ export function EditableBadgeDropdown<T extends string>({
   compact = true,
   hoverEffect = true,
   fullWidth = false,
+  loading = false,
 }: EditableBadgeDropdownProps<T>) {
   const { hovered, ref } = useHover();
   const current = options.find((o) => o.value === value);
@@ -36,6 +38,7 @@ export function EditableBadgeDropdown<T extends string>({
             variant={hoverEffect ? (hovered ? "outline" : "subtle") : "outline"}
             color={current?.color}
             rightSection={<IconChevronDown size={14} />}
+            loading={loading}
           >
             {current?.label.toUpperCase() ?? value}
           </Button>
