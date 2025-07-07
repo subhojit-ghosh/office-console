@@ -13,6 +13,7 @@ export const clientsRouter = createTRPCRouter({
   getAll: protectedProcedure
     .input(getAllClientsSchema)
     .query(async ({ ctx, input }) => {
+      console.time("getAllClients");
       const page = input.page ?? 1;
       const pageSize = input.pageSize ?? 10;
       const search = input?.search?.trim();
@@ -28,6 +29,7 @@ export const clientsRouter = createTRPCRouter({
           }
         : {};
 
+      console.time("getAllClients - DB Query");
       const [clients, total] = await Promise.all([
         ctx.db.client.findMany({
           where,
@@ -42,6 +44,9 @@ export const clientsRouter = createTRPCRouter({
         }),
         ctx.db.client.count({ where }),
       ]);
+      console.timeEnd("getAllClients - DB Query");
+
+      console.timeEnd("getAllClients");
 
       return {
         clients: clients.map((c) => ({
