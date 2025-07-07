@@ -224,7 +224,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
               disabled={loading}
             />
           </Grid.Col>
-          {session?.user.role !== UserRole.CLIENT && (
+          {session?.user.role === UserRole.ADMIN && (
             <>
               <Grid.Col span={12}>
                 <Select

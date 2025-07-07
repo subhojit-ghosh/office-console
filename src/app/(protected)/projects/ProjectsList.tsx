@@ -149,7 +149,7 @@ export default function ProjectsList() {
               setFilters({ ...filters, status: value ?? "" })
             }
           />
-          {session?.user.role !== UserRole.CLIENT && (
+          {session?.user.role === UserRole.ADMIN && (
             <Select
               placeholder="All Clients"
               clearable
@@ -256,7 +256,7 @@ export default function ProjectsList() {
           {
             accessor: "client.name",
             title: "Client",
-            hidden: session?.user.role === UserRole.CLIENT,
+            hidden: session?.user.role !== UserRole.ADMIN,
             render: (p) => p.client?.name ?? "-",
           },
           {

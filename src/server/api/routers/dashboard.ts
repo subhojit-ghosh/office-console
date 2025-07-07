@@ -8,6 +8,18 @@ export const dashboardRouter = createTRPCRouter({
     const projects = await ctx.db.project.count({
       where: {
         ...(clientId ? { clientId } : {}),
+        ...(ctx.session.user.role === "STAFF"
+          ? {
+              OR: [
+                { createdById: ctx.session.user.id },
+                {
+                  members: {
+                    some: { id: ctx.session.user.id },
+                  },
+                },
+              ],
+            }
+          : {}),
       },
     });
     const tasks = await ctx.db.task.count({

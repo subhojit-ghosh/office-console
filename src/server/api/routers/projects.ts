@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import { UserRole, type Prisma } from "@prisma/client";
 import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import {
   createProjectSchema,
@@ -30,6 +30,18 @@ export const projectsRouter = createTRPCRouter({
           : {}),
         ...(status ? { status } : {}),
         ...(clientId ? { clientId } : {}),
+        ...(ctx.session.user.role === UserRole.STAFF
+          ? {
+              OR: [
+                { createdById: ctx.session.user.id },
+                {
+                  members: {
+                    some: { id: ctx.session.user.id },
+                  },
+                },
+              ],
+            }
+          : {}),
       };
 
       const [projects, total] = await Promise.all([

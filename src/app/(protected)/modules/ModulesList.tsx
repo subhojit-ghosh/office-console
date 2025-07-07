@@ -33,6 +33,7 @@ import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ModuleForm from "./ModuleForm";
 import { useSession } from "next-auth/react";
+import { UserRole } from "@prisma/client";
 
 type ModulesResponse = inferRouterOutputs<AppRouter>["modules"]["getAll"];
 
@@ -238,7 +239,7 @@ export default function ModulesList() {
             title: "",
             textAlign: "center",
             width: 100,
-            hidden: session?.user.role !== "ADMIN",
+            hidden: session?.user.role !== UserRole.ADMIN,
             render: (row) => (
               <Menu withArrow position="bottom-end">
                 <Menu.Target>

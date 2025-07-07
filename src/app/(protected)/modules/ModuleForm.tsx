@@ -198,7 +198,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
               }
             />
           </Grid.Col>
-          {session?.user.role !== UserRole.CLIENT && (
+          {session?.user.role === UserRole.ADMIN && (
             <Grid.Col span={12}>
               <NumberInput
                 label="Time Display Multiplier (Leave empty to inherit)"
