@@ -42,12 +42,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  staffProfile   StaffProfile?
-  projects       Project[]
-  createdTasks   Task[]         @relation("CreatedTasks")
-  assignedTasks  Task[]         @relation("AssignedTasks")
-  modules        Module[]       @relation("CreatedModules")
-  taskActivities TaskActivity[] @relation("TaskActivities")
+  staffProfile     StaffProfile?
+  projects         Project[]
+  createdTasks     Task[]         @relation("CreatedTasks")
+  assignedTasks    Task[]         @relation("AssignedTasks")
+  modules          Module[]       @relation("CreatedModules")
+  taskActivities   TaskActivity[] @relation("TaskActivities")
+  projectsAsMember Project[]      @relation("ProjectMembers")
 }
 
 enum StaffPosition {
@@ -92,6 +93,7 @@ model Project {
 
   modules Module[]
   tasks   Task[]
+  members User[]   @relation("ProjectMembers")
 }
 
 model Module {
