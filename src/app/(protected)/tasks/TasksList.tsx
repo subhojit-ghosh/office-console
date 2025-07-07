@@ -335,7 +335,6 @@ export default function TasksList() {
                     setEditId(row.id);
                     setFormOpened(true);
                   }}
-                  className="button-hover-underline"
                   style={{
                     display: "block",
                     width: "100%",
@@ -350,6 +349,7 @@ export default function TasksList() {
                     c={status?.color}
                     lineClamp={2} // ✨ Allows 2 lines with ellipsis after that
                     title={row.title}
+                    className="button-hover-underline"
                   >
                     {row.title}
                   </Text>
@@ -444,7 +444,7 @@ export default function TasksList() {
             title: "Assignees",
             hidden: shouldHideAssignees,
             render: (row) => (
-              <Avatar.Group>
+              <Avatar.Group spacing="xs">
                 {row.assignees.map((assignee) => (
                   <Tooltip key={assignee.id} label={assignee.name} withArrow>
                     <Avatar key={assignee.id} name={assignee.name} size="sm" />

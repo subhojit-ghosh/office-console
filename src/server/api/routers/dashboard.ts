@@ -1,3 +1,4 @@
+import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const dashboardRouter = createTRPCRouter({
@@ -11,7 +12,22 @@ export const dashboardRouter = createTRPCRouter({
     });
     const tasks = await ctx.db.task.count({
       where: {
+        status: {
+          notIn: TASK_STATUS_FILTERS.COMPLETED,
+        },
         ...(clientId ? { project: { clientId } } : {}),
+        ...(ctx.session.user.role === "STAFF"
+          ? {
+              OR: [
+                { createdById: ctx.session.user.id },
+                {
+                  assignees: {
+                    some: { id: ctx.session.user.id },
+                  },
+                },
+              ],
+            }
+          : {}),
       },
     });
 

@@ -20,7 +20,7 @@ export default function DashboardStats() {
         <Group gap="xs"></Group>
       </Group>
       <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} px="md">
-        <Paper withBorder p="md" radius="md" className={classes.card}>
+        {/* <Paper withBorder p="md" radius="md" className={classes.card}>
           <Group justify="space-between">
             <Text className={classes.title}>Projects</Text>
             <IconFoldersFilled className={classes.icon} />
@@ -35,7 +35,7 @@ export default function DashboardStats() {
               </Text>
             )}
           </Group>
-        </Paper>
+        </Paper> */}
         <Paper withBorder p="md" radius="md" className={classes.card}>
           <Group justify="space-between">
             <Text className={classes.title}>Tasks</Text>
