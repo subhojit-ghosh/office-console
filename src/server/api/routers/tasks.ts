@@ -1,4 +1,4 @@
-import { TaskStatus, type Prisma } from "@prisma/client";
+import { TaskActivityType, TaskStatus, type Prisma } from "@prisma/client";
 import {
   createTaskSchema,
   deleteTaskSchema,
@@ -119,6 +119,23 @@ export const tasksRouter = createTRPCRouter({
           module: true,
           createdBy: true,
           assignees: true,
+          activities: {
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              type: true,
+              field: true,
+              oldValue: true,
+              newValue: true,
+              createdAt: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
       });
     }),
@@ -128,7 +145,7 @@ export const tasksRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { assigneeIds, ...rest } = input;
       const userId = ctx.session.user.id;
-      return ctx.db.task.create({
+      const task = await ctx.db.task.create({
         data: {
           ...rest,
           createdById: userId,
@@ -143,13 +160,114 @@ export const tasksRouter = createTRPCRouter({
           assignees: true,
         },
       });
+
+      await ctx.db.taskActivity.create({
+        data: {
+          taskId: task.id,
+          type: TaskActivityType.CREATED,
+          userId,
+        },
+      });
     }),
 
   update: protectedProcedure
     .input(sanitizeInputSchema(updateTaskSchema))
     .mutation(async ({ ctx, input }) => {
       const { id, assigneeIds, ...rest } = input;
-      return ctx.db.task.update({
+      const userId = ctx.session.user.id;
+
+      const existingTask = await ctx.db.task.findUnique({
+        where: { id },
+        include: {
+          assignees: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      if (!existingTask) {
+        throw new Error("Task not found");
+      }
+
+      const activityLogs: Prisma.TaskActivityCreateManyInput[] = [];
+
+      const fieldChangeKeys: (keyof typeof rest)[] = [
+        "status",
+        "priority",
+        "dueDate",
+      ];
+      const softUpdateKeys: (keyof typeof rest)[] = ["title", "description"];
+
+      for (const key of fieldChangeKeys) {
+        const newValue = rest[key];
+        const oldValue = existingTask[key];
+
+        if (newValue !== undefined && newValue !== oldValue) {
+          activityLogs.push({
+            taskId: id,
+            userId,
+            type: TaskActivityType.FIELD_CHANGE,
+            field: key,
+            oldValue: oldValue?.toString() ?? null,
+            newValue: newValue?.toString() ?? null,
+          });
+        }
+      }
+
+      for (const key of softUpdateKeys) {
+        const newValue = rest[key];
+        const oldValue = existingTask[key];
+
+        if (newValue !== undefined && newValue !== oldValue) {
+          activityLogs.push({
+            taskId: id,
+            userId,
+            type: TaskActivityType.UPDATED,
+            field: key,
+          });
+        }
+      }
+
+      if (assigneeIds) {
+        const prevIds = existingTask.assignees.map((u) => u.id);
+        const added = assigneeIds.filter((id) => !prevIds.includes(id));
+        const removed = prevIds.filter((id) => !assigneeIds.includes(id));
+
+        const [addedUsers, removedUsers] = await Promise.all([
+          ctx.db.user.findMany({
+            where: { id: { in: added } },
+            select: { id: true, name: true },
+          }),
+          ctx.db.user.findMany({
+            where: { id: { in: removed } },
+            select: { id: true, name: true },
+          }),
+        ]);
+
+        addedUsers.forEach((user) => {
+          activityLogs.push({
+            taskId: id,
+            userId,
+            type: TaskActivityType.ASSIGNED,
+            field: "assignees",
+            newValue: user.name,
+          });
+        });
+
+        removedUsers.forEach((user) => {
+          activityLogs.push({
+            taskId: id,
+            userId,
+            type: TaskActivityType.UNASSIGNED,
+            field: "assignees",
+            oldValue: user.name,
+          });
+        });
+      }
+
+      const updatedTask = await ctx.db.task.update({
         where: { id },
         data: {
           ...rest,
@@ -165,32 +283,62 @@ export const tasksRouter = createTRPCRouter({
           assignees: true,
         },
       });
+
+      if (activityLogs.length > 0) {
+        await ctx.db.taskActivity.createMany({ data: activityLogs });
+      }
+
+      return updatedTask;
     }),
 
   updateField: protectedProcedure
     .input(updateTaskFieldSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, key, value } = input;
+      const userId = ctx.session.user.id;
+
+      const task = await ctx.db.task.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          status: true,
+          priority: true,
+        },
+      });
+
+      if (!task) {
+        throw new Error("Task not found");
+      }
 
       const data: Prisma.TaskUpdateInput = {};
+      let oldValue: string | null = null;
 
       if (key === "status") {
+        oldValue = task.status;
         data.status = value;
         data.completedAt = value === TaskStatus.DONE ? new Date() : null;
       } else if (key === "priority") {
+        oldValue = task.priority;
         data.priority = value;
       }
 
-      return ctx.db.task.update({
+      const updatedTask = ctx.db.task.update({
         where: { id },
         data,
-        include: {
-          project: true,
-          module: true,
-          createdBy: true,
-          assignees: true,
+      });
+
+      await ctx.db.taskActivity.create({
+        data: {
+          taskId: task.id,
+          type: TaskActivityType.FIELD_CHANGE,
+          field: key,
+          oldValue,
+          newValue: value,
+          userId,
         },
       });
+
+      return updatedTask;
     }),
 
   delete: protectedProcedure

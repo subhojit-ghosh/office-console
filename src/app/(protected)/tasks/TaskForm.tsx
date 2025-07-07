@@ -7,12 +7,15 @@ import {
   Modal,
   MultiSelect,
   Select,
+  Tabs,
   TextInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { UserRole, type Task } from "@prisma/client";
+import { IconActivity } from "@tabler/icons-react";
+import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
@@ -23,7 +26,11 @@ import {
   TASK_STATUS_OPTIONS,
 } from "~/constants/task.constant";
 import { createTaskSchema, updateTaskSchema } from "~/schemas/task.schema";
+import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
+import { TaskActivityFeed } from "./TaskActivityFeed";
+
+type TaskGetByIdResponse = inferRouterOutputs<AppRouter>["tasks"]["getById"];
 
 interface Props {
   mode: "add" | "edit";
@@ -37,6 +44,9 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [editDataLoading, setEditDataLoading] = useState(false);
+  const [activities, setActivities] = useState<
+    NonNullable<TaskGetByIdResponse>["activities"]
+  >([]);
 
   const form = useForm({
     initialValues: {
@@ -78,6 +88,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
     }
     if (mode === "edit") {
       form.reset();
+      setActivities([]);
       void loadDataForEdit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,6 +113,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
             : [],
           dueDate: taskDetail.dueDate as never,
         });
+        setActivities(taskDetail.activities);
       }
     } catch (error) {
       console.error("Error loading task details:", error);
@@ -193,7 +205,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
-          <Grid.Col span={9}>
+          <Grid.Col span={9} style={{ maxHeight: "85vh", overflowY: "auto" }}>
             <Grid>
               <Grid.Col span={12}>
                 <TextInput
@@ -211,6 +223,24 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   }
                 />
               </Grid.Col>
+              {mode == "edit" && (
+                <Grid.Col span={12}>
+                  <Tabs variant="outline" defaultValue="activities">
+                    <Tabs.List>
+                      <Tabs.Tab
+                        value="activities"
+                        leftSection={<IconActivity size={12} />}
+                      >
+                        Activities
+                      </Tabs.Tab>
+                    </Tabs.List>
+
+                    <Tabs.Panel value="activities" pt="md">
+                      <TaskActivityFeed activities={activities} />
+                    </Tabs.Panel>
+                  </Tabs>
+                </Grid.Col>
+              )}
             </Grid>
           </Grid.Col>
           <Grid.Col span={3}>

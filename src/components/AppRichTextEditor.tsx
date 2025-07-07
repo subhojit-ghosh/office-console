@@ -53,7 +53,7 @@ export default function AppRichTextEditor(props: Props) {
         },
       }}
     >
-      <RichTextEditor.Toolbar sticky stickyOffset="var(--docs-header-height)">
+      <RichTextEditor.Toolbar>
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Bold />
           <RichTextEditor.Italic />

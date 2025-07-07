@@ -42,11 +42,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  staffProfile  StaffProfile?
-  projects      Project[]
-  createdTasks  Task[]        @relation("CreatedTasks")
-  assignedTasks Task[]        @relation("AssignedTasks")
-  modules       Module[]      @relation("CreatedModules")
+  staffProfile   StaffProfile?
+  projects       Project[]
+  createdTasks   Task[]         @relation("CreatedTasks")
+  assignedTasks  Task[]         @relation("AssignedTasks")
+  modules        Module[]       @relation("CreatedModules")
+  taskActivities TaskActivity[] @relation("TaskActivities")
 }
 
 enum StaffPosition {
@@ -146,4 +147,31 @@ model Task {
   completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  activities TaskActivity[] @relation("TaskActivities")
+}
+
+enum TaskActivityType {
+  CREATED
+  FIELD_CHANGE
+  UPDATED
+  ASSIGNED
+  UNASSIGNED
+}
+
+model TaskActivity {
+  id String @id @default(ulid())
+
+  taskId String
+  task   Task   @relation("TaskActivities", fields: [taskId], references: [id])
+
+  type     TaskActivityType
+  field    String? // Only used when type = FIELD_CHANGE
+  oldValue String?
+  newValue String?
+
+  userId String
+  user   User   @relation("TaskActivities", fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
 }
