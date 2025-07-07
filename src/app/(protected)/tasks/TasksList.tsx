@@ -11,9 +11,11 @@ import {
   Popover,
   Select,
   Switch,
+  Text,
   TextInput,
   Title,
   Tooltip,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -320,24 +322,38 @@ export default function TasksList() {
             accessor: "title",
             title: "Title",
             sortable: true,
+            width: "30%",
             render: (row) => {
               const status = TASK_STATUS_OPTIONS.find(
                 (p) => p.value === row.status,
               );
+
               return (
-                <Button
-                  className="button-hover-underline"
-                  variant="transparent"
-                  color={status?.color}
-                  p={0}
+                <UnstyledButton
                   onClick={() => {
                     setFormMode("edit");
                     setEditId(row.id);
                     setFormOpened(true);
                   }}
+                  className="button-hover-underline"
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    padding: 0,
+                    textAlign: "left",
+                    backgroundColor: "transparent",
+                  }}
                 >
-                  {row.title}
-                </Button>
+                  <Text
+                    size="sm"
+                    fw={500}
+                    c={status?.color}
+                    lineClamp={2} // ✨ Allows 2 lines with ellipsis after that
+                    title={row.title}
+                  >
+                    {row.title}
+                  </Text>
+                </UnstyledButton>
               );
             },
           },
