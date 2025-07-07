@@ -217,6 +217,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               </Grid.Col>
               <Grid.Col span={12}>
                 <AppRichTextEditor
+                  key={form.values.id}
                   content={form.values.description}
                   onUpdate={(content) =>
                     form.setFieldValue("description", content)
