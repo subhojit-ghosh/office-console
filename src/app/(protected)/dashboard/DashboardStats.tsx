@@ -1,7 +1,7 @@
 "use client";
 
 import { Group, Paper, SimpleGrid, Skeleton, Text, Title } from "@mantine/core";
-import { IconFoldersFilled, IconHomeFilled } from "@tabler/icons-react";
+import { IconHomeFilled } from "@tabler/icons-react";
 
 import { FaTasks } from "react-icons/fa";
 import { api } from "~/trpc/react";
