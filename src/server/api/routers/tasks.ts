@@ -1,4 +1,9 @@
-import { TaskActivityType, TaskStatus, type Prisma } from "@prisma/client";
+import {
+  TaskActivityType,
+  TaskStatus,
+  UserRole,
+  type Prisma,
+} from "@prisma/client";
 import {
   createTaskSchema,
   deleteTaskSchema,
@@ -52,6 +57,18 @@ export const tasksRouter = createTRPCRouter({
               assignees: {
                 some: { id: ctx.session.user.id },
               },
+            }
+          : {}),
+        ...(ctx.session.user.role === UserRole.STAFF
+          ? {
+              OR: [
+                { createdById: ctx.session.user.id },
+                {
+                  assignees: {
+                    some: { id: ctx.session.user.id },
+                  },
+                },
+              ],
             }
           : {}),
       };
