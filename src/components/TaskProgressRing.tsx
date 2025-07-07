@@ -36,9 +36,7 @@ export function TaskProgressRing({
       label={
         percentage === 100 ? (
           <Center>
-            <ActionIcon color="teal" variant="light" radius="xl" size="sm">
-              <IconCheck size={18} />
-            </ActionIcon>
+            <IconCheck size={18} color={color} />
           </Center>
         ) : (
           <Text c={color} ta="center" fz={12}>
