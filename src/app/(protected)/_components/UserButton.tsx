@@ -1,14 +1,21 @@
 import classes from "./UserButton.module.css";
 
 import { Group, Menu, Text, UnstyledButton } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { IconChevronRight, IconLogout } from "@tabler/icons-react";
 import { signOut, useSession } from "next-auth/react";
 
 export function UserButton() {
   const { data: session } = useSession();
+  const isMobile = useMediaQuery("(max-width: 48em)");
 
   return (
-    <Menu shadow="md" width={200} withArrow position="right-end">
+    <Menu
+      shadow="md"
+      width={isMobile ? 300 : 200}
+      withArrow
+      position={isMobile ? "top-end" : "right-end"}
+    >
       <Menu.Target>
         <UnstyledButton className={classes.user}>
           <Group>

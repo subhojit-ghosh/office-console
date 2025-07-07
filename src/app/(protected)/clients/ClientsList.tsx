@@ -13,7 +13,6 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
-  IconBriefcase,
   IconDotsVertical,
   IconPlus,
   IconSearch,
@@ -24,12 +23,13 @@ import { type DataTableSortStatus } from "mantine-datatable";
 import { useState } from "react";
 
 import { useDebouncedState } from "@mantine/hooks";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { FaUserTie } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ClientForm from "./ClientForm";
-import { useSession } from "next-auth/react";
 
 type ClientsResponse = inferRouterOutputs<AppRouter>["clients"]["getAll"];
 
@@ -101,7 +101,7 @@ export default function ClientsList() {
     <>
       <Group justify="space-between" px="md" mb="md">
         <Group gap="xs">
-          <IconBriefcase />
+          <FaUserTie />
           <Title size="lg">Clients</Title>
           <TextInput
             ml="md"
