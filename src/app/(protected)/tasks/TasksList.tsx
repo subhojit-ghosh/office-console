@@ -225,11 +225,8 @@ export default function TasksList() {
               searchable
               clearable
               size="xs"
-              placeholder={
-                assigneesQuery.isLoading
-                  ? "Loading assignees..."
-                  : "All assignees"
-              }
+              placeholder="All Assignees"
+              disabled={projectsQuery.isLoading}
             />
           )}
           <Popover width={300} position="bottom" withArrow shadow="md">
