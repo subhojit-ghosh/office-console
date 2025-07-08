@@ -221,6 +221,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
               }
               value={form.values.memberIds}
               onChange={(value) => form.setFieldValue("memberIds", value)}
+              searchable
               disabled={loading}
             />
           </Grid.Col>

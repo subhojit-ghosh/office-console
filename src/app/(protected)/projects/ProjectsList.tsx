@@ -153,6 +153,7 @@ export default function ProjectsList() {
             <Select
               placeholder="All Clients"
               clearable
+              searchable
               data={
                 clientsQuery.data?.clients.map((c) => ({
                   value: c.id,

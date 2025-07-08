@@ -261,6 +261,7 @@ export default function TasksList() {
                 label="Project"
                 placeholder="All Projects"
                 clearable
+                searchable
                 mb="sm"
                 data={
                   projectsQuery.data?.projects.map((p) => ({
@@ -279,6 +280,7 @@ export default function TasksList() {
                 label="Module"
                 placeholder="All Modules"
                 clearable
+                searchable
                 data={
                   modulesQuery.data?.modules.map((m) => ({
                     value: m.id,
