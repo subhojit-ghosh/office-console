@@ -14,6 +14,7 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
+import { UserRole } from "@prisma/client";
 import {
   IconDotsVertical,
   IconPlus,
@@ -23,6 +24,7 @@ import {
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,8 +34,6 @@ import { TaskProgressRing } from "~/components/TaskProgressRing";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 import ModuleForm from "./ModuleForm";
-import { useSession } from "next-auth/react";
-import { UserRole } from "@prisma/client";
 
 type ModulesResponse = inferRouterOutputs<AppRouter>["modules"]["getAll"];
 
@@ -69,10 +69,7 @@ export default function ModulesList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const projectsQuery = api.projects.getAll.useQuery({
-    page: 1,
-    pageSize: 100,
-  });
+  const projectsQuery = api.projects.getAllMinimal.useQuery();
 
   const { data, isPending } = api.modules.getAll.useQuery({
     page,
@@ -138,7 +135,7 @@ export default function ModulesList() {
             clearable
             searchable
             data={
-              projectsQuery.data?.projects.map((p) => ({
+              projectsQuery.data?.map((p) => ({
                 value: p.id,
                 label: p.name,
               })) ?? []

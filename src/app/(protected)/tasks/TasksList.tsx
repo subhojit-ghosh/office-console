@@ -10,7 +10,6 @@ import {
   Menu,
   Popover,
   Select,
-  Switch,
   Text,
   TextInput,
   Title,
@@ -71,7 +70,7 @@ export default function TasksList() {
       projectId: "",
       moduleId: "",
       priority: "",
-      assignedToMe: false,
+      assignee: null as string | null,
     },
     300,
   );
@@ -103,13 +102,9 @@ export default function TasksList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const projectsQuery = api.projects.getAll.useQuery({
-    page: 1,
-    pageSize: 100,
-  });
-  const modulesQuery = api.modules.getAll.useQuery({
-    page: 1,
-    pageSize: 100,
+  const assigneesQuery = api.users.getAllMinimal.useQuery();
+  const projectsQuery = api.projects.getAllMinimal.useQuery();
+  const modulesQuery = api.modules.getAllMinimal.useQuery({
     projectId: filters.projectId,
   });
 
@@ -123,7 +118,7 @@ export default function TasksList() {
     projectId: filters.projectId || undefined,
     moduleId: filters.moduleId || undefined,
     priority: (filters.priority as Task["priority"]) || undefined,
-    assignedToMe: filters.assignedToMe,
+    assignee: filters.assignee,
     sortBy: sortStatus.columnAccessor,
     sortOrder: sortStatus.direction,
   });
@@ -210,15 +205,30 @@ export default function TasksList() {
             style={{ width: 100 }}
           />
           {!shouldHideAssignees && (
-            <Switch
-              label="Assigned to Me"
+            <Select
+              data={
+                assigneesQuery.data
+                  ?.sort((a, b) =>
+                    a.id === session?.user.id
+                      ? -1
+                      : b.id === session?.user.id
+                        ? 1
+                        : 0,
+                  )
+                  .map((user) => ({
+                    value: user.id,
+                    label: user.name,
+                  })) ?? []
+              }
+              value={filters.assignee}
+              onChange={(value) => setFilters({ ...filters, assignee: value })}
+              searchable
+              clearable
               size="xs"
-              checked={filters.assignedToMe}
-              onChange={(event) =>
-                setFilters({
-                  ...filters,
-                  assignedToMe: event.currentTarget.checked,
-                })
+              placeholder={
+                assigneesQuery.isLoading
+                  ? "Loading assignees..."
+                  : "All assignees"
               }
             />
           )}
@@ -264,7 +274,7 @@ export default function TasksList() {
                 searchable
                 mb="sm"
                 data={
-                  projectsQuery.data?.projects.map((p) => ({
+                  projectsQuery.data?.map((p) => ({
                     value: p.id,
                     label: p.name,
                   })) ?? []
@@ -282,7 +292,7 @@ export default function TasksList() {
                 clearable
                 searchable
                 data={
-                  modulesQuery.data?.modules.map((m) => ({
+                  modulesQuery.data?.map((m) => ({
                     value: m.id,
                     label: m.name,
                   })) ?? []
@@ -465,15 +475,30 @@ export default function TasksList() {
             accessor: "assignees",
             title: "Assignees",
             hidden: shouldHideAssignees,
-            render: (row) => (
-              <Avatar.Group spacing="xs">
-                {row.assignees.map((assignee) => (
-                  <Tooltip key={assignee.id} label={assignee.name} withArrow>
-                    <Avatar key={assignee.id} name={assignee.name} size="sm" />
-                  </Tooltip>
-                ))}
-              </Avatar.Group>
-            ),
+            render: (row) => {
+              const maxVisible = 4;
+              const assignees = row.assignees;
+              const visibleAssignees = assignees.slice(0, maxVisible);
+              const extraAssignees = assignees.slice(maxVisible);
+              const extraCount = extraAssignees.length;
+              const extraNames = extraAssignees.map((a) => a.name).join(", ");
+
+              return (
+                <Avatar.Group spacing="xs">
+                  {visibleAssignees.map((assignee) => (
+                    <Tooltip key={assignee.id} label={assignee.name} withArrow>
+                      <Avatar name={assignee.name} size="sm" />
+                    </Tooltip>
+                  ))}
+
+                  {extraCount > 0 && (
+                    <Tooltip label={extraNames} withArrow>
+                      <Avatar size="sm">+{extraCount}</Avatar>
+                    </Tooltip>
+                  )}
+                </Avatar.Group>
+              );
+            },
           },
           {
             accessor: "actions",

@@ -55,6 +55,16 @@ export const clientsRouter = createTRPCRouter({
       };
     }),
 
+  getAllMinimal: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.client.findMany({
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  }),
+
   getById: protectedProcedure
     .input(getClientByIdSchema)
     .query(async ({ ctx, input }) => {

@@ -21,8 +21,7 @@ import {
   createModuleSchema,
   updateModuleSchema,
 } from "~/schemas/module.schema";
-import { api } from "~/trpc/react";
-import { apiClient } from "~/trpc/react";
+import { api, apiClient } from "~/trpc/react";
 
 interface Props {
   mode: "add" | "edit";
@@ -37,10 +36,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
   const [loading, setLoading] = useState(false);
   const [editDataLoading, setEditDataLoading] = useState(false);
 
-  const projectsQuery = api.projects.getAll.useQuery({
-    page: 1,
-    pageSize: 100,
-  });
+  const projectsQuery = api.projects.getAllMinimal.useQuery();
 
   const form = useForm({
     initialValues: {
@@ -182,7 +178,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
             <Select
               label="Project"
               data={
-                projectsQuery.data?.projects.map((p) => ({
+                projectsQuery.data?.map((p) => ({
                   value: p.id,
                   label: p.name,
                 })) ?? []

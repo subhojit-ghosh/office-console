@@ -51,7 +51,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
     validate: zodResolver(mode === "add" ? createUserSchema : updateUserSchema),
   });
 
-  const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
+  const clientsQuery = api.clients.getAllMinimal.useQuery();
 
   useEffect(() => {
     if (mode === "add") {
@@ -197,7 +197,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
               <Select
                 label="Client"
                 data={
-                  clientsQuery.data?.clients.map((c) => ({
+                  clientsQuery.data?.map((c) => ({
                     value: c.id,
                     label: c.name,
                   })) ?? []

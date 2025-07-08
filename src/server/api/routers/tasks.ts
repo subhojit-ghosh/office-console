@@ -28,7 +28,7 @@ export const tasksRouter = createTRPCRouter({
       const projectId = input.projectId;
       const moduleId = input.moduleId;
       const priority = input.priority;
-      const assignedToMe = input.assignedToMe;
+      const assignee = input.assignee;
 
       let projectIds: string[] = [];
 
@@ -52,10 +52,10 @@ export const tasksRouter = createTRPCRouter({
         ...(projectIds.length ? { projectId: { in: projectIds } } : {}),
         ...(moduleId ? { moduleId } : {}),
         ...(priority ? { priority } : {}),
-        ...(assignedToMe
+        ...(assignee
           ? {
               assignees: {
-                some: { id: ctx.session.user.id },
+                some: { id: assignee },
               },
             }
           : {}),

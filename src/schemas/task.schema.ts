@@ -21,7 +21,7 @@ export const getAllTasksSchema = z.object({
   priority: z.enum(TASK_PRIORITIES).optional(),
   projectId: z.string().optional(),
   moduleId: z.string().optional(),
-  assignedToMe: z.boolean().default(false).optional(),
+  assignee: z.string().optional().nullable(),
 });
 
 export const getTaskByIdSchema = z.object({

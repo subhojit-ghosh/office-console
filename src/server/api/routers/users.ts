@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import { UserRole, type Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import {
@@ -65,6 +65,51 @@ export const usersRouter = createTRPCRouter({
         totalPages: Math.ceil(total / pageSize),
       };
     }),
+
+  getAllMinimal: protectedProcedure.query(async ({ ctx }) => {
+    let userIds: string[] = [];
+    if (ctx.session.user.role === UserRole.STAFF) {
+      const projects = await ctx.db.project.findMany({
+        where: {
+          members: {
+            some: { id: ctx.session.user.id },
+          },
+        },
+        select: {
+          id: true,
+          members: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      userIds = projects.flatMap((project) =>
+        project.members.map((member) => member.id),
+      );
+    }
+
+    const where: Prisma.UserWhereInput = {
+      ...(userIds.length
+        ? {
+            id: { in: userIds },
+          }
+        : {}),
+    };
+
+    return ctx.db.user.findMany({
+      where,
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+      },
+    });
+  }),
 
   getById: protectedProcedure
     .input(getUserByIdSchema)

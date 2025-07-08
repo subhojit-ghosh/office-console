@@ -44,8 +44,8 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
   const [loading, setLoading] = useState(false);
   const [editDataLoading, setEditDataLoading] = useState(false);
 
-  const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
-  const membersQuery = api.users.getAll.useQuery({ page: 1, pageSize: 100 });
+  const clientsQuery = api.clients.getAllMinimal.useQuery();
+  const membersQuery = api.users.getAllMinimal.useQuery();
 
   const form = useForm({
     initialValues: {
@@ -182,6 +182,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
         close();
       }}
       title={mode === "add" ? "Add Project" : "Edit Project"}
+      size="lg"
     >
       <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -214,7 +215,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
             <MultiSelect
               label="Members"
               data={
-                membersQuery.data?.users.map((user) => ({
+                membersQuery.data?.map((user) => ({
                   value: user.id,
                   label: user.name,
                 })) ?? []
@@ -231,7 +232,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
                 <Select
                   label="Client"
                   data={
-                    clientsQuery.data?.clients.map((c) => ({
+                    clientsQuery.data?.map((c) => ({
                       value: c.id,
                       label: c.name,
                     })) ?? []

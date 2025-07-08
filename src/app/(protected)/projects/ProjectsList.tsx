@@ -78,7 +78,7 @@ export default function ProjectsList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const clientsQuery = api.clients.getAll.useQuery({ page: 1, pageSize: 100 });
+  const clientsQuery = api.clients.getAllMinimal.useQuery();
 
   const { data, isPending } = api.projects.getAll.useQuery({
     page,
@@ -155,7 +155,7 @@ export default function ProjectsList() {
               clearable
               searchable
               data={
-                clientsQuery.data?.clients.map((c) => ({
+                clientsQuery.data?.map((c) => ({
                   value: c.id,
                   label: c.name,
                 })) ?? []
@@ -263,15 +263,30 @@ export default function ProjectsList() {
           {
             accessor: "members",
             title: "Members",
-            render: (row) => (
-              <Avatar.Group spacing="xs">
-                {row.members.map((member) => (
-                  <Tooltip key={member.id} label={member.name} withArrow>
-                    <Avatar key={member.id} name={member.name} size="sm" />
-                  </Tooltip>
-                ))}
-              </Avatar.Group>
-            ),
+            render: (row) => {
+              const maxVisible = 4;
+              const members = row.members;
+              const visibleMembers = members.slice(0, maxVisible);
+              const extraMembers = members.slice(maxVisible);
+              const extraCount = extraMembers.length;
+              const extraNames = extraMembers.map((m) => m.name).join(", ");
+
+              return (
+                <Avatar.Group spacing="xs">
+                  {visibleMembers.map((member) => (
+                    <Tooltip key={member.id} label={member.name} withArrow>
+                      <Avatar name={member.name} size="sm" />
+                    </Tooltip>
+                  ))}
+
+                  {extraCount > 0 && (
+                    <Tooltip label={extraNames} withArrow>
+                      <Avatar size="sm">+{extraCount}</Avatar>
+                    </Tooltip>
+                  )}
+                </Avatar.Group>
+              );
+            },
           },
           {
             accessor: "actions",
