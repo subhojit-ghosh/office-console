@@ -76,7 +76,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
-    "recharts": "^2.15.4",
+    "recharts": "2",
     "server-only": "^0.0.1",
     "superjson": "^2.2.2",
     "tippy.js": "^6.3.7",

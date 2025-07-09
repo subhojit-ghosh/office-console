@@ -159,7 +159,7 @@ importers:
         specifier: ^5.5.0
         version: 5.5.0(react@19.1.0)
       recharts:
-        specifier: ^2.15.4
+        specifier: '2'
         version: 2.15.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       server-only:
         specifier: ^0.0.1

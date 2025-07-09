@@ -48,4 +48,34 @@ export const dashboardRouter = createTRPCRouter({
       tasks,
     };
   }),
+
+  taskTypeBreakdown: protectedProcedure.query(async ({ ctx }) => {
+    const clientId = ctx.session.user.clientId;
+    const userId = ctx.session.user.id;
+    const isStaff = ctx.session.user.role === "STAFF";
+
+    const data = await ctx.db.task.groupBy({
+      by: ["type"],
+      _count: { type: true },
+      where: {
+        status: {
+          notIn: TASK_STATUS_FILTERS.COMPLETED,
+        },
+        ...(clientId ? { project: { clientId } } : {}),
+        ...(isStaff
+          ? {
+              OR: [
+                { createdById: userId },
+                { assignees: { some: { id: userId } } },
+              ],
+            }
+          : {}),
+      },
+    });
+
+    return data.map((item) => ({
+      type: item.type,
+      count: item._count.type,
+    }));
+  }),
 });
