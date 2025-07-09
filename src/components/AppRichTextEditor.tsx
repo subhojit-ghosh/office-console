@@ -8,9 +8,10 @@ import TextStyle from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useEffect } from "react";
 
 interface Props {
-  key?: string | number;
+  id?: string | number;
   content?: string;
   onUpdate?: (value: string) => void;
 }
@@ -37,9 +38,13 @@ export default function AppRichTextEditor(props: Props) {
     },
   });
 
+  useEffect(() => {
+    editor?.commands.setContent(props.content ?? "", false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.id]);
+
   return (
     <RichTextEditor
-      key={props.key}
       editor={editor}
       styles={{
         content: {
