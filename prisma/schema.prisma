@@ -127,8 +127,20 @@ enum TaskPriority {
   URGENT
 }
 
+enum TaskType {
+  TASK
+  BUG
+  FEATURE
+  IMPROVEMENT
+  RESEARCH
+  DOCUMENTATION
+  TEST
+  MEETING
+}
+
 model Task {
   id          String       @id @default(ulid())
+  type        TaskType     @default(TASK)
   title       String
   description String?
   status      TaskStatus   @default(TODO)

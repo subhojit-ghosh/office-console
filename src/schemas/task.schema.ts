@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { TASK_PRIORITIES, TASK_STATUSES } from "~/constants/task.constant";
+import {
+  TASK_PRIORITIES,
+  TASK_STATUSES,
+  TASK_TYPES,
+} from "~/constants/task.constant";
 
 function parseDate(val: unknown) {
   if (!val) return undefined;
@@ -17,6 +21,7 @@ export const getAllTasksSchema = z.object({
   search: z.string().optional(),
   sortBy: z.string().default("title").optional(),
   sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
+  type: z.enum(TASK_TYPES).optional(),
   statuses: z.array(z.enum(TASK_STATUSES)).optional(),
   priority: z.enum(TASK_PRIORITIES).optional(),
   projectId: z.string().optional(),
@@ -29,6 +34,7 @@ export const getTaskByIdSchema = z.object({
 });
 
 export const createTaskSchema = z.object({
+  type: z.enum(TASK_TYPES).optional(),
   title: z.string().nonempty("Title is required"),
   description: z.string().optional().nullable(),
   status: z.enum(TASK_STATUSES).optional(),
@@ -41,6 +47,7 @@ export const createTaskSchema = z.object({
 
 export const updateTaskSchema = z.object({
   id: z.string().nonempty("ID is required"),
+  type: z.enum(TASK_TYPES).optional(),
   title: z.string().nonempty("Title is required"),
   description: z.string().optional().nullable(),
   status: z.enum(TASK_STATUSES).optional(),

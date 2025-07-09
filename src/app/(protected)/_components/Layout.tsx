@@ -29,7 +29,7 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
       <AppShell.Main pt="md" className={classes.mainWithMobileHeader}>
         {children}
       </AppShell.Main>
-      <div
+      {/* <div
         style={{
           position: "fixed",
           bottom: "1rem",
@@ -38,11 +38,11 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
           color: "#888",
           zIndex: 50,
         }}
-      >
+      > */}
         {/* 🐛 Built by Subhojit Ghosh — free bugs included */}
         {/* 🛠️ In development - Subhojit Ghosh */}
         {/* 🐛 More features coming (and bugs too) — Subhojit Ghosh */}
-        ⚒️ Development in progress
+        {/* ⚒️ Development in progress */}
         {/* <a
           href="https://github.com/subhojit-ghosh/office-console"
           target="_blank"
@@ -50,7 +50,7 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
         >
           Subhojit Ghosh
         </a> */}
-      </div>
+      {/* </div> */}
     </AppShell>
   );
 }

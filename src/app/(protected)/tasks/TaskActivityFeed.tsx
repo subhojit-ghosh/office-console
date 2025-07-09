@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import {
   TASK_PRIORITY_OPTIONS,
   TASK_STATUS_OPTIONS,
+  TASK_TYPE_OPTIONS,
 } from "~/constants/task.constant";
 import { titleCase } from "~/utils/text-formatting";
 
@@ -27,6 +28,13 @@ const getBadgeColorAndLabel = (
   field: string,
   value: string,
 ): { color: string; label: string } => {
+  if (field === "type") {
+    const match = TASK_TYPE_OPTIONS.find((opt) => opt.value === value);
+    return match
+      ? { color: match.color, label: match.label }
+      : { color: "gray", label: titleCase(value) };
+  }
+
   if (field === "status") {
     const match = TASK_STATUS_OPTIONS.find((opt) => opt.value === value);
     return match

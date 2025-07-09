@@ -24,6 +24,7 @@ import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
 import {
   TASK_PRIORITY_OPTIONS,
   TASK_STATUS_OPTIONS,
+  TASK_TYPE_OPTIONS,
 } from "~/constants/task.constant";
 import { createTaskSchema, updateTaskSchema } from "~/schemas/task.schema";
 import type { AppRouter } from "~/server/api/root";
@@ -53,6 +54,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       id: "",
       title: "",
       description: "",
+      type: "TASK",
       status: "PENDING",
       priority: "MEDIUM",
       projectId: null as string | null,
@@ -106,8 +108,9 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
           id: taskDetail.id,
           title: taskDetail.title,
           description: taskDetail.description ?? "",
-          status: taskDetail.status ?? "PENDING",
-          priority: taskDetail.priority ?? "MEDIUM",
+          type: taskDetail.type,
+          status: taskDetail.status,
+          priority: taskDetail.priority,
           projectId: taskDetail.projectId,
           moduleId: taskDetail.moduleId ?? "",
           assigneeIds: Array.isArray(taskDetail.assignees)
@@ -174,6 +177,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       createTask.mutate({
         title: values.title,
         description: values.description,
+        type: values.type as Task["type"],
         status: values.status as Task["status"],
         priority: values.priority as Task["priority"],
         projectId: values.projectId,
@@ -186,6 +190,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
         id: values.id,
         title: values.title,
         description: values.description,
+        type: values.type as Task["type"],
         status: values.status as Task["status"],
         priority: values.priority as Task["priority"],
         projectId: values.projectId,
@@ -215,6 +220,20 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   {...form.getInputProps("title")}
                   withAsterisk
                   disabled={loading}
+                  leftSectionWidth={70}
+                  leftSection={
+                    <EditableBadgeDropdown
+                      value={form.values.type}
+                      options={TASK_TYPE_OPTIONS}
+                      onChange={(value) => form.setFieldValue("type", value)}
+                      compact={false}
+                      hoverEffect={false}
+                      fullWidth={true}
+                      position="bottom-start"
+                      isIconVariant={true}
+                      variant="subtle"
+                    />
+                  }
                 />
               </Grid.Col>
               <Grid.Col span={12}>

@@ -24,6 +24,7 @@ export const tasksRouter = createTRPCRouter({
       const search = input?.search?.trim();
       const sortBy = input.sortBy ?? "title";
       const sortOrder = input.sortOrder ?? "asc";
+      const type = input.type;
       const statuses = input.statuses;
       const projectId = input.projectId;
       const moduleId = input.moduleId;
@@ -48,6 +49,7 @@ export const tasksRouter = createTRPCRouter({
               title: { contains: search, mode: "insensitive" },
             }
           : {}),
+        ...(type ? { type } : {}),
         ...(statuses ? { status: { in: statuses } } : {}),
         ...(projectIds.length ? { projectId: { in: projectIds } } : {}),
         ...(moduleId ? { moduleId } : {}),
@@ -81,6 +83,7 @@ export const tasksRouter = createTRPCRouter({
           take: pageSize,
           select: {
             id: true,
+            type: true,
             title: true,
             status: true,
             priority: true,
@@ -229,6 +232,7 @@ export const tasksRouter = createTRPCRouter({
       const activityLogs: Prisma.TaskActivityCreateManyInput[] = [];
 
       const fieldChangeKeys: (keyof typeof rest)[] = [
+        "type",
         "status",
         "priority",
         "dueDate",

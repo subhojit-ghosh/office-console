@@ -1,3 +1,14 @@
+import {
+  IconBug,
+  IconCalendarEvent,
+  IconCircleCheck,
+  IconSparkles,
+  IconTestPipe,
+  IconTrendingUp,
+  IconWorldSearch,
+  IconWriting,
+} from "@tabler/icons-react";
+
 export const TASK_STATUSES = [
   "BACKLOG",
   "TODO",
@@ -52,4 +63,67 @@ export const TASK_PRIORITY_OPTIONS = TASK_PRIORITIES.map((priority) => ({
   value: priority,
   label: TASK_PRIORITY_MAP[priority].label,
   color: TASK_PRIORITY_MAP[priority].color,
+}));
+
+export const TASK_TYPES = [
+  "TASK",
+  "BUG",
+  "FEATURE",
+  "IMPROVEMENT",
+  "RESEARCH",
+  "DOCUMENTATION",
+  "TEST",
+  "MEETING",
+] as const;
+
+export type TaskType = (typeof TASK_TYPES)[number];
+
+export const TASK_TYPE_MAP = {
+  TASK: {
+    label: "Task",
+    icon: IconCircleCheck,
+    color: "blue",
+  },
+  BUG: {
+    label: "Bug",
+    icon: IconBug,
+    color: "red",
+  },
+  FEATURE: {
+    label: "Feature",
+    icon: IconSparkles,
+    color: "green",
+  },
+  IMPROVEMENT: {
+    label: "Improvement",
+    icon: IconTrendingUp,
+    color: "blue",
+  },
+  RESEARCH: {
+    label: "Research",
+    icon: IconWorldSearch,
+    color: "violet",
+  },
+  DOCUMENTATION: {
+    label: "Documentation",
+    icon: IconWriting,
+    color: "orange",
+  },
+  TEST: {
+    label: "Test",
+    icon: IconTestPipe,
+    color: "teal",
+  },
+  MEETING: {
+    label: "Meeting",
+    icon: IconCalendarEvent,
+    color: "cyan",
+  },
+} as const;
+
+export const TASK_TYPE_OPTIONS = TASK_TYPES.map((type) => ({
+  value: type,
+  label: TASK_TYPE_MAP[type].label,
+  icon: TASK_TYPE_MAP[type].icon,
+  color: TASK_TYPE_MAP[type].color,
 }));

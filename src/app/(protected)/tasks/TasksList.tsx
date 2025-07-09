@@ -15,6 +15,7 @@ import {
   Title,
   Tooltip,
   UnstyledButton,
+  useMantineTheme,
 } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -40,6 +41,7 @@ import {
   TASK_PRIORITY_OPTIONS,
   TASK_STATUS_FILTERS,
   TASK_STATUS_OPTIONS,
+  TASK_TYPE_OPTIONS,
 } from "~/constants/task.constant";
 import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
@@ -48,6 +50,7 @@ import TaskForm from "./TaskForm";
 type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
 
 export default function TasksList() {
+  const theme = useMantineTheme();
   const utils = api.useUtils();
   const { data: session } = useSession();
   const [page, setPage] = useState(1);
@@ -66,6 +69,7 @@ export default function TasksList() {
   const [filters, setFilters] = useDebouncedState(
     {
       search: "",
+      type: "",
       status: "",
       projectId: "",
       moduleId: "",
@@ -112,6 +116,7 @@ export default function TasksList() {
     page,
     pageSize,
     search: filters.search,
+    type: (filters.type as Task["type"]) || undefined,
     statuses: filters.status
       ? [filters.status as TaskStatus]
       : TASK_STATUS_FILTERS[selectedStatusGroup],
@@ -237,6 +242,7 @@ export default function TasksList() {
                 leftSection={<IconFilter2 size={14} />}
                 rightSection={(() => {
                   const activeFilters = [
+                    filters.type,
                     filters.priority,
                     filters.projectId,
                     filters.moduleId,
@@ -254,6 +260,18 @@ export default function TasksList() {
             </Popover.Target>
             <Popover.Dropdown bg="var(--mantine-color-body)">
               <Select
+                label="Type"
+                placeholder="All Types"
+                clearable
+                mb="sm"
+                data={TASK_TYPE_OPTIONS}
+                defaultValue={filters.type}
+                onChange={(value) =>
+                  setFilters({ ...filters, type: value ?? "" })
+                }
+                comboboxProps={{ withinPortal: false }}
+              />
+              <Select
                 label="Priority"
                 placeholder="All Priority"
                 clearable
@@ -263,6 +281,7 @@ export default function TasksList() {
                 onChange={(value) =>
                   setFilters({ ...filters, priority: value ?? "" })
                 }
+                comboboxProps={{ withinPortal: false }}
               />
               <Select
                 label="Project"
@@ -336,6 +355,7 @@ export default function TasksList() {
               const status = TASK_STATUS_OPTIONS.find(
                 (p) => p.value === row.status,
               );
+              const type = TASK_TYPE_OPTIONS.find((t) => t.value === row.type);
 
               return (
                 <UnstyledButton
@@ -352,16 +372,25 @@ export default function TasksList() {
                     backgroundColor: "transparent",
                   }}
                 >
-                  <Text
-                    size="sm"
-                    fw={500}
-                    c={status?.color}
-                    lineClamp={2} // ✨ Allows 2 lines with ellipsis after that
-                    title={row.title}
-                    className="button-hover-underline"
-                  >
-                    {row.title}
-                  </Text>
+                  <Group gap="xs" align="center" wrap="nowrap">
+                    {type && (
+                      <type.icon
+                        size={18}
+                        color={theme.colors[type.color][4]}
+                      />
+                    )}
+                    <Text
+                      size="sm"
+                      fw={500}
+                      c={status?.color}
+                      lineClamp={2}
+                      title={row.title}
+                      className="button-hover-underline"
+                      style={{ flex: 1 }}
+                    >
+                      {row.title}
+                    </Text>
+                  </Group>
                 </UnstyledButton>
               );
             },
