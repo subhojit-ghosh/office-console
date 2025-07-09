@@ -1,6 +1,5 @@
 "use client";
 
-import { BarChart } from "@mantine/charts";
 import { Group, Paper, SimpleGrid, Skeleton, Text, Title } from "@mantine/core";
 import { IconFoldersFilled, IconHomeFilled } from "@tabler/icons-react";
 import { FaTasks } from "react-icons/fa";
@@ -87,7 +86,7 @@ export default function DashboardStats() {
             ) : (
               <Text className={classes.value}>{dashboardQuery.data.tasks}</Text>
             )}
-            <BarChart
+            {/* <BarChart
               h={300}
               data={chartData}
               dataKey="label"
@@ -101,8 +100,19 @@ export default function DashboardStats() {
                   borderRadius: "4px",
                 },
               }}
-            />
+            /> */}
           </Group>
+          {/* <Progress.Root size="xl">
+                <Progress.Section value={35} color="cyan">
+                  <Progress.Label>Documents</Progress.Label>
+                </Progress.Section>
+                <Progress.Section value={28} color="pink">
+                  <Progress.Label>Photos</Progress.Label>
+                </Progress.Section>
+                <Progress.Section value={15} color="orange">
+                  <Progress.Label>Other</Progress.Label>
+                </Progress.Section>
+              </Progress.Root> */}
         </Paper>
       </SimpleGrid>
     </>
