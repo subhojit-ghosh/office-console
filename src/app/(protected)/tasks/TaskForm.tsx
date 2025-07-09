@@ -249,17 +249,17 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               </Grid.Col>
               {mode == "edit" && (
                 <Grid.Col span={12}>
-                  <Tabs variant="outline" defaultValue="comments">
+                  <Tabs variant="default" defaultValue="comments">
                     <Tabs.List>
                       <Tabs.Tab
                         value="comments"
-                        leftSection={<IconMessage size={12} />}
+                        leftSection={<IconMessage size={16} />}
                       >
                         Comments
                       </Tabs.Tab>
                       <Tabs.Tab
                         value="activities"
-                        leftSection={<IconActivity size={12} />}
+                        leftSection={<IconActivity size={16} />}
                       >
                         Activities
                       </Tabs.Tab>
