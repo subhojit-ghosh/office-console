@@ -5,10 +5,14 @@ import {
   type Prisma,
 } from "@prisma/client";
 import {
+  createTaskCommentSchema,
   createTaskSchema,
+  deleteTaskCommentSchema,
   deleteTaskSchema,
   getAllTasksSchema,
   getTaskByIdSchema,
+  getTaskCommentsByTaskIdSchema,
+  updateTaskCommentSchema,
   updateTaskFieldSchema,
   updateTaskSchema,
 } from "~/schemas/task.schema";
@@ -165,7 +169,6 @@ export const tasksRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { assigneeIds, ...rest } = input;
 
-      // Validate assignees against project members
       const projectMembers = await ctx.db.project.findUnique({
         where: { id: input.projectId },
         select: { members: { select: { id: true } } },
@@ -385,6 +388,116 @@ export const tasksRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.db.task.delete({
         where: { id: input.id },
+      });
+    }),
+
+  getComments: protectedProcedure
+    .input(getTaskCommentsByTaskIdSchema)
+    .query(async ({ ctx, input }) => {
+      const task = await ctx.db.task.findUnique({
+        where: { id: input.taskId },
+        select: { id: true },
+      });
+
+      if (!task) {
+        throw new Error("Task not found");
+      }
+      return ctx.db.taskComment.findMany({
+        where: { taskId: input.taskId },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          type: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          edited: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+    }),
+
+  createComment: protectedProcedure
+    .input(createTaskCommentSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { taskId, type, content } = input;
+      const userId = ctx.session.user.id;
+
+      const task = await ctx.db.task.findUnique({
+        where: { id: taskId },
+        select: { id: true },
+      });
+
+      if (!task) {
+        throw new Error("Task not found");
+      }
+
+      const comment = await ctx.db.taskComment.create({
+        data: {
+          taskId,
+          type,
+          content,
+          userId,
+        },
+      });
+
+      return comment;
+    }),
+
+  updateComment: protectedProcedure
+    .input(updateTaskCommentSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { id, content } = input;
+      const userId = ctx.session.user.id;
+
+      const comment = await ctx.db.taskComment.findUnique({
+        where: { id },
+        select: { id: true, userId: true },
+      });
+
+      if (!comment) {
+        throw new Error("Comment not found");
+      }
+
+      if (comment.userId !== userId) {
+        throw new Error("You are not authorized to update this comment");
+      }
+
+      return ctx.db.taskComment.update({
+        where: { id },
+        data: {
+          content,
+          edited: true,
+        },
+      });
+    }),
+
+  deleteComment: protectedProcedure
+    .input(deleteTaskCommentSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { id } = input;
+      const userId = ctx.session.user.id;
+
+      const comment = await ctx.db.taskComment.findUnique({
+        where: { id },
+        select: { id: true, userId: true },
+      });
+
+      if (!comment) {
+        throw new Error("Comment not found");
+      }
+
+      if (comment.userId !== userId) {
+        throw new Error("You are not authorized to update this comment");
+      }
+
+      return ctx.db.taskComment.delete({
+        where: { id },
       });
     }),
 });

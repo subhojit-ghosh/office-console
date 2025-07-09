@@ -127,3 +127,9 @@ export const TASK_TYPE_OPTIONS = TASK_TYPES.map((type) => ({
   icon: TASK_TYPE_MAP[type].icon,
   color: TASK_TYPE_MAP[type].color,
 }));
+
+export const TASK_COMMENT_TYPES = [
+  "GENERAL",
+  "BLOCK_REASON",
+  "ON_HOLD_REASON",
+] as const;

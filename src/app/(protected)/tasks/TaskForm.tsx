@@ -14,7 +14,7 @@ import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { UserRole, type Task } from "@prisma/client";
-import { IconActivity } from "@tabler/icons-react";
+import { IconActivity, IconMessage } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
@@ -30,6 +30,7 @@ import { createTaskSchema, updateTaskSchema } from "~/schemas/task.schema";
 import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
 import { TaskActivityFeed } from "./TaskActivityFeed";
+import TaskComments from "./TaskComments";
 
 type TaskGetByIdResponse = inferRouterOutputs<AppRouter>["tasks"]["getById"];
 
@@ -243,12 +244,19 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   onUpdate={(content) =>
                     form.setFieldValue("description", content)
                   }
+                  placeholder="Add description..."
                 />
               </Grid.Col>
               {mode == "edit" && (
                 <Grid.Col span={12}>
-                  <Tabs variant="outline" defaultValue="activities">
+                  <Tabs variant="outline" defaultValue="comments">
                     <Tabs.List>
+                      <Tabs.Tab
+                        value="comments"
+                        leftSection={<IconMessage size={12} />}
+                      >
+                        Comments
+                      </Tabs.Tab>
                       <Tabs.Tab
                         value="activities"
                         leftSection={<IconActivity size={12} />}
@@ -257,6 +265,9 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       </Tabs.Tab>
                     </Tabs.List>
 
+                    <Tabs.Panel value="comments" pt="md">
+                      <TaskComments taskId={id!} />
+                    </Tabs.Panel>
                     <Tabs.Panel value="activities" pt="md">
                       <TaskActivityFeed activities={activities} />
                     </Tabs.Panel>

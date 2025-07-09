@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  TASK_COMMENT_TYPES,
   TASK_PRIORITIES,
   TASK_STATUSES,
   TASK_TYPES,
@@ -72,5 +73,24 @@ export const updateTaskFieldSchema = z.discriminatedUnion("key", [
 ]);
 
 export const deleteTaskSchema = z.object({
+  id: z.string().nonempty("ID is required"),
+});
+
+export const getTaskCommentsByTaskIdSchema = z.object({
+  taskId: z.string().nonempty("Task ID is required"),
+});
+
+export const createTaskCommentSchema = z.object({
+  taskId: z.string().nonempty("Task ID is required"),
+  type: z.enum(TASK_COMMENT_TYPES).optional(),
+  content: z.string().nonempty("Title is required"),
+});
+
+export const updateTaskCommentSchema = z.object({
+  id: z.string().nonempty("ID is required"),
+  content: z.string().nonempty("Content is required"),
+});
+
+export const deleteTaskCommentSchema = z.object({
   id: z.string().nonempty("ID is required"),
 });

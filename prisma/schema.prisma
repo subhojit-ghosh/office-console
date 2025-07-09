@@ -48,6 +48,7 @@ model User {
   assignedTasks    Task[]         @relation("AssignedTasks")
   modules          Module[]       @relation("CreatedModules")
   taskActivities   TaskActivity[] @relation("TaskActivities")
+  taskComments     TaskComment[]  @relation("TaskComments")
   projectsAsMember Project[]      @relation("ProjectMembers")
 }
 
@@ -163,6 +164,7 @@ model Task {
   updatedAt   DateTime  @updatedAt
 
   activities TaskActivity[] @relation("TaskActivities")
+  comments   TaskComment[]  @relation("TaskComments")
 }
 
 enum TaskActivityType {
@@ -188,4 +190,23 @@ model TaskActivity {
   user   User   @relation("TaskActivities", fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+enum TaskCommentType {
+  GENERAL
+  BLOCK_REASON
+  ON_HOLD_REASON
+}
+
+model TaskComment {
+  id        String          @id @default(ulid())
+  taskId    String
+  task      Task            @relation("TaskComments", fields: [taskId], references: [id])
+  userId    String
+  user      User            @relation("TaskComments", fields: [userId], references: [id])
+  content   String
+  type      TaskCommentType @default(GENERAL)
+  edited    Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 }
