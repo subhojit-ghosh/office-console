@@ -52,14 +52,17 @@ th.mantine-datatable-header-cell-sortable:hover {
   padding: 0;
 } */
 
+/* TABLE WRAPPER */
 .ProseMirror table {
+  border: 1px solid #ced4da; /* Outer border */
   border-collapse: separate;
   border-spacing: 0;
-  border-radius: 8px;
+  border-radius: 8px; /* Mantine radius="md" */
   overflow: hidden;
   width: 100%;
 }
 
+/* BASE CELL STYLES */
 .ProseMirror th,
 .ProseMirror td {
   border: none;
@@ -69,24 +72,42 @@ th.mantine-datatable-header-cell-sortable:hover {
   border-bottom: 1px solid #ced4da;
 }
 
-/* First column: add left border */
-.ProseMirror tr > th:first-child,
-.ProseMirror tr > td:first-child {
-  border-left: 1px solid #ced4da;
+/* REMOVE LEFT BORDER FOR INNER CELLS */
+.ProseMirror tr > th:not(:first-child),
+.ProseMirror tr > td:not(:first-child) {
+  border-left: none;
 }
 
-/* First row: add top border */
-.ProseMirror table tr:first-child th,
-.ProseMirror table tr:first-child td {
-  border-top: 1px solid #ced4da;
+/* REMOVE TOP BORDER FOR INNER ROWS */
+.ProseMirror table tr:not(:first-child) th,
+.ProseMirror table tr:not(:first-child) td {
+  border-top: none;
 }
 
-/* Header background */
+/* REMOVE RIGHT BORDER FROM LAST COLUMN */
+.ProseMirror tr > th:last-child,
+.ProseMirror tr > td:last-child {
+  border-right: none;
+}
+
+/* REMOVE BOTTOM BORDER FROM LAST ROW */
+.ProseMirror table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Real <th> (inserted table headers) */
 .ProseMirror th {
   background-color: #f8f9fa;
+  font-weight: 600;
 }
 
-/* Rounded corners */
+/* Pasted tables fallback: style first row as visual header */
+.ProseMirror table tr:first-child td {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* ROUNDED CORNERS */
 .ProseMirror table tr:first-child th:first-child {
   border-top-left-radius: 8px;
 }
