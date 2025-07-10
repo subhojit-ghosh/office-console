@@ -50,6 +50,7 @@ model User {
   taskActivities   TaskActivity[] @relation("TaskActivities")
   taskComments     TaskComment[]  @relation("TaskComments")
   projectsAsMember Project[]      @relation("ProjectMembers")
+  feedbacks        Feedback[]     @relation("Feedbacks")
 }
 
 enum StaffPosition {
@@ -209,4 +210,21 @@ model TaskComment {
   edited    Boolean         @default(false)
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
+}
+
+enum FeedbackType {
+  FEEDBACK
+  BUG
+  FEATURE
+  OTHER
+}
+
+model Feedback {
+  id        String       @id @default(ulid())
+  type      FeedbackType @default(FEEDBACK)
+  message   String
+  rating    Int? // Only for type = FEEDBACK
+  userId    String
+  user      User?        @relation("Feedbacks", fields: [userId], references: [id])
+  createdAt DateTime     @default(now())
 }

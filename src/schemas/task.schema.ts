@@ -83,7 +83,7 @@ export const getTaskCommentsByTaskIdSchema = z.object({
 export const createTaskCommentSchema = z.object({
   taskId: z.string().nonempty("Task ID is required"),
   type: z.enum(TASK_COMMENT_TYPES).optional(),
-  content: z.string().nonempty("Title is required"),
+  content: z.string().nonempty("Content is required"),
 });
 
 export const updateTaskCommentSchema = z.object({

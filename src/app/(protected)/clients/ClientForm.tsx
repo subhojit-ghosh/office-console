@@ -30,7 +30,6 @@ interface Props {
 
 export default function ClientForm({ mode, opened, close, id }: Props) {
   const utils = api.useUtils();
-
   const [loading, setLoading] = useState(false);
   const [editDataLoading, setEditDataLoading] = useState(false);
 

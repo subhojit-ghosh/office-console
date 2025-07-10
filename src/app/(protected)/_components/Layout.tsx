@@ -5,6 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import MobileHeader from "./MobileHeader";
 import { Navbar } from "./Navbar";
 
+import Feedback from "./Feedback";
 import classes from "./Layout.module.css";
 
 export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -28,6 +29,8 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
       </AppShell.Navbar>
       <AppShell.Main pt="md" className={classes.mainWithMobileHeader}>
         {children}
+        <Feedback />
+        <div style={{ height: 100 }} />
       </AppShell.Main>
       {/* <div
         style={{
@@ -39,11 +42,11 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
           zIndex: 50,
         }}
       > */}
-        {/* 🐛 Built by Subhojit Ghosh — free bugs included */}
-        {/* 🛠️ In development - Subhojit Ghosh */}
-        {/* 🐛 More features coming (and bugs too) — Subhojit Ghosh */}
-        {/* ⚒️ Development in progress */}
-        {/* <a
+      {/* 🐛 Built by Subhojit Ghosh — free bugs included */}
+      {/* 🛠️ In development - Subhojit Ghosh */}
+      {/* 🐛 More features coming (and bugs too) — Subhojit Ghosh */}
+      {/* ⚒️ Development in progress */}
+      {/* <a
           href="https://github.com/subhojit-ghosh/office-console"
           target="_blank"
           style={{ textDecoration: "none" }}
