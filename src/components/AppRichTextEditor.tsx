@@ -1,3 +1,4 @@
+import { Tooltip } from "@mantine/core";
 import {
   getTaskListExtension,
   Link,
@@ -5,8 +6,12 @@ import {
   useRichTextEditorContext,
 } from "@mantine/tiptap";
 import {
+  IconColumnInsertLeft,
   IconColumnInsertRight,
+  IconColumnRemove,
   IconRowInsertBottom,
+  IconRowInsertTop,
+  IconRowRemove,
   IconTableMinus,
   IconTablePlus,
 } from "@tabler/icons-react";
@@ -94,12 +99,14 @@ const AppRichTextEditor = forwardRef<AppRichTextEditorHandle, Props>(
         }
       },
       onBlur: () => {
-        if (props.isOneTimeActive && isFocused) return;
+        setTimeout(() => {
+          if (props.isOneTimeActive && isFocused) return;
 
-        setIsFocused(false);
-        if (props.onFocusChange) {
-          props.onFocusChange(false);
-        }
+          setIsFocused(false);
+          if (props.onFocusChange) {
+            props.onFocusChange(false);
+          }
+        }, 100);
       },
     });
 
@@ -197,36 +204,75 @@ function TableButtons() {
 
   return (
     <>
-      <RichTextEditor.Control
-        onClick={() =>
-          editor
-            .chain()
-            .focus()
-            .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-            .run()
-        }
-        title="Insert table"
-      >
-        <IconTablePlus stroke={1.5} size={16} />
-      </RichTextEditor.Control>
-      <RichTextEditor.Control
-        onClick={() => editor.chain().focus().addColumnAfter().run()}
-        title="Add column"
-      >
-        <IconColumnInsertRight stroke={1.5} size={16} />
-      </RichTextEditor.Control>
-      <RichTextEditor.Control
-        onClick={() => editor.chain().focus().addRowAfter().run()}
-        title="Add row"
-      >
-        <IconRowInsertBottom stroke={1.5} size={16} />
-      </RichTextEditor.Control>
-      <RichTextEditor.Control
-        onClick={() => editor.chain().focus().deleteTable().run()}
-        title="Delete table"
-      >
-        <IconTableMinus stroke={1.5} size={16} />
-      </RichTextEditor.Control>
+      <Tooltip label="Insert table" withArrow>
+        <RichTextEditor.Control
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+              .run()
+          }
+        >
+          <IconTablePlus stroke={1.5} size={16} />
+        </RichTextEditor.Control>
+      </Tooltip>
+
+      <Tooltip label="Add column before" withArrow>
+        <RichTextEditor.Control
+          onClick={() => editor.chain().focus().addColumnBefore().run()}
+        >
+          <IconColumnInsertLeft stroke={1.5} size={16} />
+        </RichTextEditor.Control>
+      </Tooltip>
+
+      <Tooltip label="Add column after" withArrow>
+        <RichTextEditor.Control
+          onClick={() => editor.chain().focus().addColumnAfter().run()}
+        >
+          <IconColumnInsertRight stroke={1.5} size={16} />
+        </RichTextEditor.Control>
+      </Tooltip>
+
+      <Tooltip label="Delete column" withArrow>
+        <RichTextEditor.Control
+          onClick={() => editor.chain().focus().deleteColumn().run()}
+        >
+          <IconColumnRemove stroke={1.5} size={16} />
+        </RichTextEditor.Control>
+      </Tooltip>
+
+      <Tooltip label="Add row before" withArrow>
+        <RichTextEditor.Control
+          onClick={() => editor.chain().focus().addRowBefore().run()}
+        >
+          <IconRowInsertTop stroke={1.5} size={16} />
+        </RichTextEditor.Control>
+      </Tooltip>
+
+      <Tooltip label="Add row after" withArrow>
+        <RichTextEditor.Control
+          onClick={() => editor.chain().focus().addRowAfter().run()}
+        >
+          <IconRowInsertBottom stroke={1.5} size={16} />
+        </RichTextEditor.Control>
+      </Tooltip>
+
+      <Tooltip label="Delete row" withArrow>
+        <RichTextEditor.Control
+          onClick={() => editor.chain().focus().deleteRow().run()}
+        >
+          <IconRowRemove stroke={1.5} size={16} />
+        </RichTextEditor.Control>
+      </Tooltip>
+
+      <Tooltip label="Delete table" withArrow>
+        <RichTextEditor.Control
+          onClick={() => editor.chain().focus().deleteTable().run()}
+        >
+          <IconTableMinus stroke={1.5} size={16} />
+        </RichTextEditor.Control>
+      </Tooltip>
     </>
   );
 }
