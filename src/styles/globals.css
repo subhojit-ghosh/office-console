@@ -47,17 +47,12 @@ th.mantine-datatable-header-cell-sortable:hover {
   text-decoration: underline;
 }
 
-/* .rich-text-content p {
-  margin: 0;
-  padding: 0;
-} */
-
 /* TABLE WRAPPER */
 .ProseMirror table {
-  border: 1px solid #ced4da; /* Outer border */
+  border: 1px solid light-dark(#ced4da, #3a3a3a);
   border-collapse: separate;
   border-spacing: 0;
-  border-radius: 8px; /* Mantine radius="md" */
+  border-radius: 8px;
   overflow: hidden;
   width: 100%;
 }
@@ -67,9 +62,12 @@ th.mantine-datatable-header-cell-sortable:hover {
 .ProseMirror td {
   border: none;
   padding: 8px 12px;
-  background-color: white;
-  border-right: 1px solid #ced4da;
-  border-bottom: 1px solid #ced4da;
+  border-right: 1px solid light-dark(#ced4da, #3a3a3a);
+  border-bottom: 1px solid light-dark(#ced4da, #3a3a3a);
+
+  @include dark {
+    color: #dee2e6;
+  }
 }
 
 /* REMOVE LEFT BORDER FOR INNER CELLS */
@@ -97,29 +95,33 @@ th.mantine-datatable-header-cell-sortable:hover {
 
 /* Real <th> (inserted table headers) */
 .ProseMirror th {
-  background-color: #f8f9fa;
+  /* background-color: #f8f9fa; */
   font-weight: 600;
+
+  @include dark {
+    /* background-color: #2a2a2a; */
+  }
 }
 
 /* Pasted tables fallback: style first row as visual header */
 .ProseMirror table tr:first-child td {
-  background-color: #f8f9fa;
   font-weight: 600;
+
+  @include dark {
+  }
 }
 
 /* ROUNDED CORNERS */
 .ProseMirror table tr:first-child th:first-child {
   border-top-left-radius: 8px;
 }
-
 .ProseMirror table tr:first-child th:last-child {
   border-top-right-radius: 8px;
 }
-
 .ProseMirror table tr:last-child td:first-child {
   border-bottom-left-radius: 8px;
 }
-
 .ProseMirror table tr:last-child td:last-child {
   border-bottom-right-radius: 8px;
 }
+
