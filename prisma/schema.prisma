@@ -172,6 +172,8 @@ model Task {
   activities TaskActivity[] @relation("TaskActivities")
   comments   TaskComment[]  @relation("TaskComments")
   workLogs   WorkLog[]      @relation("WorkLogs")
+  linksFrom  TaskLink[]     @relation("SourceLinks")
+  linksTo    TaskLink[]     @relation("TargetLinks")
 }
 
 enum TaskActivityType {
@@ -259,4 +261,24 @@ model WorkLog {
   source                    LogSource @default(MANUAL)
 
   createdAt DateTime @default(now())
+}
+
+enum TaskLinkType {
+  BLOCKS
+  DEPENDS_ON
+}
+
+model TaskLink {
+  id   String       @id @default(ulid())
+  type TaskLinkType
+
+  sourceId String
+  source   Task   @relation("SourceLinks", fields: [sourceId], references: [id])
+
+  targetId String
+  target   Task   @relation("TargetLinks", fields: [targetId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([sourceId, targetId, type])
 }

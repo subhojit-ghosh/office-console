@@ -44,6 +44,7 @@ th.mantine-datatable-header-cell-sortable:hover {
 }
 
 .button-hover-underline:hover {
+  cursor: pointer;
   text-decoration: underline;
 }
 

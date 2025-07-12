@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   TASK_COMMENT_TYPES,
+  TASK_LINK_TYPES,
   TASK_PRIORITIES,
   TASK_STATUSES,
   TASK_TYPES,
@@ -83,5 +84,19 @@ export const updateTaskCommentSchema = z.object({
 });
 
 export const deleteTaskCommentSchema = z.object({
+  id: z.string().nonempty("ID is required"),
+});
+
+export const getTaskLinksByTaskIdSchema = z.object({
+  taskId: z.string().nonempty("Task ID is required"),
+});
+
+export const createTaskLinkSchema = z.object({
+  type: z.enum(TASK_LINK_TYPES),
+  sourceId: z.string().nonempty("Source ID is required"),
+  targetId: z.string().nonempty("Target ID is required"),
+});
+
+export const deleteTaskLinkSchema = z.object({
   id: z.string().nonempty("ID is required"),
 });

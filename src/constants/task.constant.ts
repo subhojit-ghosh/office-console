@@ -133,3 +133,19 @@ export const TASK_COMMENT_TYPES = [
   "BLOCK_REASON",
   "ON_HOLD_REASON",
 ] as const;
+
+export const TASK_LINK_TYPES = ["BLOCKS", "DEPENDS_ON"] as const;
+
+export const TASK_LINK_MAP = {
+  BLOCKS: {
+    label: "Blocks",
+  },
+  DEPENDS_ON: {
+    label: "Depends On",
+  },
+} as const;
+
+export const TASK_LINK_TYPE_OPTIONS = TASK_LINK_TYPES.map((type) => ({
+  value: type,
+  label: TASK_LINK_MAP[type].label,
+}));

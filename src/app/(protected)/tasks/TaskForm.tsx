@@ -8,13 +8,19 @@ import {
   MultiSelect,
   Select,
   Tabs,
+  Textarea,
   TextInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { UserRole, type Task } from "@prisma/client";
-import { IconActivity, IconClockHour4, IconMessage } from "@tabler/icons-react";
+import {
+  IconActivity,
+  IconClockHour4,
+  IconLink,
+  IconMessage,
+} from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
@@ -31,7 +37,8 @@ import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
 import { TaskActivityFeed } from "./TaskActivityFeed";
 import TaskComments from "./TaskComments";
-import TaskWorkLog from "./TaskWorkLog";
+import TaskWorkLogs from "./TaskWorkLogs";
+import TaskLinks from "./TaskLinks";
 
 type TaskGetByIdResponse = inferRouterOutputs<AppRouter>["tasks"]["getById"];
 
@@ -217,11 +224,12 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
           <Grid.Col span={9} style={{ maxHeight: "85vh", overflowY: "auto" }}>
             <Grid>
               <Grid.Col span={12}>
-                <TextInput
+                <Textarea
                   placeholder="Title"
                   {...form.getInputProps("title")}
                   withAsterisk
                   disabled={loading}
+                  autosize
                   leftSectionWidth={70}
                   leftSection={
                     <EditableBadgeDropdown
@@ -250,13 +258,19 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               </Grid.Col>
               {!!(mode == "edit" && session?.user.role !== UserRole.CLIENT) && (
                 <Grid.Col span={12}>
-                  <Tabs variant="default" defaultValue="comments">
+                  <Tabs variant="default" defaultValue="links">
                     <Tabs.List>
                       <Tabs.Tab
                         value="comments"
                         leftSection={<IconMessage size={16} />}
                       >
                         Comments
+                      </Tabs.Tab>
+                      <Tabs.Tab
+                        value="links"
+                        leftSection={<IconLink size={16} />}
+                      >
+                        Links
                       </Tabs.Tab>
                       <Tabs.Tab
                         value="work-logs"
@@ -275,8 +289,11 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                     <Tabs.Panel value="comments" pt="md">
                       <TaskComments taskId={id!} />
                     </Tabs.Panel>
+                    <Tabs.Panel value="links" pt="md">
+                      <TaskLinks taskId={id!} />
+                    </Tabs.Panel>
                     <Tabs.Panel value="work-logs" pt="md">
-                      <TaskWorkLog taskId={id!} />
+                      <TaskWorkLogs taskId={id!} />
                     </Tabs.Panel>
                     <Tabs.Panel value="activities" pt="md">
                       <TaskActivityFeed activities={activities} />

@@ -88,7 +88,7 @@ interface TaskWorkLogProps {
   taskId: string;
 }
 
-export default function TaskWorkLog({ taskId }: TaskWorkLogProps) {
+export default function TaskWorkLogs({ taskId }: TaskWorkLogProps) {
   const { data: session } = useSession();
   const { data: workLogs, refetch } = api.workLogs.getByTaskId.useQuery(
     {

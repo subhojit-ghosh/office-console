@@ -7,11 +7,14 @@ import {
 import {
   archiveTaskSchema,
   createTaskCommentSchema,
+  createTaskLinkSchema,
   createTaskSchema,
   deleteTaskCommentSchema,
+  deleteTaskLinkSchema,
   getAllTasksSchema,
   getTaskByIdSchema,
   getTaskCommentsByTaskIdSchema,
+  getTaskLinksByTaskIdSchema,
   updateTaskCommentSchema,
   updateTaskFieldSchema,
   updateTaskSchema,
@@ -506,6 +509,89 @@ export const tasksRouter = createTRPCRouter({
 
       return ctx.db.taskComment.delete({
         where: { id },
+      });
+    }),
+
+  getLinks: protectedProcedure
+    .input(getTaskLinksByTaskIdSchema)
+    .query(async ({ ctx, input }) => {
+      const task = await ctx.db.task.findUnique({
+        where: { id: input.taskId },
+        select: { id: true },
+      });
+
+      if (!task) {
+        throw new Error("Task not found");
+      }
+
+      const links = await ctx.db.taskLink.findMany({
+        where: {
+          OR: [{ sourceId: input.taskId }, { targetId: input.taskId }],
+        },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          type: true,
+          sourceId: true,
+          targetId: true,
+          source: {
+            select: {
+              id: true,
+              type: true,
+              title: true,
+              status: true,
+            },
+          },
+          target: {
+            select: {
+              id: true,
+              type: true,
+              title: true,
+              status: true,
+            },
+          },
+          createdAt: true,
+        },
+      });
+
+      const outgoingLinks = links
+        .filter((link) => link.sourceId === input.taskId)
+        .map((link) => ({
+          id: link.id,
+          type: link.type,
+          target: link.target,
+          createdAt: link.createdAt,
+        }));
+
+      const incomingLinks = links
+        .filter((link) => link.targetId === input.taskId)
+        .map((link) => ({
+          id: link.id,
+          type: link.type,
+          source: link.source,
+          createdAt: link.createdAt,
+        }));
+
+      return { outgoingLinks, incomingLinks };
+    }),
+
+  createLink: protectedProcedure
+    .input(createTaskLinkSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.taskLink.create({
+        data: {
+          type: input.type,
+          sourceId: input.sourceId,
+          targetId: input.targetId,
+        },
+      });
+    }),
+
+  deleteLink: protectedProcedure
+    .input(deleteTaskLinkSchema)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.taskLink.delete({
+        where: { id: input.id },
       });
     }),
 });
