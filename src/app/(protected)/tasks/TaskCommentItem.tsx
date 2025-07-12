@@ -98,9 +98,36 @@ export default function TaskCommentItem({
       </Grid.Col>
 
       <Grid.Col span="auto">
-        <Text size="sm">
-          <strong>{comment.user.name}</strong>
-        </Text>
+        <Group justify="space-between" align="start">
+          <Text size="sm" fw={500}>
+            {comment.user.name}
+          </Text>
+
+          {session?.user.id === comment.user.id && mode === "view" && (
+            <Group gap={4}>
+              <Tooltip label="Edit" withArrow>
+                <ActionIcon
+                  size="sm"
+                  color="gray"
+                  variant="subtle"
+                  onClick={() => setMode("edit")}
+                >
+                  <IconEdit size={16} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Delete" withArrow>
+                <ActionIcon
+                  size="sm"
+                  color="gray"
+                  variant="subtle"
+                  onClick={remove}
+                >
+                  <IconTrash size={16} />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+          )}
+        </Group>
 
         <Text size="xs" c="dimmed">
           {dayjs(comment.updatedAt ?? comment.createdAt).format(
@@ -131,30 +158,6 @@ export default function TaskCommentItem({
               }}
             />
           </div>
-        )}
-        {session?.user.id === comment.user.id && mode === "view" && (
-          <Group gap={5} mt={2}>
-            <Tooltip label="Edit" withArrow>
-              <ActionIcon
-                size="sm"
-                color="gray"
-                variant="subtle"
-                onClick={() => setMode("edit")}
-              >
-                <IconEdit size={16} />
-              </ActionIcon>
-            </Tooltip>
-            <Tooltip label="Delete" withArrow>
-              <ActionIcon
-                size="sm"
-                color="gray"
-                variant="subtle"
-                onClick={remove}
-              >
-                <IconTrash size={16} />
-              </ActionIcon>
-            </Tooltip>
-          </Group>
         )}
       </Grid.Col>
     </Grid>

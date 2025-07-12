@@ -14,7 +14,7 @@ import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { UserRole, type Task } from "@prisma/client";
-import { IconActivity, IconMessage } from "@tabler/icons-react";
+import { IconActivity, IconClockHour4, IconMessage } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
@@ -31,6 +31,7 @@ import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
 import { TaskActivityFeed } from "./TaskActivityFeed";
 import TaskComments from "./TaskComments";
+import TaskWorkLog from "./TaskWorkLog";
 
 type TaskGetByIdResponse = inferRouterOutputs<AppRouter>["tasks"]["getById"];
 
@@ -247,7 +248,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   placeholder="Add description..."
                 />
               </Grid.Col>
-              {mode == "edit" && (
+              {!!(mode == "edit" && session?.user.role !== UserRole.CLIENT) && (
                 <Grid.Col span={12}>
                   <Tabs variant="default" defaultValue="comments">
                     <Tabs.List>
@@ -256,6 +257,12 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                         leftSection={<IconMessage size={16} />}
                       >
                         Comments
+                      </Tabs.Tab>
+                      <Tabs.Tab
+                        value="work-logs"
+                        leftSection={<IconClockHour4 size={16} />}
+                      >
+                        Work Logs
                       </Tabs.Tab>
                       <Tabs.Tab
                         value="activities"
@@ -267,6 +274,9 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
 
                     <Tabs.Panel value="comments" pt="md">
                       <TaskComments taskId={id!} />
+                    </Tabs.Panel>
+                    <Tabs.Panel value="work-logs" pt="md">
+                      <TaskWorkLog taskId={id!} />
                     </Tabs.Panel>
                     <Tabs.Panel value="activities" pt="md">
                       <TaskActivityFeed activities={activities} />

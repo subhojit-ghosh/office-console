@@ -19,22 +19,22 @@ export default function DashboardStats() {
     (type) => (breakdownMap[type.value] ?? 0) > 0,
   );
 
-  const chartData = [
-    visibleTypes.reduce<Record<string, number | string>>(
-      (acc, type) => {
-        acc[type.value] = breakdownMap[type.value] ?? 0;
-        return acc;
-      },
-      { label: "Task Types" },
-    ),
-  ];
+  // const chartData = [
+  //   visibleTypes.reduce<Record<string, number | string>>(
+  //     (acc, type) => {
+  //       acc[type.value] = breakdownMap[type.value] ?? 0;
+  //       return acc;
+  //     },
+  //     { label: "Task Types" },
+  //   ),
+  // ];
 
-  const chartSeries = TASK_TYPE_OPTIONS.filter((type) =>
-    visibleTypes.includes(type),
-  ).map((type) => ({
-    name: type.value,
-    color: type.color,
-  }));
+  // const chartSeries = TASK_TYPE_OPTIONS.filter((type) =>
+  //   visibleTypes.includes(type),
+  // ).map((type) => ({
+  //   name: type.value,
+  //   color: type.color,
+  // }));
 
   return (
     <>

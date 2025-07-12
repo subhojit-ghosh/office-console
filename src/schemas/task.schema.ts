@@ -5,16 +5,7 @@ import {
   TASK_STATUSES,
   TASK_TYPES,
 } from "~/constants/task.constant";
-
-function parseDate(val: unknown) {
-  if (!val) return undefined;
-  if (val instanceof Date) return val;
-  if (typeof val === "string" && val.length >= 10) {
-    const d = new Date(val);
-    if (!isNaN(d.getTime())) return d;
-  }
-  return undefined;
-}
+import { parseDate } from "~/utils/date";
 
 export const getAllTasksSchema = z.object({
   page: z.number().int().min(1).default(1).optional(),
@@ -72,7 +63,7 @@ export const updateTaskFieldSchema = z.discriminatedUnion("key", [
   }),
 ]);
 
-export const deleteTaskSchema = z.object({
+export const archiveTaskSchema = z.object({
   id: z.string().nonempty("ID is required"),
 });
 

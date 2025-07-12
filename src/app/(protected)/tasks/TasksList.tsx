@@ -22,11 +22,11 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { UserRole, type Task, type TaskStatus } from "@prisma/client";
 import {
+  IconArchive,
   IconDotsVertical,
   IconFilter2,
   IconPlus,
   IconSearch,
-  IconTrash,
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
@@ -128,11 +128,11 @@ export default function TasksList() {
     sortOrder: sortStatus.direction,
   });
 
-  const deleteTask = api.tasks.delete.useMutation({
+  const archiveTask = api.tasks.archive.useMutation({
     onSuccess: async () => {
       void utils.tasks.getAll.invalidate();
       notifications.show({
-        message: "Task deleted successfully",
+        message: "Task archived successfully",
         color: "green",
       });
     },
@@ -146,17 +146,12 @@ export default function TasksList() {
 
   const deleteConfirmation = (task: TasksResponse["tasks"][0]) => {
     modals.openConfirmModal({
-      title: "Delete Task",
-      children: (
-        <Box>
-          Are you sure you want to delete <strong>{task.title}</strong>? This
-          cannot be undone.
-        </Box>
-      ),
-      labels: { confirm: "Delete", cancel: "Cancel" },
+      title: "Archive Task",
+      children: <Box>Are you sure you want to archive the task?</Box>,
+      labels: { confirm: "Archive", cancel: "Cancel" },
       confirmProps: { color: "red" },
       onConfirm: () => {
-        deleteTask.mutate({ id: task.id });
+        archiveTask.mutate({ id: task.id });
       },
     });
   };
@@ -542,10 +537,10 @@ export default function TasksList() {
                 <Menu.Dropdown>
                   <Menu.Item
                     color="red"
-                    leftSection={<IconTrash size={14} />}
+                    leftSection={<IconArchive size={14} />}
                     onClick={() => deleteConfirmation(row)}
                   >
-                    Delete
+                    Archive
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>

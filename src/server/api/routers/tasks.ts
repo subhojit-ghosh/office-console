@@ -5,10 +5,10 @@ import {
   type Prisma,
 } from "@prisma/client";
 import {
+  archiveTaskSchema,
   createTaskCommentSchema,
   createTaskSchema,
   deleteTaskCommentSchema,
-  deleteTaskSchema,
   getAllTasksSchema,
   getTaskByIdSchema,
   getTaskCommentsByTaskIdSchema,
@@ -48,6 +48,7 @@ export const tasksRouter = createTRPCRouter({
       }
 
       const where: Prisma.TaskWhereInput = {
+        archivedAt: null,
         ...(search
           ? {
               title: { contains: search, mode: "insensitive" },
@@ -159,6 +160,9 @@ export const tasksRouter = createTRPCRouter({
                 },
               },
             },
+          },
+          _count: {
+            select: { comments: true },
           },
         },
       });
@@ -383,11 +387,15 @@ export const tasksRouter = createTRPCRouter({
       return updatedTask;
     }),
 
-  delete: protectedProcedure
-    .input(deleteTaskSchema)
+  archive: protectedProcedure
+    .input(archiveTaskSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.task.delete({
+      return ctx.db.task.update({
         where: { id: input.id },
+        data: {
+          archivedAt: new Date(),
+          archivedById: ctx.session.user.id,
+        },
       });
     }),
 

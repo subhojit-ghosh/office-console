@@ -51,6 +51,8 @@ model User {
   taskComments     TaskComment[]  @relation("TaskComments")
   projectsAsMember Project[]      @relation("ProjectMembers")
   feedbacks        Feedback[]     @relation("Feedbacks")
+  workLogs         WorkLog[]      @relation("WorkLogs")
+  archivedTasks    Task[]         @relation("ArchivedTasks")
 }
 
 enum StaffPosition {
@@ -159,13 +161,17 @@ model Task {
 
   assignees User[] @relation("AssignedTasks")
 
-  dueDate     DateTime?
-  completedAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  dueDate      DateTime?
+  completedAt  DateTime?
+  archivedAt   DateTime?
+  archivedById String?
+  archivedBy   User?     @relation("ArchivedTasks", fields: [archivedById], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   activities TaskActivity[] @relation("TaskActivities")
   comments   TaskComment[]  @relation("TaskComments")
+  workLogs   WorkLog[]      @relation("WorkLogs")
 }
 
 enum TaskActivityType {
@@ -220,11 +226,37 @@ enum FeedbackType {
 }
 
 model Feedback {
-  id        String       @id @default(ulid())
-  type      FeedbackType @default(FEEDBACK)
-  message   String
-  rating    Int? // Only for type = FEEDBACK
-  userId    String
-  user      User?        @relation("Feedbacks", fields: [userId], references: [id])
-  createdAt DateTime     @default(now())
+  id      String       @id @default(ulid())
+  type    FeedbackType @default(FEEDBACK)
+  message String
+  rating  Int? // Only for type = FEEDBACK
+
+  userId String
+  user   User?  @relation("Feedbacks", fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum LogSource {
+  MANUAL
+  AUTOMATIC
+}
+
+model WorkLog {
+  id String @id @default(ulid())
+
+  taskId String?
+  task   Task?   @relation("WorkLogs", fields: [taskId], references: [id])
+
+  userId String
+  user   User   @relation("WorkLogs", fields: [userId], references: [id])
+
+  startTime                 DateTime
+  endTime                   DateTime
+  durationMin               Int
+  clientAdjustedDurationMin Int
+  note                      String?
+  source                    LogSource @default(MANUAL)
+
+  createdAt DateTime @default(now())
 }
