@@ -31,6 +31,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   TASK_LINK_DIRECTIONAL_OPTIONS,
+  TASK_STATUS_FILTERS,
   TASK_STATUS_OPTIONS,
   TASK_TYPE_OPTIONS,
 } from "~/constants/task.constant";
@@ -39,9 +40,11 @@ import { api } from "~/trpc/react";
 
 interface TaskLinksProps {
   taskId: string;
+  projectId?: string | null;
 }
 
-export default function TaskLinks({ taskId }: TaskLinksProps) {
+export default function TaskLinks({ taskId, projectId }: TaskLinksProps) {
+  const theme = useMantineTheme();
   const { data: links, refetch } = api.tasks.getLinks.useQuery(
     {
       taskId,
@@ -49,16 +52,24 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
     { enabled: !!taskId },
   );
   const { outgoingLinks = [], incomingLinks = [] } = links ?? {};
-  const { data: tasks } = api.tasks.getAll.useQuery({});
+  const { data: tasks } = api.tasks.getAllMinimal.useQuery(
+    {
+      statuses: TASK_STATUS_FILTERS.PENDING,
+      projectId,
+    },
+    {
+      enabled: !!projectId,
+    },
+  );
   const [opened, { toggle }] = useDisclosure(false);
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
     initialValues: {
-      directionType: "",
+      directionType: null as string | null,
       type: "",
       sourceId: taskId,
-      targetId: "",
+      targetId: null as string | null,
     },
     validate: zodResolver(createTaskLinkSchema),
   });
@@ -111,17 +122,19 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
   const handleSubmit = () => {
     form.validate();
 
+    console.log(form.errors);
+
     if (!form.isValid()) return;
 
-    const [type, direction] = form.values.type.split(":") as [
+    const [type, direction] = form.values.directionType?.split(":") as [
       TaskLinkType,
       "incoming" | "outgoing",
     ];
 
     createLink.mutate({
       type,
-      sourceId: direction === "outgoing" ? taskId : form.values.targetId,
-      targetId: direction === "outgoing" ? form.values.targetId : taskId,
+      sourceId: direction === "outgoing" ? taskId : form.values.targetId!,
+      targetId: direction === "outgoing" ? form.values.targetId! : taskId,
     });
   };
 
@@ -179,17 +192,57 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
                     placeholder="Select Link Type"
                     data={TASK_LINK_DIRECTIONAL_OPTIONS}
                     {...form.getInputProps("directionType")}
+                    comboboxProps={{ withinPortal: false }}
                   />
                 </Grid.Col>
                 <Grid.Col span={9}>
                   <Select
                     placeholder="Select Target Task"
-                    data={tasks?.tasks.map((task) => ({
-                      value: task.id,
-                      label: task.title,
-                    }))}
+                    data={[
+                      {
+                        group: "Pending Tasks",
+                        items:
+                          tasks
+                            ?.filter((task) => task.id !== taskId)
+                            .map((task) => ({
+                              value: task.id,
+                              label: task.title,
+                            })) ?? [],
+                      },
+                    ]}
                     {...form.getInputProps("targetId")}
+                    comboboxProps={{ withinPortal: false }}
                     searchable
+                    renderOption={({ option }) => {
+                      const task = tasks?.find((t) => t.id === option.value);
+
+                      const status = TASK_STATUS_OPTIONS.find(
+                        (p) => p.value === task?.status,
+                      );
+                      const type = TASK_TYPE_OPTIONS.find(
+                        (t) => t.value === task?.type,
+                      );
+
+                      return (
+                        <Group gap="xs" align="center" wrap="nowrap">
+                          {type && (
+                            <type.icon
+                              size={18}
+                              color={theme.colors[type.color][4]}
+                            />
+                          )}
+                          <Text
+                            size="sm"
+                            fw={500}
+                            c={status?.color}
+                            lineClamp={2}
+                            style={{ flex: 1 }}
+                          >
+                            {option.label}
+                          </Text>
+                        </Group>
+                      );
+                    }}
                   />
                 </Grid.Col>
               </Grid>

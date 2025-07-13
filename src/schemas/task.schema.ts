@@ -22,6 +22,18 @@ export const getAllTasksSchema = z.object({
   assignee: z.string().optional().nullable(),
 });
 
+export const getAllTasksMinimalSchema = z.object({
+  search: z.string().optional(),
+  sortBy: z.string().default("title").optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
+  type: z.enum(TASK_TYPES).optional(),
+  statuses: z.array(z.enum(TASK_STATUSES)).optional(),
+  priority: z.enum(TASK_PRIORITIES).optional(),
+  projectId: z.string().optional().nullable(),
+  moduleId: z.string().optional(),
+  assignee: z.string().optional().nullable(),
+});
+
 export const getTaskByIdSchema = z.object({
   id: z.string().nonempty("ID is required"),
 });

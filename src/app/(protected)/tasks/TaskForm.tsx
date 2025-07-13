@@ -289,7 +289,10 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       <TaskComments taskId={id!} />
                     </Tabs.Panel>
                     <Tabs.Panel value="links" pt="md">
-                      <TaskLinks taskId={id!} />
+                      <TaskLinks
+                        taskId={id!}
+                        projectId={form.values.projectId}
+                      />
                     </Tabs.Panel>
                     <Tabs.Panel value="work-logs" pt="md">
                       <TaskWorkLogs taskId={id!} />
