@@ -1,15 +1,19 @@
 import { Space } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "~/trpc/react";
 import TaskCommentBox, { type TaskCommentBoxHandle } from "./TaskCommentBox";
 import TaskCommentItem from "./TaskCommentItem";
 
 interface TaskCommentsProps {
   taskId: string;
+  onCountChange?: (count: number) => void;
 }
 
-export default function TaskComments({ taskId }: TaskCommentsProps) {
+export default function TaskComments({
+  taskId,
+  onCountChange,
+}: TaskCommentsProps) {
   const { data: comments, refetch } = api.tasks.getComments.useQuery(
     {
       taskId,
@@ -18,6 +22,12 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
   );
   const createCommentBoxRef = useRef<TaskCommentBoxHandle | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (comments && onCountChange) {
+      onCountChange(comments.length);
+    }
+  }, [comments, onCountChange]);
 
   const createComment = api.tasks.createComment.useMutation({
     onMutate: () => {

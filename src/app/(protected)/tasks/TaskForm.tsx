@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Badge,
   Button,
   Grid,
   LoadingOverlay,
@@ -38,6 +39,7 @@ import { TaskActivityFeed } from "./TaskActivityFeed";
 import TaskComments from "./TaskComments";
 import TaskLinks, { type TaskTemporaryLink } from "./TaskLinks";
 import TaskWorkLogs from "./TaskWorkLogs";
+import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
 
 type TaskGetByIdResponse = inferRouterOutputs<AppRouter>["tasks"]["getById"];
 
@@ -56,6 +58,9 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
   const [activities, setActivities] = useState<
     NonNullable<TaskGetByIdResponse>["activities"]
   >([]);
+  const [commentsCount, setCommentsCount] = useState(0);
+  const [linksCount, setLinksCount] = useState(0);
+  const [totalWorkLogMinutes, setTotalWorkLogMinutes] = useState(0);
   const [temporaryLinks, setTemporaryLinks] = useState<TaskTemporaryLink[]>([]);
 
   const handleAddTemporaryLink = (link: TaskTemporaryLink) => {
@@ -110,6 +115,10 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
     if (mode === "edit") {
       form.reset();
       setActivities([]);
+      setCommentsCount(0);
+      setLinksCount(0);
+      setTotalWorkLogMinutes(0);
+      setTemporaryLinks([]);
       void loadDataForEdit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -282,6 +291,18 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                           leftSection={<IconMessage size={16} />}
                         >
                           Comments
+                          {!!commentsCount && (
+                            <Badge
+                              variant="light"
+                              ml="xs"
+                              style={{
+                                textTransform: "none",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {commentsCount}
+                            </Badge>
+                          )}
                         </Tabs.Tab>
                       )}
 
@@ -290,6 +311,15 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       leftSection={<IconLink size={16} />}
                     >
                       Links
+                      {!!linksCount && (
+                        <Badge
+                          variant="light"
+                          ml="xs"
+                          style={{ textTransform: "none", cursor: "pointer" }}
+                        >
+                          {linksCount}
+                        </Badge>
+                      )}
                     </Tabs.Tab>
 
                     {mode === "edit" &&
@@ -300,6 +330,18 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                             leftSection={<IconClockHour4 size={16} />}
                           >
                             Work Logs
+                            {!!totalWorkLogMinutes && (
+                              <Badge
+                                variant="light"
+                                ml="xs"
+                                style={{
+                                  textTransform: "none",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {formatDurationFromMinutes(totalWorkLogMinutes)}
+                              </Badge>
+                            )}
                           </Tabs.Tab>
                           <Tabs.Tab
                             value="activities"
@@ -316,6 +358,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       <TaskLinks
                         taskId={id!}
                         projectId={form.values.projectId}
+                        onCountChange={setLinksCount}
                       />
                     ) : (
                       <TaskLinks
@@ -329,13 +372,19 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   </Tabs.Panel>
                   {mode === "edit" && (
                     <Tabs.Panel value="comments" pt="md">
-                      <TaskComments taskId={id!} />
+                      <TaskComments
+                        taskId={id!}
+                        onCountChange={setCommentsCount}
+                      />
                     </Tabs.Panel>
                   )}
                   {mode === "edit" && (
                     <>
                       <Tabs.Panel value="work-logs" pt="md">
-                        <TaskWorkLogs taskId={id!} />
+                        <TaskWorkLogs
+                          taskId={id!}
+                          onMinutesChange={setTotalWorkLogMinutes}
+                        />
                       </Tabs.Panel>
                       <Tabs.Panel value="activities" pt="md">
                         <TaskActivityFeed activities={activities} />

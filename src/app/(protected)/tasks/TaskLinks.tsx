@@ -53,6 +53,7 @@ export interface TaskLinksProps {
   temporaryLinks?: TaskTemporaryLink[];
   onAddTemporaryLink?: (link: TaskTemporaryLink) => void;
   onRemoveTemporaryLink?: (linkId: string) => void;
+  onCountChange?: (count: number) => void;
 }
 
 export default function TaskLinks({
@@ -61,6 +62,7 @@ export default function TaskLinks({
   temporaryLinks = [],
   onAddTemporaryLink,
   onRemoveTemporaryLink,
+  onCountChange,
 }: TaskLinksProps) {
   const theme = useMantineTheme();
   const { data: links, refetch } = api.tasks.getLinks.useQuery(
@@ -81,6 +83,12 @@ export default function TaskLinks({
   );
   const [opened, { toggle }] = useDisclosure(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (outgoingLinks && incomingLinks && onCountChange) {
+      onCountChange(incomingLinks.length + outgoingLinks.length);
+    }
+  }, [outgoingLinks, incomingLinks, onCountChange]);
 
   const form = useForm({
     initialValues: {

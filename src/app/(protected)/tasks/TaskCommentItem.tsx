@@ -92,7 +92,7 @@ export default function TaskCommentItem({
   };
 
   return (
-    <Grid key={comment.id} mb="md" align="flex-start">
+    <Grid key={comment.id} align="flex-start">
       <Grid.Col span="content">
         <Avatar size="sm" name={comment.user.name} />
       </Grid.Col>

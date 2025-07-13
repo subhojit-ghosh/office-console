@@ -86,9 +86,13 @@ function formatStartEndTime(start: Date, end: Date): string {
 
 interface TaskWorkLogProps {
   taskId: string;
+  onMinutesChange?: (minutes: number) => void;
 }
 
-export default function TaskWorkLogs({ taskId }: TaskWorkLogProps) {
+export default function TaskWorkLogs({
+  taskId,
+  onMinutesChange,
+}: TaskWorkLogProps) {
   const { data: session } = useSession();
   const { data: workLogs, refetch } = api.workLogs.getByTaskId.useQuery(
     {
@@ -98,6 +102,16 @@ export default function TaskWorkLogs({ taskId }: TaskWorkLogProps) {
   );
   const [opened, { toggle }] = useDisclosure(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (workLogs && onMinutesChange) {
+      const totalMinutes = workLogs.reduce(
+        (total, log) => total + log.durationMin,
+        0,
+      );
+      onMinutesChange(totalMinutes);
+    }
+  }, [workLogs, onMinutesChange]);
 
   const form = useForm({
     initialValues: {

@@ -223,9 +223,6 @@ export const tasksRouter = createTRPCRouter({
               },
             },
           },
-          _count: {
-            select: { comments: true },
-          },
         },
       });
     }),

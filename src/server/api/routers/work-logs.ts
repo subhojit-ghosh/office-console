@@ -9,8 +9,9 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 export const workLogsRouter = createTRPCRouter({
   getByTaskId: protectedProcedure
     .input(getWorkLogByTaskIdSchema)
-    .query(async ({ ctx }) => {
+    .query(async ({ ctx, input }) => {
       return ctx.db.workLog.findMany({
+        where: { taskId: input.taskId },
         orderBy: { startTime: "desc" },
         select: {
           id: true,
