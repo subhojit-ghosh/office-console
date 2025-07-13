@@ -458,7 +458,7 @@ const RenderLinkCard = ({
               if (!isTaskCliclkable) return;
 
               const params = new URLSearchParams(searchParams);
-              params.set("task", taskId);
+              params.set("selectedTask", taskId);
               router.push(`?${params.toString()}`);
             }}
           >

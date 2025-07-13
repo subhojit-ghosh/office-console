@@ -32,6 +32,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaTasks } from "react-icons/fa";
@@ -322,7 +323,7 @@ export default function TasksList() {
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             const params = new URLSearchParams(searchParams);
-            params.set("task", "new");
+            params.set("selectedTask", "new");
             router.push(`?${params.toString()}`);
           }}
         >
@@ -350,16 +351,15 @@ export default function TasksList() {
               );
               const type = TASK_TYPE_OPTIONS.find((t) => t.value === row.type);
 
+              const params = new URLSearchParams(searchParams);
+              params.set("selectedTask", row.id);
+
+              const href = `?${params.toString()}`;
+
               return (
                 <UnstyledButton
-                  onClick={() => {
-                    // setFormMode("edit");
-                    // setEditId(row.id);
-                    // setFormOpened(true);
-                    const params = new URLSearchParams(searchParams);
-                    params.set("task", row.id);
-                    router.push(`?${params.toString()}`);
-                  }}
+                  component={Link}
+                  href={href}
                   style={{
                     display: "block",
                     width: "100%",
@@ -550,14 +550,14 @@ export default function TasksList() {
         ]}
       />
       <TaskForm
-        opened={searchParams.has("task")}
+        opened={searchParams.has("selectedTask")}
         close={() => {
           const params = new URLSearchParams(searchParams);
-          params.delete("task");
+          params.delete("selectedTask");
           router.push(`?${params.toString()}`);
         }}
-        mode={searchParams.get("task") === "new" ? "add" : "edit"}
-        id={searchParams.get("task") ?? null}
+        mode={searchParams.get("selectedTask") === "new" ? "add" : "edit"}
+        id={searchParams.get("selectedTask") ?? null}
       />
     </>
   );
