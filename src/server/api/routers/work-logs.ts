@@ -59,6 +59,34 @@ export const workLogsRouter = createTRPCRouter({
         throw new Error("Task not found.");
       }
 
+      const overlappingWorkLog = await ctx.db.workLog.findFirst({
+        where: {
+          userId: ctx.session.user.id,
+          AND: [
+            { startTime: { lt: input.endTime } },
+            { endTime: { gt: input.startTime } },
+          ],
+        },
+        select: {
+          startTime: true,
+          endTime: true,
+          task: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+      });
+
+      if (overlappingWorkLog) {
+        const rawTitle = overlappingWorkLog.task?.title ?? "Unnamed Task";
+        const shortTitle =
+          rawTitle.length > 80 ? rawTitle.slice(0, 77) + "..." : rawTitle;
+
+        throw new Error(`Overlapping work log exists in "${shortTitle}"`);
+      }
+
       const durationMin =
         (input.endTime.getTime() - input.startTime.getTime()) / 60000;
 
