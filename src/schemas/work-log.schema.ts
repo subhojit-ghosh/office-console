@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { parseDate } from "~/utils/date";
 
-export const getWorkLogByTaskIdSchema = z.object({
-  taskId: z.string().nonempty("Task ID is required"),
+export const getWorkLogsSchema = z.object({
+  taskId: z.string().optional().nullable(),
+  userId: z.string().optional().nullable(),
 });
 
 export const createWotkLogSchema = z.object({

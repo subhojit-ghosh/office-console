@@ -25,7 +25,7 @@ import {
   IconHourglassLow,
   IconInfoCircle,
   IconTrash,
-  IconX
+  IconX,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -93,7 +93,7 @@ export default function TaskWorkLogs({
   onMinutesChange,
 }: TaskWorkLogProps) {
   const { data: session } = useSession();
-  const { data: workLogs, refetch } = api.workLogs.getByTaskId.useQuery(
+  const { data: workLogs, refetch } = api.workLogs.getAll.useQuery(
     {
       taskId,
     },

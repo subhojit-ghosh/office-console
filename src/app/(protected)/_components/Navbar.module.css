@@ -47,22 +47,26 @@
       color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
     }
   }
+}
 
-  &[data-active] {
-    &,
-    &:hover {
-      background-color: light-dark(#e1e1e3, #17181b);
-      color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-      font-weight: 500;
+/* 🔷 Active styles (text color + weight) always apply when data-active is present */
+.link[data-active] {
+  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+  font-weight: 500;
 
-      .linkIcon {
-        color: light-dark(
-          var(--mantine-color-black),
-          var(--mantine-color-white)
-        );
-      }
-    }
+  .linkIcon {
+    color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
   }
+}
+
+/* 🔶 Background only when NOT suppressed */
+.link[data-active]:not([data-active-no-background]) {
+  background-color: light-dark(#e1e1e3, #17181b);
+}
+
+/* 🔶 Hover background only if allowed */
+.link[data-active]:not([data-active-no-background]):hover {
+  background-color: light-dark(#e1e1e3, #17181b);
 }
 
 .linkIcon {
@@ -90,4 +94,11 @@
   @mixin dark {
     display: none;
   }
+}
+
+.submenu {
+  padding-left: var(--mantine-spacing-xs);
+  padding-bottom: 6px;
+  border-left: 2px solid light-dark(#e2e2e2, #2a2a2a);
+  margin-left: 20px;
 }

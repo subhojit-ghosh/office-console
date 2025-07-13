@@ -1,17 +1,23 @@
+import type { Prisma } from "@prisma/client";
 import {
   createWotkLogSchema,
   deleteWorkLogSchema,
-  getWorkLogByTaskIdSchema,
+  getWorkLogsSchema,
 } from "~/schemas/work-log.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const workLogsRouter = createTRPCRouter({
-  getByTaskId: protectedProcedure
-    .input(getWorkLogByTaskIdSchema)
+  getAll: protectedProcedure
+    .input(getWorkLogsSchema)
     .query(async ({ ctx, input }) => {
+      const where: Prisma.WorkLogWhereInput = {
+        ...(input.taskId ? { taskId: input.taskId } : {}),
+        ...(input.userId ? { userId: input.userId } : {}),
+      };
+
       return ctx.db.workLog.findMany({
-        where: { taskId: input.taskId },
+        where,
         orderBy: { startTime: "desc" },
         select: {
           id: true,
@@ -24,6 +30,13 @@ export const workLogsRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
+            },
+          },
+          task: {
+            select: {
+              id: true,
+              title: true,
+              type: true,
             },
           },
         },
