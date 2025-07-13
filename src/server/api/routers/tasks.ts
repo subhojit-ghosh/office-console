@@ -233,7 +233,7 @@ export const tasksRouter = createTRPCRouter({
   create: protectedProcedure
     .input(sanitizeInputSchema(createTaskSchema))
     .mutation(async ({ ctx, input }) => {
-      const { assigneeIds, ...rest } = input;
+      const { assigneeIds, links, ...rest } = input;
 
       const projectMembers = await ctx.db.project.findUnique({
         where: { id: input.projectId },
@@ -275,6 +275,16 @@ export const tasksRouter = createTRPCRouter({
           userId,
         },
       });
+
+      if (links?.length) {
+        await ctx.db.taskLink.createMany({
+          data: links.map((link) => ({
+            ...link,
+            sourceId: link.sourceId ?? task.id,
+            targetId: link.targetId ?? task.id,
+          })),
+        });
+      }
     }),
 
   update: protectedProcedure

@@ -48,6 +48,15 @@ export const createTaskSchema = z.object({
   moduleId: z.string().optional().nullable(),
   assigneeIds: z.array(z.string()).optional(),
   dueDate: z.preprocess(parseDate, z.date().optional().nullable()),
+  links: z
+    .array(
+      z.object({
+        type: z.enum(TASK_LINK_TYPES),
+        sourceId: z.string().optional().nullable(),
+        targetId: z.string().optional().nullable(),
+      }),
+    )
+    .optional(),
 });
 
 export const updateTaskSchema = z.object({

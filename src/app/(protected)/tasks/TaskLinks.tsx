@@ -38,16 +38,34 @@ import {
 import { createTaskLinkSchema } from "~/schemas/task.schema";
 import { api } from "~/trpc/react";
 
-interface TaskLinksProps {
-  taskId: string;
-  projectId?: string | null;
+export interface TaskTemporaryLink {
+  id: string;
+  type: TaskLinkType;
+  targetId: string;
+  title: string;
+  status: string;
+  taskType: string;
 }
 
-export default function TaskLinks({ taskId, projectId }: TaskLinksProps) {
+export interface TaskLinksProps {
+  taskId: string | null;
+  projectId?: string | null;
+  temporaryLinks?: TaskTemporaryLink[];
+  onAddTemporaryLink?: (link: TaskTemporaryLink) => void;
+  onRemoveTemporaryLink?: (linkId: string) => void;
+}
+
+export default function TaskLinks({
+  taskId,
+  projectId,
+  temporaryLinks = [],
+  onAddTemporaryLink,
+  onRemoveTemporaryLink,
+}: TaskLinksProps) {
   const theme = useMantineTheme();
   const { data: links, refetch } = api.tasks.getLinks.useQuery(
     {
-      taskId,
+      taskId: taskId!,
     },
     { enabled: !!taskId },
   );
@@ -68,7 +86,7 @@ export default function TaskLinks({ taskId, projectId }: TaskLinksProps) {
     initialValues: {
       directionType: null as string | null,
       type: "",
-      sourceId: taskId,
+      sourceId: taskId ?? crypto.randomUUID(),
       targetId: null as string | null,
     },
     validate: zodResolver(createTaskLinkSchema),
@@ -122,8 +140,6 @@ export default function TaskLinks({ taskId, projectId }: TaskLinksProps) {
   const handleSubmit = () => {
     form.validate();
 
-    console.log(form.errors);
-
     if (!form.isValid()) return;
 
     const [type, direction] = form.values.directionType?.split(":") as [
@@ -131,25 +147,54 @@ export default function TaskLinks({ taskId, projectId }: TaskLinksProps) {
       "incoming" | "outgoing",
     ];
 
-    createLink.mutate({
+    const newLink = {
+      id: crypto.randomUUID(),
       type,
-      sourceId: direction === "outgoing" ? taskId : form.values.targetId!,
-      targetId: direction === "outgoing" ? form.values.targetId! : taskId,
-    });
+      sourceId: direction === "outgoing" ? taskId! : form.values.targetId!,
+      targetId: direction === "outgoing" ? form.values.targetId! : taskId!,
+    };
+
+    if (taskId) {
+      createLink.mutate(newLink);
+    } else if (onAddTemporaryLink) {
+      const task = tasks?.find((t) => t.id === form.values.targetId);
+
+      if (!task) {
+        notifications.show({
+          message: "Target task not found",
+          color: "red",
+        });
+        return;
+      }
+
+      onAddTemporaryLink({
+        ...newLink,
+        status: task.status,
+        title: task.title,
+        taskType: task.type,
+      });
+
+      form.reset();
+      toggle();
+    }
   };
 
   const remove = (id: string) => {
-    modals.openConfirmModal({
-      title: "Delete Link",
-      children: (
-        <Box>Are you sure you want to delete? This cannot be undone.</Box>
-      ),
-      labels: { confirm: "Delete", cancel: "Cancel" },
-      confirmProps: { color: "red" },
-      onConfirm: () => {
-        deleteLink.mutate({ id });
-      },
-    });
+    if (taskId) {
+      modals.openConfirmModal({
+        title: "Delete Link",
+        children: (
+          <Box>Are you sure you want to delete? This cannot be undone.</Box>
+        ),
+        labels: { confirm: "Delete", cancel: "Cancel" },
+        confirmProps: { color: "red" },
+        onConfirm: () => {
+          deleteLink.mutate({ id });
+        },
+      });
+    } else if (onRemoveTemporaryLink) {
+      onRemoveTemporaryLink(id);
+    }
   };
 
   return (
@@ -267,7 +312,9 @@ export default function TaskLinks({ taskId, projectId }: TaskLinksProps) {
         </Paper>
       </Collapse>
 
-      {(incomingLinks.length > 0 || outgoingLinks.length > 0) && (
+      {(incomingLinks.length > 0 ||
+        outgoingLinks.length > 0 ||
+        temporaryLinks.length > 0) && (
         <Stack gap="xs" mt="md">
           {incomingLinks.length > 0 && (
             <>
@@ -303,6 +350,24 @@ export default function TaskLinks({ taskId, projectId }: TaskLinksProps) {
               ))}
             </>
           )}
+
+          {temporaryLinks.length > 0 && (
+            <>
+              {temporaryLinks.map((link) => (
+                <RenderLinkCard
+                  key={link.id}
+                  taskId={link.targetId}
+                  taskTitle={link.title}
+                  taskStatus={link.status}
+                  taskType={link.taskType}
+                  type={link.type}
+                  direction="outgoing"
+                  onDelete={() => remove(link.id)}
+                  isTaskCliclkable={false}
+                />
+              ))}
+            </>
+          )}
         </Stack>
       )}
     </>
@@ -317,6 +382,7 @@ const RenderLinkCard = ({
   type,
   direction,
   onDelete,
+  isTaskCliclkable = true,
 }: {
   taskId: string;
   taskTitle: string;
@@ -325,6 +391,7 @@ const RenderLinkCard = ({
   type: TaskLinkType;
   direction: "incoming" | "outgoing";
   onDelete: () => void;
+  isTaskCliclkable?: boolean;
 }) => {
   const theme = useMantineTheme();
   const router = useRouter();
@@ -378,8 +445,10 @@ const RenderLinkCard = ({
             c={taskStatusOption?.color}
             lineClamp={2}
             style={{ flex: 1, minWidth: 0 }}
-            className="button-hover-underline"
+            className={isTaskCliclkable ? "button-hover-underline" : ""}
             onClick={() => {
+              if (!isTaskCliclkable) return;
+
               const params = new URLSearchParams(searchParams);
               params.set("task", taskId);
               router.push(`?${params.toString()}`);

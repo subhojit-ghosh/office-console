@@ -36,7 +36,7 @@ import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
 import { TaskActivityFeed } from "./TaskActivityFeed";
 import TaskComments from "./TaskComments";
-import TaskLinks from "./TaskLinks";
+import TaskLinks, { type TaskTemporaryLink } from "./TaskLinks";
 import TaskWorkLogs from "./TaskWorkLogs";
 
 type TaskGetByIdResponse = inferRouterOutputs<AppRouter>["tasks"]["getById"];
@@ -56,6 +56,15 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
   const [activities, setActivities] = useState<
     NonNullable<TaskGetByIdResponse>["activities"]
   >([]);
+  const [temporaryLinks, setTemporaryLinks] = useState<TaskTemporaryLink[]>([]);
+
+  const handleAddTemporaryLink = (link: TaskTemporaryLink) => {
+    setTemporaryLinks((prev) => [...prev, link]);
+  };
+
+  const handleRemoveTemporaryLink = (linkId: string) => {
+    setTemporaryLinks((prev) => prev.filter((link) => link.id !== linkId));
+  };
 
   const form = useForm({
     initialValues: {
@@ -192,6 +201,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
         moduleId: values.moduleId,
         assigneeIds: values.assigneeIds,
         dueDate: values.dueDate,
+        links: temporaryLinks,
       });
     } else if (mode === "edit" && id) {
       updateTask.mutate({
@@ -255,54 +265,85 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   placeholder="Add description..."
                 />
               </Grid.Col>
-              {!!(mode == "edit" && session?.user.role !== UserRole.CLIENT) && (
-                <Grid.Col span={12}>
-                  <Tabs variant="default" defaultValue="comments">
-                    <Tabs.List>
-                      <Tabs.Tab
-                        value="comments"
-                        leftSection={<IconMessage size={16} />}
-                      >
-                        Comments
-                      </Tabs.Tab>
-                      <Tabs.Tab
-                        value="links"
-                        leftSection={<IconLink size={16} />}
-                      >
-                        Links
-                      </Tabs.Tab>
-                      <Tabs.Tab
-                        value="work-logs"
-                        leftSection={<IconClockHour4 size={16} />}
-                      >
-                        Work Logs
-                      </Tabs.Tab>
-                      <Tabs.Tab
-                        value="activities"
-                        leftSection={<IconActivity size={16} />}
-                      >
-                        Activities
-                      </Tabs.Tab>
-                    </Tabs.List>
+              <Grid.Col span={12}>
+                <Tabs
+                  variant="default"
+                  defaultValue={
+                    mode === "add" || session?.user.role === UserRole.CLIENT
+                      ? "links"
+                      : "comments"
+                  }
+                >
+                  <Tabs.List>
+                    {mode === "edit" &&
+                      session?.user.role !== UserRole.CLIENT && (
+                        <Tabs.Tab
+                          value="comments"
+                          leftSection={<IconMessage size={16} />}
+                        >
+                          Comments
+                        </Tabs.Tab>
+                      )}
 
-                    <Tabs.Panel value="comments" pt="md">
-                      <TaskComments taskId={id!} />
-                    </Tabs.Panel>
-                    <Tabs.Panel value="links" pt="md">
+                    <Tabs.Tab
+                      value="links"
+                      leftSection={<IconLink size={16} />}
+                    >
+                      Links
+                    </Tabs.Tab>
+
+                    {mode === "edit" &&
+                      session?.user.role !== UserRole.CLIENT && (
+                        <>
+                          <Tabs.Tab
+                            value="work-logs"
+                            leftSection={<IconClockHour4 size={16} />}
+                          >
+                            Work Logs
+                          </Tabs.Tab>
+                          <Tabs.Tab
+                            value="activities"
+                            leftSection={<IconActivity size={16} />}
+                          >
+                            Activities
+                          </Tabs.Tab>
+                        </>
+                      )}
+                  </Tabs.List>
+
+                  <Tabs.Panel value="links" pt="md">
+                    {mode === "edit" ? (
                       <TaskLinks
                         taskId={id!}
                         projectId={form.values.projectId}
                       />
+                    ) : (
+                      <TaskLinks
+                        taskId={null}
+                        projectId={form.values.projectId}
+                        temporaryLinks={temporaryLinks}
+                        onAddTemporaryLink={handleAddTemporaryLink}
+                        onRemoveTemporaryLink={handleRemoveTemporaryLink}
+                      />
+                    )}
+                  </Tabs.Panel>
+                  {mode === "edit" && (
+                    <Tabs.Panel value="comments" pt="md">
+                      <TaskComments taskId={id!} />
                     </Tabs.Panel>
-                    <Tabs.Panel value="work-logs" pt="md">
-                      <TaskWorkLogs taskId={id!} />
-                    </Tabs.Panel>
-                    <Tabs.Panel value="activities" pt="md">
-                      <TaskActivityFeed activities={activities} />
-                    </Tabs.Panel>
-                  </Tabs>
-                </Grid.Col>
-              )}
+                  )}
+                  {mode === "edit" && (
+                    <>
+                      <Tabs.Panel value="work-logs" pt="md">
+                        <TaskWorkLogs taskId={id!} />
+                      </Tabs.Panel>
+                      <Tabs.Panel value="activities" pt="md">
+                        <TaskActivityFeed activities={activities} />
+                      </Tabs.Panel>
+                    </>
+                  )}
+                </Tabs>
+              </Grid.Col>
             </Grid>
           </Grid.Col>
           <Grid.Col span={3}>
