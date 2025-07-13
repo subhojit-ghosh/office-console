@@ -24,13 +24,13 @@ import {
   IconLink,
   IconLinkPlus,
   IconTrash,
-  IconX
+  IconX,
 } from "@tabler/icons-react";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
-  TASK_LINK_TYPE_OPTIONS,
+  TASK_LINK_DIRECTIONAL_OPTIONS,
   TASK_STATUS_OPTIONS,
   TASK_TYPE_OPTIONS,
 } from "~/constants/task.constant";
@@ -42,7 +42,6 @@ interface TaskLinksProps {
 }
 
 export default function TaskLinks({ taskId }: TaskLinksProps) {
-  const { data: session } = useSession();
   const { data: links, refetch } = api.tasks.getLinks.useQuery(
     {
       taskId,
@@ -56,12 +55,18 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
 
   const form = useForm({
     initialValues: {
-      type: null,
+      directionType: "",
+      type: "",
       sourceId: taskId,
       targetId: "",
     },
     validate: zodResolver(createTaskLinkSchema),
   });
+
+  useEffect(() => {
+    form.setFieldValue("type", form.values.directionType?.split(":")[0] ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.values.directionType]);
 
   const createLink = api.tasks.createLink.useMutation({
     onMutate: () => {
@@ -108,10 +113,15 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
 
     if (!form.isValid()) return;
 
+    const [type, direction] = form.values.type.split(":") as [
+      TaskLinkType,
+      "incoming" | "outgoing",
+    ];
+
     createLink.mutate({
-      type: form.values.type!,
-      sourceId: form.values.sourceId,
-      targetId: form.values.targetId,
+      type,
+      sourceId: direction === "outgoing" ? taskId : form.values.targetId,
+      targetId: direction === "outgoing" ? form.values.targetId : taskId,
     });
   };
 
@@ -167,8 +177,8 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
                 <Grid.Col span={3}>
                   <Select
                     placeholder="Select Link Type"
-                    data={TASK_LINK_TYPE_OPTIONS}
-                    {...form.getInputProps("type")}
+                    data={TASK_LINK_DIRECTIONAL_OPTIONS}
+                    {...form.getInputProps("directionType")}
                   />
                 </Grid.Col>
                 <Grid.Col span={9}>
@@ -211,6 +221,7 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
               {incomingLinks.map((link) => (
                 <RenderLinkCard
                   key={link.id}
+                  taskId={link.source.id}
                   taskTitle={link.source.title}
                   taskStatus={link.source.status}
                   taskType={link.source.type}
@@ -228,6 +239,7 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
               {outgoingLinks.map((link) => (
                 <RenderLinkCard
                   key={link.id}
+                  taskId={link.target.id}
                   taskTitle={link.target.title}
                   taskStatus={link.target.status}
                   taskType={link.target.type}
@@ -245,6 +257,7 @@ export default function TaskLinks({ taskId }: TaskLinksProps) {
 }
 
 const RenderLinkCard = ({
+  taskId,
   taskTitle,
   taskStatus,
   taskType,
@@ -252,6 +265,7 @@ const RenderLinkCard = ({
   direction,
   onDelete,
 }: {
+  taskId: string;
   taskTitle: string;
   taskStatus: string;
   taskType: string;
@@ -260,6 +274,8 @@ const RenderLinkCard = ({
   onDelete: () => void;
 }) => {
   const theme = useMantineTheme();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const badgeText =
     type === "BLOCKS"
       ? direction === "incoming"
@@ -310,6 +326,11 @@ const RenderLinkCard = ({
             lineClamp={2}
             style={{ flex: 1, minWidth: 0 }}
             className="button-hover-underline"
+            onClick={() => {
+              const params = new URLSearchParams(searchParams);
+              params.set("task", taskId);
+              router.push(`?${params.toString()}`);
+            }}
           >
             {taskTitle}
           </Text>

@@ -9,7 +9,6 @@ import {
   Select,
   Tabs,
   Textarea,
-  TextInput,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
@@ -37,8 +36,8 @@ import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
 import { TaskActivityFeed } from "./TaskActivityFeed";
 import TaskComments from "./TaskComments";
-import TaskWorkLogs from "./TaskWorkLogs";
 import TaskLinks from "./TaskLinks";
+import TaskWorkLogs from "./TaskWorkLogs";
 
 type TaskGetByIdResponse = inferRouterOutputs<AppRouter>["tasks"]["getById"];
 
@@ -343,6 +342,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   disabled={loading || projectsQuery.isLoading}
                   searchable
                   withAsterisk
+                  readOnly={mode === "edit"}
                   placeholder={
                     projectsQuery.isLoading
                       ? "Loading projects..."

@@ -135,17 +135,23 @@ export const TASK_COMMENT_TYPES = [
 ] as const;
 
 export const TASK_LINK_TYPES = ["BLOCKS", "DEPENDS_ON"] as const;
+export type TaskLinkType = (typeof TASK_LINK_TYPES)[number];
 
-export const TASK_LINK_MAP = {
-  BLOCKS: {
+export const TASK_LINK_DIRECTIONAL_OPTIONS = [
+  {
+    value: "BLOCKS:outgoing",
     label: "Blocks",
   },
-  DEPENDS_ON: {
+  {
+    value: "BLOCKS:incoming",
+    label: "Is Blocked By",
+  },
+  {
+    value: "DEPENDS_ON:outgoing",
     label: "Depends On",
   },
-} as const;
-
-export const TASK_LINK_TYPE_OPTIONS = TASK_LINK_TYPES.map((type) => ({
-  value: type,
-  label: TASK_LINK_MAP[type].label,
-}));
+  {
+    value: "DEPENDS_ON:incoming",
+    label: "Is Required By",
+  },
+] as const;

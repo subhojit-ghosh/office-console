@@ -32,7 +32,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaTasks } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
@@ -55,9 +55,6 @@ export default function TasksList() {
   const { data: session } = useSession();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
-  const [formOpened, setFormOpened] = useState(false);
-  const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [editId, setEditId] = useState<string | null>(null);
   const [selectedStatusGroup, setSelectedStatusGroup] =
     useState<keyof typeof TASK_STATUS_FILTERS>("PENDING");
   const [sortStatus, setSortStatus] = useState<
@@ -86,6 +83,7 @@ export default function TasksList() {
     );
   }, [session?.user]);
 
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -323,9 +321,9 @@ export default function TasksList() {
           variant="outline"
           leftSection={<IconPlus size={16} />}
           onClick={() => {
-            setFormMode("add");
-            setEditId(null);
-            setFormOpened(true);
+            const params = new URLSearchParams(searchParams);
+            params.set("task", "new");
+            router.push(`?${params.toString()}`);
           }}
         >
           Create
@@ -355,9 +353,12 @@ export default function TasksList() {
               return (
                 <UnstyledButton
                   onClick={() => {
-                    setFormMode("edit");
-                    setEditId(row.id);
-                    setFormOpened(true);
+                    // setFormMode("edit");
+                    // setEditId(row.id);
+                    // setFormOpened(true);
+                    const params = new URLSearchParams(searchParams);
+                    params.set("task", row.id);
+                    router.push(`?${params.toString()}`);
                   }}
                   style={{
                     display: "block",
@@ -549,13 +550,14 @@ export default function TasksList() {
         ]}
       />
       <TaskForm
-        opened={formOpened}
+        opened={searchParams.has("task")}
         close={() => {
-          setFormOpened(false);
-          setEditId(null);
+          const params = new URLSearchParams(searchParams);
+          params.delete("task");
+          router.push(`?${params.toString()}`);
         }}
-        mode={formMode}
-        id={editId}
+        mode={searchParams.get("task") === "new" ? "add" : "edit"}
+        id={searchParams.get("task") ?? null}
       />
     </>
   );
