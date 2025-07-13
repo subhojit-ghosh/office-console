@@ -51,6 +51,7 @@ export function EditableBadgeDropdown<T extends string>({
             color={current?.color}
             rightSection={<IconChevronDown size={14} />}
             loading={loading}
+            tabIndex={-1}
           >
             {isIconVariant && current?.icon ? (
               <current.icon size={18} />

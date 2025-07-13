@@ -257,7 +257,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               </Grid.Col>
               {!!(mode == "edit" && session?.user.role !== UserRole.CLIENT) && (
                 <Grid.Col span={12}>
-                  <Tabs variant="default" defaultValue="links">
+                  <Tabs variant="default" defaultValue="comments">
                     <Tabs.List>
                       <Tabs.Tab
                         value="comments"
