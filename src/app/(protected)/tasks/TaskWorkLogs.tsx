@@ -22,11 +22,10 @@ import {
   IconCheck,
   IconClockHour4,
   IconClockPlus,
-  IconHourglassEmpty,
   IconHourglassLow,
   IconInfoCircle,
   IconTrash,
-  IconX,
+  IconX
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -103,6 +102,26 @@ export default function TaskWorkLogs({
   const [opened, { toggle }] = useDisclosure(false);
   const [loading, setLoading] = useState(false);
 
+  const contributorDurations = useMemo(() => {
+    if (!workLogs) return [];
+
+    const map = new Map<string, { name: string; minutes: number }>();
+
+    for (const log of workLogs) {
+      const prev = map.get(log.user.id);
+      if (prev) {
+        prev.minutes += log.durationMin;
+      } else {
+        map.set(log.user.id, {
+          name: log.user.name,
+          minutes: log.durationMin,
+        });
+      }
+    }
+
+    return Array.from(map.values()).sort((a, b) => b.minutes - a.minutes);
+  }, [workLogs]);
+
   useEffect(() => {
     if (workLogs && onMinutesChange) {
       const totalMinutes = workLogs.reduce(
@@ -127,14 +146,6 @@ export default function TaskWorkLogs({
     form.setFieldValue("endTime", form.values.startTime);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.values.startTime]);
-
-  const totalDuration = useMemo(() => {
-    if (!workLogs || workLogs.length === 0) return 0;
-
-    return workLogs.reduce((total, log) => {
-      return total + log.durationMin;
-    }, 0);
-  }, [workLogs]);
 
   const createWorkLog = api.workLogs.create.useMutation({
     onMutate: () => {
@@ -224,20 +235,18 @@ export default function TaskWorkLogs({
   return (
     <>
       <Group justify="space-between" gap="xs" mb="md">
-        <Badge
-          leftSection={
-            totalDuration ? (
-              <IconHourglassLow size={14} />
-            ) : (
-              <IconHourglassEmpty size={14} />
-            )
-          }
-          variant="light"
-          color={totalDuration ? "green" : "red"}
-          style={{ textTransform: "none" }}
-        >
-          {totalDuration ? formatDurationFromMinutes(totalDuration) : "--"}
-        </Badge>
+        <div>
+          {contributorDurations.map((c) => (
+            <Badge
+              key={c.name}
+              variant="outline"
+              style={{ textTransform: "none" }}
+              mr="xs"
+            >
+              {c.name}: {formatDurationFromMinutes(c.minutes)}
+            </Badge>
+          ))}
+        </div>
         <Button
           variant="subtle"
           size="xs"

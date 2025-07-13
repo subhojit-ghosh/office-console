@@ -364,6 +364,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       <TaskLinks
                         taskId={null}
                         projectId={form.values.projectId}
+                        onCountChange={setLinksCount}
                         temporaryLinks={temporaryLinks}
                         onAddTemporaryLink={handleAddTemporaryLink}
                         onRemoveTemporaryLink={handleRemoveTemporaryLink}

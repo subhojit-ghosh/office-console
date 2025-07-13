@@ -18,7 +18,7 @@ import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { TaskLinkType } from "@prisma/client";
+import { TaskLinkType } from "@prisma/client";
 import {
   IconCheck,
   IconLink,
@@ -42,9 +42,11 @@ export interface TaskTemporaryLink {
   id: string;
   type: TaskLinkType;
   targetId: string;
+  sourceId: string;
   title: string;
   status: string;
   taskType: string;
+  direction: "incoming" | "outgoing";
 }
 
 export interface TaskLinksProps {
@@ -85,10 +87,18 @@ export default function TaskLinks({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (outgoingLinks && incomingLinks && onCountChange) {
-      onCountChange(incomingLinks.length + outgoingLinks.length);
+    if (onCountChange) {
+      const totalIncoming =
+        (incomingLinks?.length ?? 0) +
+        temporaryLinks.filter((l) => l.direction === "incoming").length;
+
+      const totalOutgoing =
+        (outgoingLinks?.length ?? 0) +
+        temporaryLinks.filter((l) => l.direction === "outgoing").length;
+
+      onCountChange(totalIncoming + totalOutgoing);
     }
-  }, [outgoingLinks, incomingLinks, onCountChange]);
+  }, [incomingLinks, outgoingLinks, temporaryLinks, onCountChange]);
 
   const form = useForm({
     initialValues: {
@@ -175,11 +185,29 @@ export default function TaskLinks({
         return;
       }
 
+      const isAlreadyExists = temporaryLinks.some((link) => {
+        const a = link.sourceId;
+        const b = link.targetId;
+        const x = newLink.sourceId;
+        const y = newLink.targetId;
+
+        return (a === x && b === y) || (a === y && b === x);
+      });
+
+      if (isAlreadyExists) {
+        notifications.show({
+          message: "Tasks are already linked",
+          color: "red",
+        });
+        return;
+      }
+
       onAddTemporaryLink({
         ...newLink,
         status: task.status,
         title: task.title,
         taskType: task.type,
+        direction,
       });
 
       form.reset();
@@ -212,15 +240,28 @@ export default function TaskLinks({
           leftSection={<IconLink size={14} />}
           variant="light"
           color={
-            incomingLinks.some((l) => l.type === "BLOCKS")
+            [
+              ...incomingLinks,
+              ...temporaryLinks.filter((l) => l.direction === "incoming"),
+            ].some((l) => l.type === "BLOCKS")
               ? "red"
-              : incomingLinks.length > 0
+              : incomingLinks.length +
+                    temporaryLinks.filter((l) => l.direction === "incoming")
+                      .length >
+                  0
                 ? "orange"
                 : "blue"
           }
           style={{ textTransform: "none" }}
         >
-          {incomingLinks.length} Incoming • {outgoingLinks.length} Outgoing
+          {incomingLinks.length +
+            temporaryLinks.filter((l) => l.direction === "incoming")
+              .length}{" "}
+          Incoming •{" "}
+          {outgoingLinks.length +
+            temporaryLinks.filter((l) => l.direction === "outgoing")
+              .length}{" "}
+          Outgoing
         </Badge>
         <Button
           variant="subtle"
@@ -250,7 +291,10 @@ export default function TaskLinks({
                 </Grid.Col>
                 <Grid.Col span={9}>
                   <Select
-                    placeholder="Select Target Task"
+                    placeholder={
+                      projectId ? "Select Target Task" : "Select Project First"
+                    }
+                    disabled={!projectId}
                     data={[
                       {
                         group: "Pending Tasks",
@@ -369,7 +413,7 @@ export default function TaskLinks({
                   taskStatus={link.status}
                   taskType={link.taskType}
                   type={link.type}
-                  direction="outgoing"
+                  direction={link.direction}
                   onDelete={() => remove(link.id)}
                   isTaskCliclkable={false}
                 />
@@ -405,7 +449,7 @@ const RenderLinkCard = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const badgeText =
-    type === "BLOCKS"
+    type === TaskLinkType.BLOCKS
       ? direction === "incoming"
         ? "Is Blocked By"
         : "Blocks"
@@ -414,7 +458,7 @@ const RenderLinkCard = ({
         : "Depends On";
 
   const badgeColor =
-    type === "BLOCKS"
+    type === TaskLinkType.BLOCKS
       ? direction === "incoming"
         ? "red"
         : "blue"

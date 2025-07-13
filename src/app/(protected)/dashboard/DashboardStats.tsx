@@ -3,21 +3,20 @@
 import { Group, Paper, SimpleGrid, Skeleton, Text, Title } from "@mantine/core";
 import { IconFoldersFilled, IconHomeFilled } from "@tabler/icons-react";
 import { FaTasks } from "react-icons/fa";
-import { TASK_TYPE_OPTIONS } from "~/constants/task.constant";
 import { api } from "~/trpc/react";
 import classes from "./DashboardStats.module.css";
 
 export default function DashboardStats() {
   const dashboardQuery = api.dashboard.stats.useQuery();
-  const taskTypeBreakdownQuery = api.dashboard.taskTypeBreakdown.useQuery();
+  // const taskTypeBreakdownQuery = api.dashboard.taskTypeBreakdown.useQuery();
 
-  const breakdownMap = Object.fromEntries(
-    (taskTypeBreakdownQuery.data ?? []).map((item) => [item.type, item.count]),
-  );
+  // const breakdownMap = Object.fromEntries(
+  //   (taskTypeBreakdownQuery.data ?? []).map((item) => [item.type, item.count]),
+  // );
 
-  const visibleTypes = TASK_TYPE_OPTIONS.filter(
-    (type) => (breakdownMap[type.value] ?? 0) > 0,
-  );
+  // const visibleTypes = TASK_TYPE_OPTIONS.filter(
+  //   (type) => (breakdownMap[type.value] ?? 0) > 0,
+  // );
 
   // const chartData = [
   //   visibleTypes.reduce<Record<string, number | string>>(
