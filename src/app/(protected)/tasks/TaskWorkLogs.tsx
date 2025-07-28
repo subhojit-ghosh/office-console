@@ -268,8 +268,6 @@ export default function TaskWorkLogs({
                 <Grid.Col span={5}>
                   <DateTimePicker
                     placeholder="Start Date & Time"
-                    minDate={minDate}
-                    maxDate={maxDate}
                     valueFormat="MMM D, YYYY @ h:mm A"
                     timePickerProps={{
                       format: "12h",
@@ -287,8 +285,6 @@ export default function TaskWorkLogs({
                 <Grid.Col span={5}>
                   <DateTimePicker
                     placeholder="End Date & Time"
-                    minDate={minDate}
-                    maxDate={maxDate}
                     valueFormat="MMM D, YYYY @ h:mm A"
                     timePickerProps={{
                       format: "12h",
