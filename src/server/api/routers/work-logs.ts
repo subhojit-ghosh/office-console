@@ -145,6 +145,7 @@ export const workLogsRouter = createTRPCRouter({
         where: workLogWhere,
         select: {
           durationMin: true,
+          startTime: true,
           task: {
             select: {
               projectId: true,
@@ -154,7 +155,12 @@ export const workLogsRouter = createTRPCRouter({
       });
 
       // Create a map of project work log data
-      const projectWorkLogMap = new Map<string, { totalDuration: number; totalWorkLogs: number }>();
+      const projectWorkLogMap = new Map<string, { 
+        totalDuration: number; 
+        totalWorkLogs: number;
+        firstWorkLogDate: Date | null;
+        lastWorkLogDate: Date | null;
+      }>();
       
       for (const workLog of workLogs) {
         if (workLog.task?.projectId) {
@@ -164,23 +170,40 @@ export const workLogsRouter = createTRPCRouter({
             projectWorkLogMap.set(projectId, {
               totalDuration: 0,
               totalWorkLogs: 0,
+              firstWorkLogDate: null,
+              lastWorkLogDate: null,
             });
           }
           
           const projectData = projectWorkLogMap.get(projectId)!;
           projectData.totalDuration += workLog.durationMin;
           projectData.totalWorkLogs += 1;
+          
+          // Track first and last work log dates
+          if (!projectData.firstWorkLogDate || workLog.startTime < projectData.firstWorkLogDate) {
+            projectData.firstWorkLogDate = workLog.startTime;
+          }
+          if (!projectData.lastWorkLogDate || workLog.startTime > projectData.lastWorkLogDate) {
+            projectData.lastWorkLogDate = workLog.startTime;
+          }
         }
       }
 
       // Combine all projects with their work log data
       return allProjects.map(project => {
-        const workLogData = projectWorkLogMap.get(project.id) ?? { totalDuration: 0, totalWorkLogs: 0 };
+        const workLogData = projectWorkLogMap.get(project.id) ?? { 
+          totalDuration: 0, 
+          totalWorkLogs: 0,
+          firstWorkLogDate: null,
+          lastWorkLogDate: null,
+        };
         return {
           id: project.id,
           name: project.name,
           totalDuration: workLogData.totalDuration,
           totalWorkLogs: workLogData.totalWorkLogs,
+          firstWorkLogDate: workLogData.firstWorkLogDate,
+          lastWorkLogDate: workLogData.lastWorkLogDate,
         };
       });
     }),
@@ -244,6 +267,7 @@ export const workLogsRouter = createTRPCRouter({
         where: workLogWhere,
         select: {
           durationMin: true,
+          startTime: true,
           task: {
             select: {
               moduleId: true,
@@ -253,7 +277,12 @@ export const workLogsRouter = createTRPCRouter({
       });
 
       // Create a map of module work log data
-      const moduleWorkLogMap = new Map<string, { totalDuration: number; totalWorkLogs: number }>();
+      const moduleWorkLogMap = new Map<string, { 
+        totalDuration: number; 
+        totalWorkLogs: number;
+        firstWorkLogDate: Date | null;
+        lastWorkLogDate: Date | null;
+      }>();
       
       for (const workLog of workLogs) {
         const moduleId = workLog.task?.moduleId ?? `no-module-${input.projectId}`;
@@ -262,23 +291,40 @@ export const workLogsRouter = createTRPCRouter({
           moduleWorkLogMap.set(moduleId, {
             totalDuration: 0,
             totalWorkLogs: 0,
+            firstWorkLogDate: null,
+            lastWorkLogDate: null,
           });
         }
         
         const moduleData = moduleWorkLogMap.get(moduleId)!;
         moduleData.totalDuration += workLog.durationMin;
         moduleData.totalWorkLogs += 1;
+        
+        // Track first and last work log dates
+        if (!moduleData.firstWorkLogDate || workLog.startTime < moduleData.firstWorkLogDate) {
+          moduleData.firstWorkLogDate = workLog.startTime;
+        }
+        if (!moduleData.lastWorkLogDate || workLog.startTime > moduleData.lastWorkLogDate) {
+          moduleData.lastWorkLogDate = workLog.startTime;
+        }
       }
 
       // Combine all modules with their work log data
       const modulesWithData = allModules.map(module => {
-        const workLogData = moduleWorkLogMap.get(module.id) ?? { totalDuration: 0, totalWorkLogs: 0 };
+        const workLogData = moduleWorkLogMap.get(module.id) ?? { 
+          totalDuration: 0, 
+          totalWorkLogs: 0,
+          firstWorkLogDate: null,
+          lastWorkLogDate: null,
+        };
         return {
           id: module.id,
           name: module.name,
           projectId: input.projectId,
           totalDuration: workLogData.totalDuration,
           totalWorkLogs: workLogData.totalWorkLogs,
+          firstWorkLogDate: workLogData.firstWorkLogDate,
+          lastWorkLogDate: workLogData.lastWorkLogDate,
         };
       });
 
@@ -291,6 +337,8 @@ export const workLogsRouter = createTRPCRouter({
           projectId: input.projectId,
           totalDuration: noModuleData.totalDuration,
           totalWorkLogs: noModuleData.totalWorkLogs,
+          firstWorkLogDate: noModuleData.firstWorkLogDate,
+          lastWorkLogDate: noModuleData.lastWorkLogDate,
         });
       }
 
@@ -363,12 +411,18 @@ export const workLogsRouter = createTRPCRouter({
         where: workLogWhere,
         select: {
           durationMin: true,
+          startTime: true,
           taskId: true,
         },
       });
 
       // Create a map of task work log data
-      const taskWorkLogMap = new Map<string, { totalDuration: number; totalWorkLogs: number }>();
+      const taskWorkLogMap = new Map<string, { 
+        totalDuration: number; 
+        totalWorkLogs: number;
+        firstWorkLogDate: Date | null;
+        lastWorkLogDate: Date | null;
+      }>();
       
       for (const workLog of workLogs) {
         const taskId = workLog.taskId;
@@ -377,6 +431,8 @@ export const workLogsRouter = createTRPCRouter({
           taskWorkLogMap.set(taskId, {
             totalDuration: 0,
             totalWorkLogs: 0,
+            firstWorkLogDate: null,
+            lastWorkLogDate: null,
           });
         }
         
@@ -384,12 +440,25 @@ export const workLogsRouter = createTRPCRouter({
           const taskData = taskWorkLogMap.get(taskId)!;
           taskData.totalDuration += workLog.durationMin;
           taskData.totalWorkLogs += 1;
+          
+          // Track first and last work log dates
+          if (!taskData.firstWorkLogDate || workLog.startTime < taskData.firstWorkLogDate) {
+            taskData.firstWorkLogDate = workLog.startTime;
+          }
+          if (!taskData.lastWorkLogDate || workLog.startTime > taskData.lastWorkLogDate) {
+            taskData.lastWorkLogDate = workLog.startTime;
+          }
         }
       }
 
       // Combine all tasks with their work log data
       return allTasks.map(task => {
-        const workLogData = taskWorkLogMap.get(task.id) ?? { totalDuration: 0, totalWorkLogs: 0 };
+        const workLogData = taskWorkLogMap.get(task.id) ?? { 
+          totalDuration: 0, 
+          totalWorkLogs: 0,
+          firstWorkLogDate: null,
+          lastWorkLogDate: null,
+        };
         return {
           id: task.id,
           title: task.title,
@@ -397,6 +466,8 @@ export const workLogsRouter = createTRPCRouter({
           moduleId: input.moduleId,
           totalDuration: workLogData.totalDuration,
           totalWorkLogs: workLogData.totalWorkLogs,
+          firstWorkLogDate: workLogData.firstWorkLogDate,
+          lastWorkLogDate: workLogData.lastWorkLogDate,
         };
       });
     }),

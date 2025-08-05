@@ -3,6 +3,7 @@
 import { Group } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import { FaCubes } from "react-icons/fa";
+import dayjs from "dayjs";
 import AppTable from "~/components/AppTable";
 import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
@@ -40,7 +41,7 @@ export function ProjectModules({
       columns={[
         {
           accessor: 'name',
-          width: '60%',
+          width: '40%',
           noWrap: true,
           render: ({ id, name }) => (
             <Group gap="xs" align="center" wrap="nowrap" ml={20}>
@@ -55,8 +56,24 @@ export function ProjectModules({
           ),
         },
         {
+          accessor: 'firstWorkLogDate',
+          title: 'First Entry',
+          width: '20%',
+          textAlign: 'left',
+          render: ({ firstWorkLogDate }) => 
+            firstWorkLogDate ? dayjs(firstWorkLogDate).format('MMM D, YYYY') : '-',
+        },
+        {
+          accessor: 'lastWorkLogDate',
+          title: 'Last Entry',
+          width: '20%',
+          textAlign: 'left',
+          render: ({ lastWorkLogDate }) => 
+            lastWorkLogDate ? dayjs(lastWorkLogDate).format('MMM D, YYYY') : '-',
+        },
+        {
           accessor: 'totalDuration',
-          width: '40%',
+          width: '20%',
           textAlign: 'left',
           render: ({ totalDuration }) => formatDurationFromMinutes(totalDuration),
         },

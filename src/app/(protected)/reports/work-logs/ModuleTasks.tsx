@@ -1,6 +1,7 @@
 "use client";
 
 import { useMantineTheme, Group } from "@mantine/core";
+import dayjs from "dayjs";
 import AppTable from "~/components/AppTable";
 import { TASK_TYPE_OPTIONS } from "~/constants/task.constant";
 import { api } from "~/trpc/react";
@@ -37,7 +38,7 @@ export function ModuleTasks({
       columns={[
         {
           accessor: 'name',
-          width: '60%',
+          width: '40%',
           noWrap: false,
           render: ({ title, type }) => {
             const typeOption = TASK_TYPE_OPTIONS.find(t => t.value === type);
@@ -70,8 +71,24 @@ export function ModuleTasks({
           },
         },
         {
+          accessor: 'firstWorkLogDate',
+          title: 'First Entry',
+          width: '20%',
+          textAlign: 'left',
+          render: ({ firstWorkLogDate }) => 
+            firstWorkLogDate ? dayjs(firstWorkLogDate).format('MMM D, YYYY') : '-',
+        },
+        {
+          accessor: 'lastWorkLogDate',
+          title: 'Last Entry',
+          width: '20%',
+          textAlign: 'left',
+          render: ({ lastWorkLogDate }) => 
+            lastWorkLogDate ? dayjs(lastWorkLogDate).format('MMM D, YYYY') : '-',
+        },
+        {
           accessor: 'totalDuration',
-          width: '40%',
+          width: '20%',
           textAlign: 'left',
           render: ({ totalDuration }) => formatDurationFromMinutes(totalDuration),
         },

@@ -12,6 +12,7 @@ import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
 import classes from "./WorkLogs.module.css";
 import clsx from "clsx";
+import dayjs from "dayjs";
 
 export default function WorkLogs() {
   const { data: session } = useSession();
@@ -81,7 +82,7 @@ export default function WorkLogs() {
           {
             accessor: 'name',
             title: 'Project / Module / Task',
-            width: '60%',
+            width: '40%',
             noWrap: true,
             render: ({ id, name }) => (
               <Group gap="xs" align="center" wrap="nowrap">
@@ -96,9 +97,25 @@ export default function WorkLogs() {
             ),
           },
           {
+            accessor: 'firstWorkLogDate',
+            title: 'First Entry',
+            width: '20%',
+            textAlign: 'left',
+            render: ({ firstWorkLogDate }) => 
+              firstWorkLogDate ? dayjs(firstWorkLogDate).format('MMM D, YYYY') : '-',
+          },
+          {
+            accessor: 'lastWorkLogDate',
+            title: 'Last Entry',
+            width: '20%',
+            textAlign: 'left',
+            render: ({ lastWorkLogDate }) => 
+              lastWorkLogDate ? dayjs(lastWorkLogDate).format('MMM D, YYYY') : '-',
+          },
+          {
             accessor: 'totalDuration',
             title: 'Total Duration',
-            width: '40%',
+            width: '20%',
             textAlign: 'left',
             render: ({ totalDuration }) => formatDurationFromMinutes(totalDuration),
           },
