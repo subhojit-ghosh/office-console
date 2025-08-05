@@ -2,11 +2,9 @@
 
 import { Group, Select, Title } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
-import { UserRole } from "@prisma/client";
 import { IconClockHour4, IconChevronRight, IconFoldersFilled } from "@tabler/icons-react";
 import dayjs from "dayjs";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AppTable from "~/components/AppTable";
 import { ProjectModules } from "./ProjectModules";
 import { api } from "~/trpc/react";
@@ -15,31 +13,19 @@ import classes from "./WorkLogs.module.css";
 import clsx from "clsx";
 
 export default function WorkLogs() {
-  const { data: session } = useSession();
-  const usersQuery = api.users.getAllMinimal.useQuery();
   const projectsQuery = api.projects.getAllMinimal.useQuery();
   const [filters, setFilters] = useDebouncedState(
     {
-      user: null as string | null,
       projectId: "",
     },
     300,
   );
 
   // Load projects (first level)
-  const { data: projects, isPending: projectsLoading } = api.workLogs.getProjects.useQuery({
-    userId: filters.user,
-  });
+  const { data: projects, isPending: projectsLoading } = api.workLogs.getProjects.useQuery({});
 
   const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>([]);
   const [expandedModuleIds, setExpandedModuleIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (session?.user?.role) {
-      setFilters((prev) => ({ ...prev, user: session.user.id }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user?.role]);
 
   // Filter projects based on selected projectId
   const filteredProjects = projects?.filter(project => 
@@ -52,29 +38,6 @@ export default function WorkLogs() {
         <Group gap="xs">
           <IconClockHour4 />
           <Title size="lg">Work Logs</Title>
-          {session?.user?.role === UserRole.ADMIN && (
-            <Select
-              data={
-                usersQuery.data
-                  ?.sort((a, b) =>
-                    a.id === session?.user.id
-                      ? -1
-                      : b.id === session?.user.id
-                        ? 1
-                        : 0,
-                  )
-                  .map((user) => ({
-                    value: user.id,
-                    label: user.name,
-                  })) ?? []
-              }
-              value={filters.user}
-              onChange={(value) => setFilters({ ...filters, user: value })}
-              searchable
-              placeholder="Select User"
-              ml="md"
-            />
-          )}
           <Select
             placeholder="All Projects"
             clearable
@@ -150,7 +113,6 @@ export default function WorkLogs() {
           content: ({ record: project }) => (
             <ProjectModules 
               projectId={project.id} 
-              userId={filters.user}
               expandedModuleIds={expandedModuleIds}
               setExpandedModuleIds={setExpandedModuleIds}
             />

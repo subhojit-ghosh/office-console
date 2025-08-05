@@ -13,20 +13,17 @@ import { ModuleTasks } from "./ModuleTasks";
 
 interface ProjectModulesProps {
   projectId: string;
-  userId: string | null;
   expandedModuleIds: string[];
   setExpandedModuleIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function ProjectModules({ 
   projectId, 
-  userId, 
   expandedModuleIds, 
   setExpandedModuleIds
 }: ProjectModulesProps) {
   const { data: modules, isPending: modulesLoading } = api.workLogs.getModules.useQuery({
     projectId,
-    userId,
   }, {
     enabled: !!projectId,
   });
@@ -85,7 +82,6 @@ export function ProjectModules({
           <ModuleTasks 
             moduleId={module.id}
             projectId={projectId}
-            userId={userId}
           />
         ),
       }}

@@ -138,7 +138,6 @@ export const workLogsRouter = createTRPCRouter({
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
         ...(input.taskId ? { taskId: input.taskId } : {}),
-        ...(input.userId ? { userId: input.userId } : {}),
       };
 
       const workLogs = await ctx.db.workLog.findMany({
@@ -212,7 +211,6 @@ export const workLogsRouter = createTRPCRouter({
   getModules: protectedProcedure
     .input(z.object({
       projectId: z.string(),
-      userId: z.string().optional().nullable(),
     }))
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
@@ -257,7 +255,6 @@ export const workLogsRouter = createTRPCRouter({
 
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
-        ...(input.userId ? { userId: input.userId } : {}),
         task: {
           projectId: input.projectId,
         },
@@ -350,7 +347,6 @@ export const workLogsRouter = createTRPCRouter({
     .input(z.object({
       moduleId: z.string(),
       projectId: z.string(),
-      userId: z.string().optional().nullable(),
     }))
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
@@ -400,7 +396,6 @@ export const workLogsRouter = createTRPCRouter({
 
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
-        ...(input.userId ? { userId: input.userId } : {}),
         task: {
           projectId: input.projectId,
           ...(input.moduleId.startsWith('no-module-') ? { moduleId: null } : { moduleId: input.moduleId }),
@@ -476,7 +471,6 @@ export const workLogsRouter = createTRPCRouter({
   getWorkLogs: protectedProcedure
     .input(z.object({
       taskId: z.string(),
-      userId: z.string().optional().nullable(),
     }))
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
@@ -520,7 +514,6 @@ export const workLogsRouter = createTRPCRouter({
 
       const where: Prisma.WorkLogWhereInput = {
         taskId: input.taskId,
-        ...(input.userId ? { userId: input.userId } : {}),
       };
 
       return ctx.db.workLog.findMany({
