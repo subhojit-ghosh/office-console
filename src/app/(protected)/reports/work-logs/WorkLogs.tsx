@@ -4,6 +4,7 @@ import { Group, Select, Title } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { UserRole } from "@prisma/client";
 import { IconClockHour4, IconChevronRight, IconFoldersFilled } from "@tabler/icons-react";
+import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import AppTable from "~/components/AppTable";
@@ -12,14 +13,15 @@ import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
 import classes from "./WorkLogs.module.css";
 import clsx from "clsx";
-import dayjs from "dayjs";
 
 export default function WorkLogs() {
   const { data: session } = useSession();
   const usersQuery = api.users.getAllMinimal.useQuery();
+  const projectsQuery = api.projects.getAllMinimal.useQuery();
   const [filters, setFilters] = useDebouncedState(
     {
       user: null as string | null,
+      projectId: "",
     },
     300,
   );
@@ -38,6 +40,11 @@ export default function WorkLogs() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.role]);
+
+  // Filter projects based on selected projectId
+  const filteredProjects = projects?.filter(project => 
+    !filters.projectId || project.id === filters.projectId
+  ) ?? [];
 
   return (
     <>
@@ -68,6 +75,23 @@ export default function WorkLogs() {
               ml="md"
             />
           )}
+          <Select
+            placeholder="All Projects"
+            clearable
+            searchable
+            data={
+              projectsQuery.data?.map((p) => ({
+                value: p.id,
+                label: p.name,
+              })) ?? []
+            }
+            value={filters.projectId}
+            onChange={(value) =>
+              setFilters({ ...filters, projectId: value ?? "" })
+            }
+            disabled={projectsQuery.isLoading}
+            style={{ width: 200 }}
+          />
         </Group>
         <div></div>
       </Group>
@@ -77,7 +101,7 @@ export default function WorkLogs() {
         withColumnBorders
         highlightOnHover
         fetching={projectsLoading}
-        records={projects ?? []}
+        records={filteredProjects}
         columns={[
           {
             accessor: 'name',
