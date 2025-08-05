@@ -55,16 +55,12 @@ export function Navbar({ toggleMobile }: NavbarProps) {
           { link: "/clients", label: "Clients", icon: FaUserTie },
         ]
       : []),
-    ...(session?.user?.role !== UserRole.CLIENT
-      ? [
-          {
-            link: "/reports",
-            label: "Reports",
-            icon: BsBarChartLineFill,
-            links: [{ label: "Work Logs", link: "/reports/work-logs" }],
-          },
-        ]
-      : []),
+    {
+      link: "/reports",
+      label: "Reports",
+      icon: BsBarChartLineFill,
+      links: [{ label: "Work Logs", link: "/reports/work-logs" }],
+    },
   ];
 
   const links = data.map((item) => {

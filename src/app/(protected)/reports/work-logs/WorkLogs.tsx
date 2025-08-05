@@ -1,19 +1,19 @@
 "use client";
 
-import { Group, Select, Text, Title, useMantineTheme } from "@mantine/core";
+import { Group, Select, Title } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { UserRole } from "@prisma/client";
-import { IconClockHour4 } from "@tabler/icons-react";
-import dayjs from "dayjs";
+import { IconClockHour4, IconChevronRight, IconFoldersFilled } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AppTable from "~/components/AppTable";
-import { TASK_TYPE_OPTIONS } from "~/constants/task.constant";
+import { ProjectModules } from "./ProjectModules";
 import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
+import classes from "./WorkLogs.module.css";
+import clsx from "clsx";
 
 export default function WorkLogs() {
-  const theme = useMantineTheme();
   const { data: session } = useSession();
   const usersQuery = api.users.getAllMinimal.useQuery();
   const [filters, setFilters] = useDebouncedState(
@@ -23,9 +23,13 @@ export default function WorkLogs() {
     300,
   );
 
-  const { data, isPending } = api.workLogs.getAll.useQuery({
+  // Load projects (first level)
+  const { data: projects, isPending: projectsLoading } = api.workLogs.getProjects.useQuery({
     userId: filters.user,
   });
+
+  const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>([]);
+  const [expandedModuleIds, setExpandedModuleIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (session?.user?.role) {
@@ -66,54 +70,51 @@ export default function WorkLogs() {
         </Group>
         <div></div>
       </Group>
+      
       <AppTable
-        fetching={isPending}
-        records={data ?? []}
+        withTableBorder
+        withColumnBorders
+        highlightOnHover
+        fetching={projectsLoading}
+        records={projects ?? []}
         columns={[
           {
-            accessor: "task",
-            title: "Task",
-            width: "30%",
-            render: (row) => {
-              const type = TASK_TYPE_OPTIONS.find(
-                (t) => t.value === row.task?.type,
-              );
-
-              return (
-                <Group gap="xs" align="center" wrap="nowrap">
-                  {type && (
-                    <type.icon size={18} color={theme.colors[type.color][4]} />
-                  )}
-                  <Text
-                    size="sm"
-                    fw={500}
-                    lineClamp={2}
-                    title={row.task?.title}
-                    style={{ flex: 1 }}
-                  >
-                    {row.task?.title}
-                  </Text>
-                </Group>
-              );
-            },
+            accessor: 'name',
+            title: 'Project / Module / Task',
+            width: '60%',
+            noWrap: true,
+            render: ({ id, name }) => (
+              <Group gap="xs" align="center" wrap="nowrap">
+                <IconChevronRight
+                  className={clsx(classes.icon, classes.expandIcon, {
+                    [classes.expandIconRotated!]: expandedProjectIds.includes(id),
+                  })}
+                />
+                <IconFoldersFilled className={classes.icon} />
+                <span className={classes.projectRow}>{name}</span>
+              </Group>
+            ),
           },
           {
-            accessor: "startTime",
-            title: "Start Time",
-            render: (row) =>
-              dayjs(row.startTime).format("MMM D, YYYY @ h:mm A"),
-          },
-          {
-            accessor: "endTime",
-            title: "End Time",
-            render: (row) => dayjs(row.endTime).format("MMM D, YYYY @ h:mm A"),
-          },
-          {
-            accessor: "durationMin",
-            title: "Duration",
-            render: (row) => formatDurationFromMinutes(row.durationMin),
+            accessor: 'totalDuration',
+            title: 'Total Duration',
+            width: '40%',
+            textAlign: 'right',
+            render: ({ totalDuration }) => formatDurationFromMinutes(totalDuration),
           },
         ]}
+        rowExpansion={{
+          allowMultiple: true,
+          expanded: { recordIds: expandedProjectIds, onRecordIdsChange: setExpandedProjectIds },
+          content: ({ record: project }) => (
+            <ProjectModules 
+              projectId={project.id} 
+              userId={filters.user}
+              expandedModuleIds={expandedModuleIds}
+              setExpandedModuleIds={setExpandedModuleIds}
+            />
+          ),
+        }}
       />
     </>
   );

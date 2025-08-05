@@ -1,0 +1,30 @@
+.icon {
+  flex-shrink: 0;
+}
+
+.expandIcon {
+  transition: transform 0.2s ease;
+}
+
+.expandIconRotated {
+  transform: rotate(90deg);
+}
+
+.projectRow {
+  font-weight: 600;
+  background-color: var(--mantine-color-gray-0);
+}
+
+.moduleRow {
+  font-weight: 500;
+  background-color: var(--mantine-color-gray-1);
+}
+
+.taskRow {
+  background-color: var(--mantine-color-white);
+}
+
+.workLogRow {
+  background-color: var(--mantine-color-gray-0);
+  font-size: 0.875rem;
+} 
