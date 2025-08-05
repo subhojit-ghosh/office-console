@@ -256,7 +256,7 @@ export const workLogsRouter = createTRPCRouter({
       const moduleWorkLogMap = new Map<string, { totalDuration: number; totalWorkLogs: number }>();
       
       for (const workLog of workLogs) {
-        const moduleId = workLog.task?.moduleId ?? 'no-module';
+        const moduleId = workLog.task?.moduleId ?? `no-module-${input.projectId}`;
         
         if (!moduleWorkLogMap.has(moduleId)) {
           moduleWorkLogMap.set(moduleId, {
@@ -283,10 +283,10 @@ export const workLogsRouter = createTRPCRouter({
       });
 
       // Add "No Module" entry if there are work logs without modules
-      const noModuleData = moduleWorkLogMap.get('no-module');
+      const noModuleData = moduleWorkLogMap.get(`no-module-${input.projectId}`);
       if (noModuleData && noModuleData.totalWorkLogs > 0) {
         modulesWithData.push({
-          id: 'no-module',
+          id: `no-module-${input.projectId}`,
           name: 'No Module',
           projectId: input.projectId,
           totalDuration: noModuleData.totalDuration,
@@ -336,7 +336,7 @@ export const workLogsRouter = createTRPCRouter({
       }
 
       // First, get all tasks for the module/project
-      const taskWhere = input.moduleId === 'no-module' 
+      const taskWhere = input.moduleId.startsWith('no-module-') 
         ? { projectId: input.projectId, moduleId: null }
         : { projectId: input.projectId, moduleId: input.moduleId };
 
@@ -355,7 +355,7 @@ export const workLogsRouter = createTRPCRouter({
         ...(input.userId ? { userId: input.userId } : {}),
         task: {
           projectId: input.projectId,
-          ...(input.moduleId === 'no-module' ? { moduleId: null } : { moduleId: input.moduleId }),
+          ...(input.moduleId.startsWith('no-module-') ? { moduleId: null } : { moduleId: input.moduleId }),
         },
       };
 
@@ -600,11 +600,12 @@ export const workLogsRouter = createTRPCRouter({
           const taskType = workLog.task?.type;
           
           if (taskId && taskTitle) {
-            let moduleData = project.modules.find(m => m.id === 'no-module');
+            const noModuleId = `no-module-${projectId}`;
+            let moduleData = project.modules.find(m => m.id === noModuleId);
             
             if (!moduleData) {
               moduleData = {
-                id: 'no-module',
+                id: noModuleId,
                 name: 'No Module',
                 projectId,
                 tasks: [],
@@ -624,7 +625,7 @@ export const workLogsRouter = createTRPCRouter({
                 id: taskId,
                 title: taskTitle,
                 type: taskType,
-                moduleId: 'no-module',
+                moduleId: noModuleId,
                 workLogs: [],
                 totalDuration: 0,
               };

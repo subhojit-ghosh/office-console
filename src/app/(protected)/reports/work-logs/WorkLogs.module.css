@@ -12,19 +12,22 @@
 
 .projectRow {
   font-weight: 600;
-  background-color: var(--mantine-color-gray-0);
 }
 
 .moduleRow {
   font-weight: 500;
-  background-color: var(--mantine-color-gray-1);
+  line-height: 1.2;
 }
 
 .taskRow {
-  background-color: var(--mantine-color-white);
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .workLogRow {
-  background-color: var(--mantine-color-gray-0);
   font-size: 0.875rem;
 } 

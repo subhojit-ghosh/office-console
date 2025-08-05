@@ -1,6 +1,6 @@
 "use client";
 
-import { Box } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import { FaCubes } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
@@ -43,7 +43,7 @@ export function ProjectModules({
           width: '60%',
           noWrap: true,
           render: ({ id, name }) => (
-            <Box component="span" ml={20}>
+            <Group gap="xs" align="center" wrap="nowrap" ml={20}>
               <IconChevronRight
                 className={clsx(classes.icon, classes.expandIcon, {
                   [classes.expandIconRotated!]: expandedModuleIds.includes(id),
@@ -51,13 +51,13 @@ export function ProjectModules({
               />
               <FaCubes className={classes.icon} />
               <span className={classes.moduleRow}>{name}</span>
-            </Box>
+            </Group>
           ),
         },
         {
           accessor: 'totalDuration',
           width: '40%',
-          textAlign: 'right',
+          textAlign: 'left',
           render: ({ totalDuration }) => formatDurationFromMinutes(totalDuration),
         },
       ]}

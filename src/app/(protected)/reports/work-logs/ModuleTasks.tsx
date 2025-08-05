@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, useMantineTheme } from "@mantine/core";
+import { useMantineTheme, Group } from "@mantine/core";
 import AppTable from "~/components/AppTable";
 import { TASK_TYPE_OPTIONS } from "~/constants/task.constant";
 import { api } from "~/trpc/react";
@@ -38,11 +38,11 @@ export function ModuleTasks({
         {
           accessor: 'name',
           width: '60%',
-          noWrap: true,
+          noWrap: false,
           render: ({ title, type }) => {
             const typeOption = TASK_TYPE_OPTIONS.find(t => t.value === type);
             return (
-              <Box component="span" ml={40}>
+              <Group gap="xs" align="flex-start" wrap="wrap" ml={40}>
                 {typeOption && (
                   <typeOption.icon 
                     className={classes.icon} 
@@ -50,15 +50,29 @@ export function ModuleTasks({
                     color={theme.colors[typeOption.color][4]} 
                   />
                 )}
-                <span className={classes.taskRow}>{title}</span>
-              </Box>
+                <span 
+                  className={classes.taskRow}
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    wordBreak: 'break-word',
+                    lineHeight: '1.2',
+                    maxWidth: '100%'
+                  }}
+                >
+                  {title}
+                </span>
+              </Group>
             );
           },
         },
         {
           accessor: 'totalDuration',
           width: '40%',
-          textAlign: 'right',
+          textAlign: 'left',
           render: ({ totalDuration }) => formatDurationFromMinutes(totalDuration),
         },
       ]}

@@ -99,7 +99,7 @@ export default function WorkLogs() {
             accessor: 'totalDuration',
             title: 'Total Duration',
             width: '40%',
-            textAlign: 'right',
+            textAlign: 'left',
             render: ({ totalDuration }) => formatDurationFromMinutes(totalDuration),
           },
         ]}
