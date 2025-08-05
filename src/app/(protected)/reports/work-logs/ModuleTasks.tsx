@@ -11,16 +11,19 @@ import classes from "./WorkLogs.module.css";
 interface ModuleTasksProps {
   moduleId: string;
   projectId: string;
+  dateRange: [Date | null, Date | null];
 }
 
 export function ModuleTasks({ 
   moduleId, 
-  projectId
+  projectId,
+  dateRange
 }: ModuleTasksProps) {
   const theme = useMantineTheme();
   const { data: tasks, isPending: tasksLoading } = api.workLogs.getTasks.useQuery({
     moduleId,
     projectId,
+    dateRange,
   }, {
     enabled: !!moduleId && !!projectId,
   });

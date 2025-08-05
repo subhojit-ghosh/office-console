@@ -1,6 +1,7 @@
 "use client";
 
 import { Group, Select, Title } from "@mantine/core";
+import { DatePickerInput, type DatesRangeValue } from "@mantine/dates";
 import { useDebouncedState } from "@mantine/hooks";
 import { IconClockHour4, IconChevronRight, IconFoldersFilled } from "@tabler/icons-react";
 import dayjs from "dayjs";
@@ -17,12 +18,21 @@ export default function WorkLogs() {
   const [filters, setFilters] = useDebouncedState(
     {
       projectId: "",
+      dateRange: [null, null] as DatesRangeValue,
     },
     300,
   );
 
+  // Convert string dates to Date objects for API
+  const dateRangeForAPI: [Date | null, Date | null] = [
+    filters.dateRange[0] ? new Date(filters.dateRange[0]) : null,
+    filters.dateRange[1] ? new Date(filters.dateRange[1]) : null,
+  ];
+
   // Load projects (first level)
-  const { data: projects, isPending: projectsLoading } = api.workLogs.getProjects.useQuery({});
+  const { data: projects, isPending: projectsLoading } = api.workLogs.getProjects.useQuery({
+    dateRange: dateRangeForAPI,
+  });
 
   const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>([]);
   const [expandedModuleIds, setExpandedModuleIds] = useState<string[]>([]);
@@ -32,12 +42,46 @@ export default function WorkLogs() {
     !filters.projectId || project.id === filters.projectId
   ) ?? [];
 
+  // Date range presets
+  const today = dayjs();
+  const presets = [
+    {
+      value: [today.subtract(7, 'day').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')] as [string, string],
+      label: 'Last 7 days',
+    },
+    {
+      value: [today.subtract(30, 'day').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')] as [string, string],
+      label: 'Last 30 days',
+    },
+    {
+      value: [today.startOf('month').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')] as [string, string],
+      label: 'This month',
+    },
+    {
+      value: [today.subtract(1, 'month').startOf('month').format('YYYY-MM-DD'), today.subtract(1, 'month').endOf('month').format('YYYY-MM-DD')] as [string, string],
+      label: 'Last month',
+    },
+    {
+      value: [today.startOf('year').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')] as [string, string],
+      label: 'This year',
+    },
+  ];
+
   return (
     <>
       <Group justify="space-between" px="md" mb="md">
         <Group gap="xs">
           <IconClockHour4 />
           <Title size="lg">Work Logs</Title>
+          <DatePickerInput
+            type="range"
+            placeholder="Filter by date range"
+            value={filters.dateRange}
+            onChange={(value) => setFilters({ ...filters, dateRange: value })}
+            presets={presets}
+            clearable
+            style={{ width: 250 }}
+          />
           <Select
             placeholder="All Projects"
             clearable
@@ -113,6 +157,7 @@ export default function WorkLogs() {
           content: ({ record: project }) => (
             <ProjectModules 
               projectId={project.id} 
+              dateRange={dateRangeForAPI}
               expandedModuleIds={expandedModuleIds}
               setExpandedModuleIds={setExpandedModuleIds}
             />

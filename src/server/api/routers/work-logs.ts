@@ -104,7 +104,9 @@ export const workLogsRouter = createTRPCRouter({
 
   // Get projects with work log summaries
   getProjects: protectedProcedure
-    .input(getWorkLogsSchema)
+    .input(z.object({
+      dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
+    }))
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
 
@@ -137,7 +139,12 @@ export const workLogsRouter = createTRPCRouter({
 
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
-        ...(input.taskId ? { taskId: input.taskId } : {}),
+        ...(input.dateRange?.[0] && input.dateRange?.[1] ? {
+          startTime: {
+            gte: input.dateRange[0],
+            lte: input.dateRange[1],
+          },
+        } : {}),
       };
 
       const workLogs = await ctx.db.workLog.findMany({
@@ -188,7 +195,24 @@ export const workLogsRouter = createTRPCRouter({
         }
       }
 
-      // Combine all projects with their work log data
+      // If date range is applied, only return projects that have work logs in that range
+      if (input.dateRange?.[0] && input.dateRange?.[1]) {
+        return allProjects
+          .filter(project => projectWorkLogMap.has(project.id))
+          .map(project => {
+            const workLogData = projectWorkLogMap.get(project.id)!;
+            return {
+              id: project.id,
+              name: project.name,
+              totalDuration: workLogData.totalDuration,
+              totalWorkLogs: workLogData.totalWorkLogs,
+              firstWorkLogDate: workLogData.firstWorkLogDate,
+              lastWorkLogDate: workLogData.lastWorkLogDate,
+            };
+          });
+      }
+
+      // If no date range, return all projects with their work log data
       return allProjects.map(project => {
         const workLogData = projectWorkLogMap.get(project.id) ?? { 
           totalDuration: 0, 
@@ -211,6 +235,7 @@ export const workLogsRouter = createTRPCRouter({
   getModules: protectedProcedure
     .input(z.object({
       projectId: z.string(),
+      dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
     }))
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
@@ -255,6 +280,12 @@ export const workLogsRouter = createTRPCRouter({
 
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
+        ...(input.dateRange?.[0] && input.dateRange?.[1] ? {
+          startTime: {
+            gte: input.dateRange[0],
+            lte: input.dateRange[1],
+          },
+        } : {}),
         task: {
           projectId: input.projectId,
         },
@@ -306,7 +337,41 @@ export const workLogsRouter = createTRPCRouter({
         }
       }
 
-      // Combine all modules with their work log data
+      // If date range is applied, only return modules that have work logs in that range
+      if (input.dateRange?.[0] && input.dateRange?.[1]) {
+        const modulesWithData = allModules
+          .filter(module => moduleWorkLogMap.has(module.id))
+          .map(module => {
+            const workLogData = moduleWorkLogMap.get(module.id)!;
+            return {
+              id: module.id,
+              name: module.name,
+              projectId: input.projectId,
+              totalDuration: workLogData.totalDuration,
+              totalWorkLogs: workLogData.totalWorkLogs,
+              firstWorkLogDate: workLogData.firstWorkLogDate,
+              lastWorkLogDate: workLogData.lastWorkLogDate,
+            };
+          });
+
+        // Add "No Module" entry if there are work logs without modules
+        const noModuleData = moduleWorkLogMap.get(`no-module-${input.projectId}`);
+        if (noModuleData && noModuleData.totalWorkLogs > 0) {
+          modulesWithData.push({
+            id: `no-module-${input.projectId}`,
+            name: 'No Module',
+            projectId: input.projectId,
+            totalDuration: noModuleData.totalDuration,
+            totalWorkLogs: noModuleData.totalWorkLogs,
+            firstWorkLogDate: noModuleData.firstWorkLogDate,
+            lastWorkLogDate: noModuleData.lastWorkLogDate,
+          });
+        }
+
+        return modulesWithData;
+      }
+
+      // If no date range, return all modules with their work log data
       const modulesWithData = allModules.map(module => {
         const workLogData = moduleWorkLogMap.get(module.id) ?? { 
           totalDuration: 0, 
@@ -347,6 +412,7 @@ export const workLogsRouter = createTRPCRouter({
     .input(z.object({
       moduleId: z.string(),
       projectId: z.string(),
+      dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
     }))
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
@@ -396,6 +462,12 @@ export const workLogsRouter = createTRPCRouter({
 
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
+        ...(input.dateRange?.[0] && input.dateRange?.[1] ? {
+          startTime: {
+            gte: input.dateRange[0],
+            lte: input.dateRange[1],
+          },
+        } : {}),
         task: {
           projectId: input.projectId,
           ...(input.moduleId.startsWith('no-module-') ? { moduleId: null } : { moduleId: input.moduleId }),
@@ -446,7 +518,26 @@ export const workLogsRouter = createTRPCRouter({
         }
       }
 
-      // Combine all tasks with their work log data
+      // If date range is applied, only return tasks that have work logs in that range
+      if (input.dateRange?.[0] && input.dateRange?.[1]) {
+        return allTasks
+          .filter(task => taskWorkLogMap.has(task.id))
+          .map(task => {
+            const workLogData = taskWorkLogMap.get(task.id)!;
+            return {
+              id: task.id,
+              title: task.title,
+              type: task.type,
+              moduleId: input.moduleId,
+              totalDuration: workLogData.totalDuration,
+              totalWorkLogs: workLogData.totalWorkLogs,
+              firstWorkLogDate: workLogData.firstWorkLogDate,
+              lastWorkLogDate: workLogData.lastWorkLogDate,
+            };
+          });
+      }
+
+      // If no date range, return all tasks with their work log data
       return allTasks.map(task => {
         const workLogData = taskWorkLogMap.get(task.id) ?? { 
           totalDuration: 0, 

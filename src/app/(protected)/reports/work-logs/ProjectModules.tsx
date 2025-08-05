@@ -13,17 +13,20 @@ import { ModuleTasks } from "./ModuleTasks";
 
 interface ProjectModulesProps {
   projectId: string;
+  dateRange: [Date | null, Date | null];
   expandedModuleIds: string[];
   setExpandedModuleIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function ProjectModules({ 
   projectId, 
+  dateRange,
   expandedModuleIds, 
   setExpandedModuleIds
 }: ProjectModulesProps) {
   const { data: modules, isPending: modulesLoading } = api.workLogs.getModules.useQuery({
     projectId,
+    dateRange,
   }, {
     enabled: !!projectId,
   });
@@ -82,6 +85,7 @@ export function ProjectModules({
           <ModuleTasks 
             moduleId={module.id}
             projectId={projectId}
+            dateRange={dateRange}
           />
         ),
       }}
