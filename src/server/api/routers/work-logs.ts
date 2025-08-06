@@ -3,10 +3,14 @@ import {
   createWotkLogSchema,
   deleteWorkLogSchema,
   getWorkLogsSchema,
+  getProjectsSchema,
+  getModulesSchema,
+  getTasksSchema,
+  getWorkLogsForTaskSchema,
+  getExportDataSchema,
 } from "~/schemas/work-log.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { z } from "zod";
 import { UserRole } from "@prisma/client";
 
 // Type definitions for hierarchical structure
@@ -104,9 +108,7 @@ export const workLogsRouter = createTRPCRouter({
 
   // Get projects with work log summaries
   getProjects: protectedProcedure
-    .input(z.object({
-      dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
-    }))
+    .input(getProjectsSchema)
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
 
@@ -238,10 +240,7 @@ export const workLogsRouter = createTRPCRouter({
 
   // Get modules for a specific project
   getModules: protectedProcedure
-    .input(z.object({
-      projectId: z.string(),
-      dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
-    }))
+    .input(getModulesSchema)
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
 
@@ -419,11 +418,7 @@ export const workLogsRouter = createTRPCRouter({
 
   // Get tasks for a specific module
   getTasks: protectedProcedure
-    .input(z.object({
-      moduleId: z.string(),
-      projectId: z.string(),
-      dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
-    }))
+    .input(getTasksSchema)
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
 
@@ -575,9 +570,7 @@ export const workLogsRouter = createTRPCRouter({
 
   // Get work logs for a specific task
   getWorkLogs: protectedProcedure
-    .input(z.object({
-      taskId: z.string(),
-    }))
+    .input(getWorkLogsForTaskSchema)
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
 
@@ -928,10 +921,7 @@ export const workLogsRouter = createTRPCRouter({
 
   // Get all data for Excel export (optimized for memory usage)
   getExportData: protectedProcedure
-    .input(z.object({
-      dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
-      projectId: z.string().optional(),
-    }))
+    .input(getExportDataSchema)
     .query(async ({ ctx, input }) => {
       const clientId = ctx.session.user.clientId;
 

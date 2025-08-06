@@ -158,7 +158,6 @@ function convertToExcelRowsWithStyling(data: WorkLogExportData[]): {
     "Task Type",
     "Total Duration (Hours)",
     "Total Duration (Formatted)",
-    "Work Logs Count",
     "First Entry",
     "Last Entry",
   ];
@@ -180,7 +179,6 @@ function convertToExcelRowsWithStyling(data: WorkLogExportData[]): {
       item.taskType,
       item.totalDuration / 60, // Convert minutes to hours
       formatDurationFromMinutes(item.totalDuration),
-      item.totalWorkLogs,
       item.firstWorkLogDate ? dayjs(item.firstWorkLogDate).format("MMM D, YYYY") : "",
       item.lastWorkLogDate ? dayjs(item.lastWorkLogDate).format("MMM D, YYYY") : "",
     ];
@@ -243,7 +241,6 @@ export async function exportWorkLogsToExcel(
       { wch: 15 }, // Task Type
       { wch: 15 }, // Total Duration (Hours)
       { wch: 15 }, // Total Duration (Formatted)
-      { wch: 12 }, // Work Logs Count
       { wch: 12 }, // First Entry
       { wch: 12 }, // Last Entry
     ];
@@ -302,7 +299,6 @@ export async function exportVisibleWorkLogsToExcel(
       { wch: 15 }, // Task Type
       { wch: 15 }, // Total Duration (Hours)
       { wch: 15 }, // Total Duration (Formatted)
-      { wch: 12 }, // Work Logs Count
       { wch: 12 }, // First Entry
       { wch: 12 }, // Last Entry
     ];
@@ -398,7 +394,6 @@ export async function exportServerDataToExcel(
       { wch: 15 }, // Task Type
       { wch: 15 }, // Total Duration (Hours)
       { wch: 15 }, // Total Duration (Formatted)
-      { wch: 12 }, // Work Logs Count
       { wch: 12 }, // First Entry
       { wch: 12 }, // Last Entry
     ];
