@@ -44,7 +44,7 @@ export function ProjectModules({
           width: '40%',
           noWrap: true,
           render: ({ id, name }) => (
-            <Group gap="xs" align="center" wrap="nowrap" ml={20}>
+            <Group gap="xs" align="center" wrap="nowrap">
               <IconChevronRight
                 className={clsx(classes.icon, classes.expandIcon, {
                   [classes.expandIconRotated!]: expandedModuleIds.includes(id),

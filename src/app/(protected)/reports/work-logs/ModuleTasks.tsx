@@ -43,7 +43,7 @@ export function ModuleTasks({
           render: ({ title, type }) => {
             const typeOption = TASK_TYPE_OPTIONS.find(t => t.value === type);
             return (
-              <Group gap="xs" align="flex-start" wrap="wrap" ml={40}>
+              <Group gap="xs" align="flex-start" wrap="wrap">
                 {typeOption && (
                   <typeOption.icon 
                     className={classes.icon} 

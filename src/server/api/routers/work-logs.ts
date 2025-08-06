@@ -151,6 +151,7 @@ export const workLogsRouter = createTRPCRouter({
         where: workLogWhere,
         select: {
           durationMin: true,
+          clientAdjustedDurationMin: true,
           startTime: true,
           task: {
             select: {
@@ -182,7 +183,11 @@ export const workLogsRouter = createTRPCRouter({
           }
           
           const projectData = projectWorkLogMap.get(projectId)!;
-          projectData.totalDuration += workLog.durationMin;
+          // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
+          const durationToUse = ctx.session.user.role === UserRole.CLIENT 
+            ? workLog.clientAdjustedDurationMin 
+            : workLog.durationMin;
+          projectData.totalDuration += durationToUse;
           projectData.totalWorkLogs += 1;
           
           // Track first and last work log dates
@@ -295,6 +300,7 @@ export const workLogsRouter = createTRPCRouter({
         where: workLogWhere,
         select: {
           durationMin: true,
+          clientAdjustedDurationMin: true,
           startTime: true,
           task: {
             select: {
@@ -325,7 +331,11 @@ export const workLogsRouter = createTRPCRouter({
         }
         
         const moduleData = moduleWorkLogMap.get(moduleId)!;
-        moduleData.totalDuration += workLog.durationMin;
+        // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
+        const durationToUse = ctx.session.user.role === UserRole.CLIENT 
+          ? workLog.clientAdjustedDurationMin 
+          : workLog.durationMin;
+        moduleData.totalDuration += durationToUse;
         moduleData.totalWorkLogs += 1;
         
         // Track first and last work log dates
@@ -478,6 +488,7 @@ export const workLogsRouter = createTRPCRouter({
         where: workLogWhere,
         select: {
           durationMin: true,
+          clientAdjustedDurationMin: true,
           startTime: true,
           taskId: true,
         },
@@ -505,7 +516,11 @@ export const workLogsRouter = createTRPCRouter({
         
         if (taskId) {
           const taskData = taskWorkLogMap.get(taskId)!;
-          taskData.totalDuration += workLog.durationMin;
+          // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
+          const durationToUse = ctx.session.user.role === UserRole.CLIENT 
+            ? workLog.clientAdjustedDurationMin 
+            : workLog.durationMin;
+          taskData.totalDuration += durationToUse;
           taskData.totalWorkLogs += 1;
           
           // Track first and last work log dates
@@ -700,7 +715,11 @@ export const workLogsRouter = createTRPCRouter({
         }
         
         const project = projectsMap.get(projectId)!;
-        project.totalDuration += workLog.durationMin;
+        // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
+        const durationToUse = ctx.session.user.role === UserRole.CLIENT 
+          ? workLog.clientAdjustedDurationMin 
+          : workLog.durationMin;
+        project.totalDuration += durationToUse;
         project.totalWorkLogs += 1;
         
         // Group by module
@@ -722,7 +741,7 @@ export const workLogsRouter = createTRPCRouter({
             project.modules.push(moduleData);
           }
           
-          moduleData.totalDuration += workLog.durationMin;
+          moduleData.totalDuration += durationToUse;
           moduleData.totalWorkLogs += 1;
           
           // Group by task
@@ -746,7 +765,7 @@ export const workLogsRouter = createTRPCRouter({
             }
             
             task.workLogs.push(workLog);
-            task.totalDuration += workLog.durationMin;
+            task.totalDuration += durationToUse;
           }
         } else {
           // Task without module
@@ -770,7 +789,7 @@ export const workLogsRouter = createTRPCRouter({
               project.modules.push(moduleData);
             }
             
-            moduleData.totalDuration += workLog.durationMin;
+            moduleData.totalDuration += durationToUse;
             moduleData.totalWorkLogs += 1;
             
             let task = moduleData.tasks.find(t => t.id === taskId);
@@ -788,7 +807,7 @@ export const workLogsRouter = createTRPCRouter({
             }
             
             task.workLogs.push(workLog);
-            task.totalDuration += workLog.durationMin;
+            task.totalDuration += durationToUse;
           }
         }
       });
