@@ -1,26 +1,26 @@
 "use client";
 
-import { Group, Select, Title } from "@mantine/core";
+import { Group, Select, Title, Button } from "@mantine/core";
 import { DatePickerInput, type DatesRangeValue } from "@mantine/dates";
 import { useDebouncedState } from "@mantine/hooks";
 import {
   IconChevronRight,
   IconClockHour4,
   IconFoldersFilled,
+  IconDownload,
 } from "@tabler/icons-react";
 import clsx from "clsx";
 import dayjs from "dayjs";
-import { useSession } from "next-auth/react";
 import { useState } from "react";
 import AppTable from "~/components/AppTable";
-import { api } from "~/trpc/react";
+import { api, apiClient } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
+import { exportServerDataToExcel } from "~/utils/excel-export";
 import { ProjectModules } from "./ProjectModules";
 import classes from "./WorkLogs.module.css";
 
 export default function WorkLogs() {
   const projectsQuery = api.projects.getAllMinimal.useQuery();
-  const { data: session } = useSession();
   const [filters, setFilters] = useDebouncedState(
     {
       projectId: "",
@@ -43,6 +43,7 @@ export default function WorkLogs() {
 
   const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>([]);
   const [expandedModuleIds, setExpandedModuleIds] = useState<string[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Filter projects based on selected projectId
   const filteredProjects =
@@ -90,7 +91,30 @@ export default function WorkLogs() {
     },
   ];
 
-  const isClient = session?.user?.role === "CLIENT";
+  // Export function
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      
+      // Fetch all data from server for export using tRPC client
+      const exportData = await apiClient.workLogs.getExportData.query({
+        dateRange: dateRangeForAPI,
+        projectId: filters.projectId || undefined,
+      });
+
+      // Export to Excel
+      await exportServerDataToExcel(
+        exportData.data,
+        dateRangeForAPI,
+      );
+
+    } catch (error) {
+      console.error("Export failed:", error);
+      // You can add a notification here if you have a notification system
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <>
@@ -125,78 +149,90 @@ export default function WorkLogs() {
             style={{ width: 200 }}
           />
         </Group>
-        <div></div>
+        <Button
+          leftSection={isExporting ? undefined : <IconDownload size={16} />}
+          onClick={handleExport}
+          loading={isExporting}
+          disabled={projectsLoading || filteredProjects.length === 0 || isExporting}
+          variant="light"
+          color="blue"
+          style={{ minWidth: 140 }}
+        >
+          {isExporting ? "Exporting..." : "Export to Excel"}
+        </Button>
       </Group>
 
-      <AppTable
-        withColumnBorders
-        highlightOnHover
-        fetching={projectsLoading}
-        records={filteredProjects}
-        columns={[
-          {
-            accessor: "name",
-            title: "Project / Module / Task",
-            width: "40%",
-            noWrap: true,
-            render: ({ id, name }) => (
-              <Group gap="xs" align="center" wrap="nowrap">
-                <IconChevronRight
-                  className={clsx(classes.icon, classes.expandIcon, {
-                    [classes.expandIconRotated!]:
-                      expandedProjectIds.includes(id),
-                  })}
-                />
-                <IconFoldersFilled className={classes.icon} />
-                <span className={classes.projectRow}>{name}</span>
-              </Group>
+      <div style={{ position: 'relative' }}>
+        <AppTable
+          withColumnBorders
+          highlightOnHover
+          fetching={projectsLoading}
+          records={filteredProjects}
+          columns={[
+            {
+              accessor: "name",
+              title: "Project / Module / Task",
+              width: "40%",
+              noWrap: true,
+              render: ({ id, name }) => (
+                <Group gap="xs" align="center" wrap="nowrap">
+                  <IconChevronRight
+                    className={clsx(classes.icon, classes.expandIcon, {
+                      [classes.expandIconRotated!]:
+                        expandedProjectIds.includes(id),
+                    })}
+                  />
+                  <IconFoldersFilled className={classes.icon} />
+                  <span className={classes.projectRow}>{name}</span>
+                </Group>
+              ),
+            },
+            {
+              accessor: "firstWorkLogDate",
+              title: "First Entry",
+              width: "20%",
+              textAlign: "left",
+              render: ({ firstWorkLogDate }) =>
+                firstWorkLogDate
+                  ? dayjs(firstWorkLogDate).format("MMM D, YYYY")
+                  : "-",
+            },
+            {
+              accessor: "lastWorkLogDate",
+              title: "Last Entry",
+              width: "20%",
+              textAlign: "left",
+              render: ({ lastWorkLogDate }) =>
+                lastWorkLogDate
+                  ? dayjs(lastWorkLogDate).format("MMM D, YYYY")
+                  : "-",
+            },
+            {
+              accessor: "totalDuration",
+              title: "Total Duration",
+              width: "20%",
+              textAlign: "left",
+              render: ({ totalDuration }) =>
+                formatDurationFromMinutes(totalDuration),
+            },
+          ]}
+          rowExpansion={{
+            allowMultiple: true,
+            expanded: {
+              recordIds: expandedProjectIds,
+              onRecordIdsChange: setExpandedProjectIds,
+            },
+            content: ({ record: project }) => (
+              <ProjectModules
+                projectId={project.id}
+                dateRange={dateRangeForAPI}
+                expandedModuleIds={expandedModuleIds}
+                setExpandedModuleIds={setExpandedModuleIds}
+              />
             ),
-          },
-          {
-            accessor: "firstWorkLogDate",
-            title: "First Entry",
-            width: "20%",
-            textAlign: "left",
-            render: ({ firstWorkLogDate }) =>
-              firstWorkLogDate
-                ? dayjs(firstWorkLogDate).format("MMM D, YYYY")
-                : "-",
-          },
-          {
-            accessor: "lastWorkLogDate",
-            title: "Last Entry",
-            width: "20%",
-            textAlign: "left",
-            render: ({ lastWorkLogDate }) =>
-              lastWorkLogDate
-                ? dayjs(lastWorkLogDate).format("MMM D, YYYY")
-                : "-",
-          },
-          {
-            accessor: "totalDuration",
-            title: "Total Duration",
-            width: "20%",
-            textAlign: "left",
-            render: ({ totalDuration }) =>
-              formatDurationFromMinutes(totalDuration),
-          },
-        ]}
-        rowExpansion={{
-          allowMultiple: true,
-          expanded: {
-            recordIds: expandedProjectIds,
-            onRecordIdsChange: setExpandedProjectIds,
-          },
-          content: ({ record: project }) => (
-            <ProjectModules
-              projectId={project.id}
-              dateRange={dateRangeForAPI}
-              expandedModuleIds={expandedModuleIds}
-              setExpandedModuleIds={setExpandedModuleIds}
-            />
-          ),
-        }}
-      />
+          }}
+        />
+      </div>
     </>
   );
 }

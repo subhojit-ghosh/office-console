@@ -925,4 +925,145 @@ export const workLogsRouter = createTRPCRouter({
         where: { id: input.id },
       });
     }),
+
+  // Get all data for Excel export (optimized for memory usage)
+  getExportData: protectedProcedure
+    .input(z.object({
+      dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
+      projectId: z.string().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const clientId = ctx.session.user.clientId;
+
+      // Apply the same filtering logic as projects router
+      const projectWhere: Prisma.ProjectWhereInput = {
+        ...(clientId ? { clientId } : {}),
+        ...(input.projectId ? { id: input.projectId } : {}),
+        ...(ctx.session.user.role === UserRole.STAFF
+          ? {
+              OR: [
+                { createdById: ctx.session.user.id },
+                {
+                  members: {
+                    some: { id: ctx.session.user.id },
+                  },
+                },
+              ],
+            }
+          : {}),
+      };
+
+      // Get work log data for filtering
+      const workLogWhere: Prisma.WorkLogWhereInput = {
+        ...(input.dateRange?.[0] && input.dateRange?.[1] ? {
+          startTime: {
+            gte: input.dateRange[0],
+            lte: input.dateRange[1],
+          },
+        } : {}),
+        task: {
+          project: projectWhere,
+        },
+      };
+
+      // Get aggregated work log data
+      const workLogAggregates = await ctx.db.workLog.groupBy({
+        by: ['taskId'],
+        where: workLogWhere,
+        _sum: {
+          durationMin: true,
+          clientAdjustedDurationMin: true,
+        },
+        _count: {
+          id: true,
+        },
+        _min: {
+          startTime: true,
+        },
+        _max: {
+          startTime: true,
+        },
+      });
+
+      // Get tasks with their project and module info
+      const tasks = await ctx.db.task.findMany({
+        where: {
+          project: projectWhere,
+        },
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          projectId: true,
+          moduleId: true,
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          module: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: { title: 'asc' },
+      });
+
+      // Create maps for efficient lookup
+      const workLogMap = new Map(
+        workLogAggregates.map(wl => [
+          wl.taskId,
+          {
+            totalDuration: wl._sum.durationMin ?? 0,
+            totalClientAdjustedDuration: wl._sum.clientAdjustedDurationMin ?? 0,
+            totalWorkLogs: wl._count.id,
+            firstWorkLogDate: wl._min.startTime,
+            lastWorkLogDate: wl._max.startTime,
+          }
+        ])
+      );
+
+      // Process data in memory-efficient way
+      const exportData: Array<{
+        projectName: string;
+        moduleName: string;
+        taskTitle: string;
+        taskType: string;
+        totalDuration: number;
+        totalWorkLogs: number;
+        firstWorkLogDate: Date | null;
+        lastWorkLogDate: Date | null;
+      }> = [];
+
+      for (const task of tasks) {
+        const workLogData = workLogMap.get(task.id);
+        if (!workLogData) continue;
+
+        // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
+        const durationToUse = ctx.session.user.role === UserRole.CLIENT 
+          ? workLogData.totalClientAdjustedDuration 
+          : workLogData.totalDuration;
+
+        exportData.push({
+          projectName: task.project.name,
+          moduleName: task.module?.name ?? 'No Module',
+          taskTitle: task.title,
+          taskType: task.type,
+          totalDuration: durationToUse,
+          totalWorkLogs: workLogData.totalWorkLogs,
+          firstWorkLogDate: workLogData.firstWorkLogDate,
+          lastWorkLogDate: workLogData.lastWorkLogDate,
+        });
+      }
+
+      return {
+        data: exportData,
+        totalRecords: exportData.length,
+        dateRange: input.dateRange,
+        exportedAt: new Date(),
+      };
+    }),
 });

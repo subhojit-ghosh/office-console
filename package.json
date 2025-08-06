@@ -87,6 +87,7 @@
     "server-only": "^0.0.1",
     "superjson": "^2.2.2",
     "tippy.js": "^6.3.7",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^3.25.76"
   },
   "devDependencies": {
