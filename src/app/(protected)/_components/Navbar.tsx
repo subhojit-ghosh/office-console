@@ -49,10 +49,12 @@ export function Navbar({ toggleMobile }: NavbarProps) {
     { link: "/tasks", label: "Tasks", icon: FaTasks },
     { link: "/modules", label: "Modules", icon: FaCubes },
     { link: "/projects", label: "Projects", icon: IconFoldersFilled },
-    ...(session?.user?.role === UserRole.ADMIN
+    ...(session?.user?.role === UserRole.ADMIN || session?.user?.role === UserRole.CLIENT_ADMIN
       ? [
           { link: "/users", label: "Users", icon: FaUsers },
-          { link: "/clients", label: "Clients", icon: FaUserTie },
+          ...(session?.user?.role === UserRole.ADMIN
+            ? [{ link: "/clients", label: "Clients", icon: FaUserTie }]
+            : []),
         ]
       : []),
     {

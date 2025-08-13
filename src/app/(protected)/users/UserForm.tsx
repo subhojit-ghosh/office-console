@@ -13,9 +13,10 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { type User } from "@prisma/client";
+import { UserRole, type User } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 import { userRoleOptions } from "~/constants/user.constant";
 import { createUserSchema, updateUserSchema } from "~/schemas/user.schema";
 import { api, apiClient } from "~/trpc/react";
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export default function UserForm({ mode, opened, close, id }: Props) {
+  const { data: session } = useSession();
   const utils = api.useUtils();
   const [editDataLoading, setEditDataLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,6 +50,15 @@ export default function UserForm({ mode, opened, close, id }: Props) {
 
   const clientsQuery = api.clients.getAllMinimal.useQuery();
 
+  const filteredRoleOptions = useMemo(() => {
+    if (session?.user.role === UserRole.CLIENT_ADMIN) {
+      return userRoleOptions.filter((o) =>
+        [UserRole.CLIENT_ADMIN, UserRole.CLIENT_USER].includes(o.value as UserRole),
+      );
+    }
+    return userRoleOptions;
+  }, [session?.user.role]);
+
   useEffect(() => {
     if (mode === "add") {
       form.reset();
@@ -58,6 +69,17 @@ export default function UserForm({ mode, opened, close, id }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, id, opened]);
+
+  // Auto-select client for Client Admins when choosing a client role
+  useEffect(() => {
+    if (
+      session?.user.clientId &&
+      session?.user.role === UserRole.CLIENT_ADMIN &&
+      isClientRole(form.values.role as UserRole)
+    ) {
+      form.setFieldValue("clientId", session.user.clientId);
+    }
+  }, [session?.user.clientId, session?.user.role, form.values.role]);
 
   const createUser = api.users.create.useMutation({
     onSuccess: async () => {
@@ -137,7 +159,9 @@ export default function UserForm({ mode, opened, close, id }: Props) {
         role: values.role as User["role"],
         password: values.password,
         isActive: values.isActive,
-        clientId: isClientRole(values.role) ? values.clientId : undefined,
+        clientId: isClientRole(values.role as UserRole)
+          ? values.clientId
+          : undefined,
       });
     } else if (mode === "edit" && id) {
       updateUser.mutate({
@@ -147,7 +171,9 @@ export default function UserForm({ mode, opened, close, id }: Props) {
         role: values.role as User["role"],
         password: values.password || undefined,
         isActive: values.isActive,
-        clientId: isClientRole(values.role) ? values.clientId : undefined,
+        clientId: isClientRole(values.role as UserRole)
+          ? values.clientId
+          : undefined,
       });
     }
   };
@@ -181,13 +207,14 @@ export default function UserForm({ mode, opened, close, id }: Props) {
           <Grid.Col span={12}>
             <Select
               label="Role"
-              data={userRoleOptions}
+              data={filteredRoleOptions}
               {...form.getInputProps("role")}
               withAsterisk
               disabled={loading}
             />
           </Grid.Col>
-          {isClientRole(form.values.role) && (
+          {isClientRole(form.values.role as UserRole) &&
+            session?.user.role !== UserRole.CLIENT_ADMIN && (
             <Grid.Col span={12}>
               <Select
                 label="Client"

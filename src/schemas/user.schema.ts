@@ -1,13 +1,8 @@
 import { z } from "zod";
+import { UserRole } from "@prisma/client";
 import { isClientRole } from "~/utils/roles";
 
-const userRoleEnum = z.enum([
-  "SUPER_ADMIN",
-  "ADMIN",
-  "STAFF",
-  "CLIENT_ADMIN",
-  "CLIENT_USER",
-]);
+const userRoleEnum = z.nativeEnum(UserRole);
 
 export const getAllUsersSchema = z.object({
   page: z.number().int().min(1).default(1).optional().nullable(),

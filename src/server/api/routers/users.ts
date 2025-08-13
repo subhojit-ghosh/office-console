@@ -22,7 +22,11 @@ export const usersRouter = createTRPCRouter({
       const sortOrder = input.sortOrder ?? "asc";
       const role = input.role;
       const isActive = input.isActive;
-      const clientId = input.clientId;
+      // CLIENT_ADMIN can only see users from their own client
+      const isClientAdmin = ctx.session.user.role === UserRole.CLIENT_ADMIN;
+      const effectiveClientId = isClientAdmin
+        ? ctx.session.user.clientId
+        : input.clientId;
 
       const where: Prisma.UserWhereInput = {
         ...(search
@@ -35,7 +39,13 @@ export const usersRouter = createTRPCRouter({
           : {}),
         ...(role ? { role } : {}),
         ...(typeof isActive === "boolean" ? { isActive } : {}),
-        ...(clientId ? { clientId } : {}),
+        ...(effectiveClientId ? { clientId: effectiveClientId } : {}),
+        ...(isClientAdmin
+          ? {
+              // additionally restrict to only client roles for client admins
+              role: { in: [UserRole.CLIENT_USER, UserRole.CLIENT_ADMIN] },
+            }
+          : {}),
       };
 
       const [users, total] = await Promise.all([
@@ -137,6 +147,21 @@ export const usersRouter = createTRPCRouter({
   create: protectedProcedure
     .input(createUserSchema)
     .mutation(async ({ ctx, input }) => {
+      // CLIENT_ADMIN can only create CLIENT_USER for their own client
+      if (ctx.session.user.role === UserRole.CLIENT_ADMIN) {
+        if (input.role !== UserRole.CLIENT_USER) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Client Admins can only create Client Users",
+          });
+        }
+        if (!ctx.session.user.clientId) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Client Admin does not have an associated client",
+          });
+        }
+      }
       const existingUser = await ctx.db.user.findFirst({
         where: { email: input.email },
       });
@@ -156,8 +181,14 @@ export const usersRouter = createTRPCRouter({
         data: {
           name: input.name,
           email: input.email,
-          role: input.role,
-          clientId: input.clientId,
+          role:
+            ctx.session.user.role === UserRole.CLIENT_ADMIN
+              ? UserRole.CLIENT_USER
+              : input.role,
+          clientId:
+            ctx.session.user.role === UserRole.CLIENT_ADMIN
+              ? ctx.session.user.clientId
+              : input.clientId,
           password: hashedPassword,
           isActive: input.isActive ?? true,
         },
@@ -167,6 +198,28 @@ export const usersRouter = createTRPCRouter({
   update: protectedProcedure
     .input(updateUserSchema)
     .mutation(async ({ ctx, input }) => {
+      // If client admin, restrict updates to users of their own client
+      if (ctx.session.user.role === UserRole.CLIENT_ADMIN) {
+        const target = await ctx.db.user.findUnique({
+          where: { id: input.id },
+          select: { clientId: true },
+        });
+        if (!target || target.clientId !== ctx.session.user.clientId) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+        }
+        // Prevent role escalation beyond client roles
+        if (
+          input.role !== UserRole.CLIENT_USER &&
+          input.role !== UserRole.CLIENT_ADMIN
+        ) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Client Admins can only set client roles",
+          });
+        }
+        // Force clientId to their own
+        input.clientId = ctx.session.user.clientId;
+      }
       const existingUser = await ctx.db.user.findFirst({
         where: {
           email: input.email,

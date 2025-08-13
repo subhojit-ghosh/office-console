@@ -23,7 +23,8 @@ import {
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { UserRole } from "@prisma/client";
 
 import { FaUsers } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
@@ -65,6 +66,15 @@ export default function UsersList() {
     sortBy: sortStatus.columnAccessor,
     sortOrder: sortStatus.direction,
   });
+
+  const filteredRoleOptions = useMemo(() => {
+    if (session?.user.role === UserRole.CLIENT_ADMIN) {
+      return userRoleOptions.filter((o) =>
+        [UserRole.CLIENT_ADMIN, UserRole.CLIENT_USER].includes(o.value as UserRole),
+      );
+    }
+    return userRoleOptions;
+  }, [session?.user.role]);
 
   const deleteUser = api.users.delete.useMutation({
     onSuccess: async () => {
@@ -119,7 +129,7 @@ export default function UsersList() {
           <Select
             placeholder="All Roles"
             clearable
-            data={userRoleOptions}
+            data={filteredRoleOptions}
             defaultValue={filters.role}
             onChange={(value) => setFilters({ ...filters, role: value ?? "" })}
           />
