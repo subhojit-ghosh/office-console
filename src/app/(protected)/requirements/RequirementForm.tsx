@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Grid, Group, LoadingOverlay, Modal, Select, TextInput, Textarea } from "@mantine/core";
+import { Badge, Button, Grid, Group, LoadingOverlay, Modal, Select, Tabs, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { RequirementPriority, RequirementStatus, RequirementType, type Requirement } from "@prisma/client";
@@ -11,6 +11,9 @@ import { createRequirementSchema, updateRequirementSchema } from "~/schemas/requ
 import { api, apiClient } from "~/trpc/react";
 import { isClientRole } from "~/utils/roles";
 import { REQUIREMENT_STATUS_OPTIONS, REQUIREMENT_PRIORITY_OPTIONS, REQUIREMENT_TYPE_OPTIONS } from "~/constants/requirement.constant";
+import AppRichTextEditor from "~/components/AppRichTextEditor";
+import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
+import { IconFileDescription, IconMessage } from "@tabler/icons-react";
 
 interface Props {
   mode: "add" | "edit";
@@ -56,10 +59,15 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
 
   // Auto-select client for client roles
   useEffect(() => {
-    if (session?.user.clientId && isClientRole(session.user.role)) {
-      form.setFieldValue("clientId", session.user.clientId);
+    const targetClientId = session?.user?.clientId;
+    if (
+      targetClientId &&
+      isClientRole(session?.user?.role) &&
+      form.values.clientId !== targetClientId
+    ) {
+      form.setFieldValue("clientId", targetClientId);
     }
-  }, [session?.user.clientId, session?.user.role, form]);
+  }, [session?.user?.clientId, session?.user?.role, form.values.clientId]);
 
   const createRequirement = api.requirements.create.useMutation({
     onSuccess: async () => {
@@ -147,59 +155,118 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
   const isChangeRequest = useMemo(() => form.values.type === RequirementType.CHANGE_REQUEST, [form.values.type]);
 
   return (
-    <Modal opened={opened} onClose={close} title={mode === "add" ? "Add Requirement" : "Edit Requirement"} centered>
+    <Modal opened={opened} onClose={close} centered size="90%" withCloseButton={false}>
       <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
-          <Grid.Col span={12}>
-            <Select label="Type" data={REQUIREMENT_TYPE_OPTIONS} {...form.getInputProps("type")} withAsterisk disabled={loading} />
+          <Grid.Col span={9} style={{ maxHeight: "85vh", overflowY: "auto" }}>
+            <Grid>
+              <Grid.Col span={12}>
+                <Textarea
+                  placeholder="Title"
+                  {...form.getInputProps("title")}
+                  withAsterisk
+                  disabled={loading}
+                  autosize
+                  minRows={1}
+                  leftSectionWidth={70}
+                  leftSection={
+                    <EditableBadgeDropdown
+                      value={form.values.type}
+                      options={REQUIREMENT_TYPE_OPTIONS}
+                      onChange={(value) => form.setFieldValue("type", value)}
+                      compact={false}
+                      hoverEffect={false}
+                      fullWidth={true}
+                      position="bottom-start"
+                      isIconVariant={true}
+                      variant="subtle"
+                    />
+                  }
+                  styles={{ input: { paddingTop: 5 } }}
+                />
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <AppRichTextEditor
+                  id={form.values.id}
+                  content={form.values.description}
+                  onUpdate={(content) => form.setFieldValue("description", content)}
+                  placeholder="Add description..."
+                />
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <Tabs variant="default" defaultValue="details">
+                  <Tabs.List>
+                    <Tabs.Tab value="details" leftSection={<IconFileDescription size={16} />}>Details</Tabs.Tab>
+                  </Tabs.List>
+                  <Tabs.Panel value="details" pt="md">&nbsp;</Tabs.Panel>
+                </Tabs>
+              </Grid.Col>
+            </Grid>
           </Grid.Col>
-          <Grid.Col span={12}>
-            <TextInput label="Title" {...form.getInputProps("title")} withAsterisk disabled={loading} />
-          </Grid.Col>
-          <Grid.Col span={12}>
-            <Textarea label="Description" autosize minRows={4} {...form.getInputProps("description")} disabled={loading} />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Select label="Status" data={REQUIREMENT_STATUS_OPTIONS} {...form.getInputProps("status")} withAsterisk disabled={loading} />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Select label="Priority" data={REQUIREMENT_PRIORITY_OPTIONS} {...form.getInputProps("priority")} withAsterisk disabled={loading} />
-          </Grid.Col>
-          {!isClientRole(session?.user.role) && (
-            <Grid.Col span={12}>
-              <Select
-                label="Client"
-                data={clientsQuery.data?.map((c) => ({ value: c.id, label: c.name })) ?? []}
-                {...form.getInputProps("clientId")}
-                searchable
-                disabled={loading || clientsQuery.isLoading}
-                placeholder={clientsQuery.isLoading ? "Loading clients..." : "Select client (optional)"}
-              />
-            </Grid.Col>
-          )}
-          {isChangeRequest && (
-            <Grid.Col span={12}>
-              <Select
-                label="Parent Requirement"
-                data={parentsQuery.data?.map((p) => ({ value: p.id, label: `${p.title} (${p.type.replace("_", " ")})` })) ?? []}
-                {...form.getInputProps("parentId")}
-                withAsterisk
-                searchable
-                disabled={loading || parentsQuery.isLoading}
-                placeholder={parentsQuery.isLoading ? "Loading requirements..." : "Select parent requirement"}
-              />
-            </Grid.Col>
-          )}
-          <Grid.Col span={12}>
-            <Group justify="space-between">
-              <Button variant="subtle" onClick={() => close()}>
-                Cancel
-              </Button>
-              <Button loading={loading} type="submit">
-                Save
-              </Button>
-            </Group>
+          <Grid.Col span={3}>
+            <Grid>
+              <Grid.Col span={6}>
+                <EditableBadgeDropdown
+                  value={form.values.status}
+                  options={REQUIREMENT_STATUS_OPTIONS}
+                  onChange={(value) => form.setFieldValue("status", value)}
+                  compact={false}
+                  hoverEffect={false}
+                  fullWidth={true}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <EditableBadgeDropdown
+                  value={form.values.priority}
+                  options={REQUIREMENT_PRIORITY_OPTIONS}
+                  onChange={(value) => form.setFieldValue("priority", value)}
+                  compact={false}
+                  hoverEffect={false}
+                  fullWidth={true}
+                />
+              </Grid.Col>
+              {!isClientRole(session?.user.role) && (
+                <Grid.Col span={12}>
+                  <Select
+                    label="Client"
+                    data={clientsQuery.data?.map((c) => ({ value: c.id, label: c.name })) ?? []}
+                    {...form.getInputProps("clientId")}
+                    searchable
+                    disabled={loading || clientsQuery.isLoading}
+                    placeholder={clientsQuery.isLoading ? "Loading clients..." : "Select client (optional)"}
+                  />
+                </Grid.Col>
+              )}
+              {isChangeRequest && (
+                <Grid.Col span={12}>
+                  <Select
+                    label="Parent Requirement"
+                    data={parentsQuery.data?.map((p) => ({ value: p.id, label: `${p.title} (${p.type.replace("_", " ")})` })) ?? []}
+                    {...form.getInputProps("parentId")}
+                    withAsterisk
+                    searchable
+                    disabled={loading || parentsQuery.isLoading}
+                    placeholder={parentsQuery.isLoading ? "Loading requirements..." : "Select parent requirement"}
+                  />
+                </Grid.Col>
+              )}
+              <Grid.Col span={6}>
+                <Button
+                  variant="default"
+                  onClick={close}
+                  type="button"
+                  fullWidth
+                >
+                  Close
+                </Button>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Button loading={loading} type="submit" fullWidth>
+                  Save
+                </Button>
+              </Grid.Col>
+            </Grid>
           </Grid.Col>
         </Grid>
       </form>

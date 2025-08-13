@@ -1,15 +1,16 @@
 "use client";
 
-import { ActionIcon, Badge, Box, Button, Group, Menu, Popover, Select, TextInput, Title } from "@mantine/core";
+import { ActionIcon, Box, Button, Group, Menu, Popover, Select, Text, TextInput, Title, UnstyledButton, useMantineTheme } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { RequirementPriority, RequirementStatus, RequirementType } from "@prisma/client";
+import type { RequirementPriority, RequirementStatus, RequirementType } from "@prisma/client";
 import { IconDotsVertical, IconFileDescriptionFilled, IconFilter2, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
@@ -21,11 +22,12 @@ type RequirementsResponse = inferRouterOutputs<AppRouter>["requirements"]["getAl
 
 export default function RequirementsList() {
   const utils = api.useUtils();
+  const theme = useMantineTheme();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
-  const [formOpened, setFormOpened] = useState(false);
-  const [formMode, setFormMode] = useState<"add" | "edit">("add");
-  const [editId, setEditId] = useState<string | null>(null);
+  // modal state managed via URL param like tasks
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<RequirementsResponse["requirements"][0]>
   >({
@@ -118,7 +120,20 @@ export default function RequirementsList() {
           />
           <Popover width={300} position="bottom" withArrow shadow="md">
             <Popover.Target>
-              <Button variant="outline" size="xs" leftSection={<IconFilter2 size={14} />} color="cyan">
+              <Button
+                variant="outline"
+                size="xs"
+                leftSection={<IconFilter2 size={14} />}
+                rightSection={(() => {
+                  const activeFilters = [filters.type, filters.priority].filter(Boolean);
+                  return activeFilters.length > 0 ? (
+                    <span className="mantine-Badge-root mantine-Badge-light mantine-color-blue-light" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: 18 }}>
+                      <span className="mantine-Badge-label">{activeFilters.length}</span>
+                    </span>
+                  ) : undefined;
+                })()}
+                color="cyan"
+              >
                 Filters
               </Button>
             </Popover.Target>
@@ -146,15 +161,15 @@ export default function RequirementsList() {
             </Popover.Dropdown>
           </Popover>
         </Group>
-        <Button
+          <Button
           style={{ float: "right" }}
           variant="outline"
           leftSection={<IconPlus size={16} />}
-          onClick={() => {
-            setFormMode("add");
-            setEditId(null);
-            setFormOpened(true);
-          }}
+            onClick={() => {
+              const params = new URLSearchParams(searchParams);
+              params.set("selectedRequirement", "new");
+              router.push(`?${params.toString()}`);
+            }}
         >
           Create
         </Button>
@@ -173,6 +188,38 @@ export default function RequirementsList() {
             accessor: "title",
             title: "Title",
             sortable: true,
+            render: (row) => {
+              const typeMeta = REQUIREMENT_TYPE_OPTIONS.find((t) => t.value === row.type);
+              const statusMeta = REQUIREMENT_STATUS_OPTIONS.find((s) => s.value === row.status);
+              const params = new URLSearchParams(searchParams);
+              params.set("selectedRequirement", row.id);
+              const href = `?${params.toString()}`;
+              return (
+                <UnstyledButton
+                  onClick={() => router.push(href)}
+                  style={{ display: "block", width: "100%", padding: 0, textAlign: "left", backgroundColor: "transparent" }}
+                >
+                  <Group gap="xs" align="center" wrap="nowrap">
+                    {typeMeta?.icon && (
+                      <typeMeta.icon
+                        size={18}
+                        color={theme.colors[typeMeta.color]?.[4] ?? undefined}
+                      />
+                    )}
+                    <Text
+                      size="sm"
+                      fw={500}
+                      c={statusMeta?.color}
+                      title={row.title}
+                      className="button-hover-underline"
+                      style={{ flex: 1 }}
+                    >
+                      {row.title}
+                    </Text>
+                  </Group>
+                </UnstyledButton>
+              );
+            },
           },
           {
             accessor: "type",
@@ -184,13 +231,27 @@ export default function RequirementsList() {
             accessor: "status",
             title: "Status",
             sortable: true,
-            render: (row) => REQUIREMENT_STATUS_OPTIONS.find((s) => s.value === row.status)?.label,
+            render: (row) => {
+              const statusMeta = REQUIREMENT_STATUS_OPTIONS.find((s) => s.value === row.status);
+              return (
+                <Text size="sm" c={statusMeta?.color}>
+                  {statusMeta?.label}
+                </Text>
+              );
+            },
           },
           {
             accessor: "priority",
             title: "Priority",
             sortable: true,
-            render: (row) => REQUIREMENT_PRIORITY_OPTIONS.find((p) => p.value === row.priority)?.label,
+            render: (row) => {
+              const priorityMeta = REQUIREMENT_PRIORITY_OPTIONS.find((p) => p.value === row.priority);
+              return (
+                <Text size="sm" c={priorityMeta?.color}>
+                  {priorityMeta?.label}
+                </Text>
+              );
+            },
           },
           {
             accessor: "createdBy.name",
@@ -225,7 +286,16 @@ export default function RequirementsList() {
           },
         ]}
       />
-      <RequirementForm opened={formOpened} close={() => setFormOpened(false)} mode={formMode} id={editId} />
+      <RequirementForm
+        opened={searchParams.has("selectedRequirement")}
+        close={() => {
+          const params = new URLSearchParams(searchParams);
+          params.delete("selectedRequirement");
+          router.push(`?${params.toString()}`);
+        }}
+        mode={searchParams.get("selectedRequirement") === "new" ? "add" : "edit"}
+        id={searchParams.get("selectedRequirement") ?? null}
+      />
     </>
   );
 }
