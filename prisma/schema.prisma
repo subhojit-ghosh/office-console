@@ -21,6 +21,7 @@ model Client {
 
   users    User[]
   projects Project[]
+  requirements Requirement[]
 }
 
 enum UserRole {
@@ -54,6 +55,7 @@ model User {
   feedbacks        Feedback[]     @relation("Feedbacks")
   workLogs         WorkLog[]      @relation("WorkLogs")
   archivedTasks    Task[]         @relation("ArchivedTasks")
+  createdRequirements Requirement[] @relation("CreatedRequirements")
 }
 
 enum StaffPosition {
@@ -99,6 +101,51 @@ model Project {
   modules Module[]
   tasks   Task[]
   members User[]   @relation("ProjectMembers")
+}
+
+enum RequirementStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum RequirementPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum RequirementType {
+  NEW_PROJECT
+  FEATURE_REQUEST
+  CHANGE_REQUEST
+  BUG
+}
+
+model Requirement {
+  id          String               @id @default(ulid())
+  type        RequirementType
+  title       String
+  description String?
+  status      RequirementStatus    @default(DRAFT)
+  priority    RequirementPriority  @default(MEDIUM)
+
+  clientId   String?
+  client     Client?               @relation(fields: [clientId], references: [id])
+
+  createdById String
+  createdBy   User                 @relation("CreatedRequirements", fields: [createdById], references: [id])
+
+  parentId   String?
+  parent     Requirement?          @relation("RequirementChildren", fields: [parentId], references: [id])
+  children   Requirement[]         @relation("RequirementChildren")
+
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
 }
 
 model Module {

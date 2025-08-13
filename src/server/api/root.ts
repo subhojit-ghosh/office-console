@@ -5,6 +5,7 @@ import { feedbackRouter } from "./routers/feedback";
 import { modulesRouter } from "./routers/modules";
 import { projectsRouter } from "./routers/projects";
 import { tasksRouter } from "./routers/tasks";
+import { requirementsRouter } from "./routers/requirements";
 import { usersRouter } from "./routers/users";
 import { workLogsRouter } from "./routers/work-logs";
 
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   projects: projectsRouter,
   modules: modulesRouter,
   tasks: tasksRouter,
+  requirements: requirementsRouter,
   feedback: feedbackRouter,
   workLogs: workLogsRouter,
 });
