@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+description: Always run pnpm db:migrate:dev with echo to provide a migration name after updating the schema
+---
+
+When running `pnpm db:migrate:dev`, **never** run it directly without a migration name.
+
+Always run it like this:
+
+```bash
+echo "my_migration_name" | pnpm db:migrate:dev
