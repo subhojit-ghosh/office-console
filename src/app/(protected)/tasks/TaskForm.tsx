@@ -246,6 +246,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   withAsterisk
                   disabled={loading}
                   autosize
+                  minRows={1}
                   leftSectionWidth={70}
                   leftSection={
                     <EditableBadgeDropdown
@@ -260,6 +261,11 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       variant="subtle"
                     />
                   }
+                  styles={{
+                    input: {
+                      paddingTop:5,
+                    }
+                  }}
                 />
               </Grid.Col>
               <Grid.Col span={12}>
