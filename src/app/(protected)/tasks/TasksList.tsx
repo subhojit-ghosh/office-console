@@ -35,6 +35,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { isClientRole } from "~/utils/roles";
 import { FaTasks } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
 import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
@@ -78,10 +79,7 @@ export default function TasksList() {
   );
 
   const shouldHideAssignees = useMemo(() => {
-    return (
-      session?.user.role === UserRole.CLIENT &&
-      !session?.user.client?.showAssignees
-    );
+    return isClientRole(session?.user.role) && !session?.user.client?.showAssignees;
   }, [session?.user]);
 
   const router = useRouter();

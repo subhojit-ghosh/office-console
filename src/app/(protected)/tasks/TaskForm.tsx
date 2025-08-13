@@ -25,6 +25,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
+import { isClientRole } from "~/utils/roles";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
 import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
 import {
@@ -101,10 +102,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
   );
 
   const shouldHideAssignees = useMemo(() => {
-    return (
-      session?.user.role === UserRole.CLIENT &&
-      !session?.user.client?.showAssignees
-    );
+    return isClientRole(session?.user.role) && !session?.user.client?.showAssignees;
   }, [session?.user]);
 
   useEffect(() => {
@@ -277,15 +275,15 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               <Grid.Col span={12}>
                 <Tabs
                   variant="default"
-                  defaultValue={
-                    mode === "add" || session?.user.role === UserRole.CLIENT
-                      ? "links"
-                      : "comments"
-                  }
+                    defaultValue={
+                      mode === "add" || isClientRole(session?.user.role)
+                        ? "links"
+                        : "comments"
+                    }
                 >
                   <Tabs.List>
                     {mode === "edit" &&
-                      session?.user.role !== UserRole.CLIENT && (
+                      !isClientRole(session?.user.role) && (
                         <Tabs.Tab
                           value="comments"
                           leftSection={<IconMessage size={16} />}
@@ -323,7 +321,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                     </Tabs.Tab>
 
                     {mode === "edit" &&
-                      session?.user.role !== UserRole.CLIENT && (
+                      !isClientRole(session?.user.role) && (
                         <>
                           <Tabs.Tab
                             value="work-logs"

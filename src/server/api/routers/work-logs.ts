@@ -12,6 +12,7 @@ import {
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { UserRole } from "@prisma/client";
+import { isClientRole } from "~/utils/roles";
 
 // Type definitions for hierarchical structure
 type WorkLogWithHierarchy = {
@@ -186,8 +187,8 @@ export const workLogsRouter = createTRPCRouter({
           
           const projectData = projectWorkLogMap.get(projectId)!;
           // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
-          const durationToUse = ctx.session.user.role === UserRole.CLIENT 
-            ? workLog.clientAdjustedDurationMin 
+          const durationToUse = isClientRole(ctx.session.user.role)
+            ? workLog.clientAdjustedDurationMin
             : workLog.durationMin;
           projectData.totalDuration += durationToUse;
           projectData.totalWorkLogs += 1;
@@ -331,8 +332,8 @@ export const workLogsRouter = createTRPCRouter({
         
         const moduleData = moduleWorkLogMap.get(moduleId)!;
         // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
-        const durationToUse = ctx.session.user.role === UserRole.CLIENT 
-          ? workLog.clientAdjustedDurationMin 
+        const durationToUse = isClientRole(ctx.session.user.role)
+          ? workLog.clientAdjustedDurationMin
           : workLog.durationMin;
         moduleData.totalDuration += durationToUse;
         moduleData.totalWorkLogs += 1;
@@ -512,8 +513,8 @@ export const workLogsRouter = createTRPCRouter({
         if (taskId) {
           const taskData = taskWorkLogMap.get(taskId)!;
           // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
-          const durationToUse = ctx.session.user.role === UserRole.CLIENT 
-            ? workLog.clientAdjustedDurationMin 
+          const durationToUse = isClientRole(ctx.session.user.role)
+            ? workLog.clientAdjustedDurationMin
             : workLog.durationMin;
           taskData.totalDuration += durationToUse;
           taskData.totalWorkLogs += 1;
@@ -709,8 +710,8 @@ export const workLogsRouter = createTRPCRouter({
         
         const project = projectsMap.get(projectId)!;
         // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
-        const durationToUse = ctx.session.user.role === UserRole.CLIENT 
-          ? workLog.clientAdjustedDurationMin 
+        const durationToUse = isClientRole(ctx.session.user.role)
+          ? workLog.clientAdjustedDurationMin
           : workLog.durationMin;
         project.totalDuration += durationToUse;
         project.totalWorkLogs += 1;
@@ -1033,8 +1034,8 @@ export const workLogsRouter = createTRPCRouter({
         if (!workLogData) continue;
 
         // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
-        const durationToUse = ctx.session.user.role === UserRole.CLIENT 
-          ? workLogData.totalClientAdjustedDuration 
+        const durationToUse = isClientRole(ctx.session.user.role)
+          ? workLogData.totalClientAdjustedDuration
           : workLogData.totalDuration;
 
         exportData.push({

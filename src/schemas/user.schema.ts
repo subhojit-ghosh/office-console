@@ -1,6 +1,13 @@
 import { z } from "zod";
+import { isClientRole } from "~/utils/roles";
 
-const userRoleEnum = z.enum(["SUPER_ADMIN", "ADMIN", "STAFF", "CLIENT"]);
+const userRoleEnum = z.enum([
+  "SUPER_ADMIN",
+  "ADMIN",
+  "STAFF",
+  "CLIENT_ADMIN",
+  "CLIENT_USER",
+]);
 
 export const getAllUsersSchema = z.object({
   page: z.number().int().min(1).default(1).optional().nullable(),
@@ -27,11 +34,11 @@ export const createUserSchema = z
     isActive: z.boolean().optional().default(true),
   })
   .superRefine((data, ctx) => {
-    if (data.role === userRoleEnum.Values.CLIENT && !data.clientId) {
+    if (isClientRole(data.role) && !data.clientId) {
       ctx.addIssue({
         path: ["clientId"],
         code: z.ZodIssueCode.custom,
-        message: "Client ID is required when role is CLIENT",
+        message: "Client ID is required for client roles",
       });
     }
   });
@@ -53,11 +60,11 @@ export const updateUserSchema = z
     isActive: z.boolean().optional().nullable(),
   })
   .superRefine((data, ctx) => {
-    if (data.role === userRoleEnum.Values.CLIENT && !data.clientId) {
+    if (isClientRole(data.role) && !data.clientId) {
       ctx.addIssue({
         path: ["clientId"],
         code: z.ZodIssueCode.custom,
-        message: "Client ID is required when role is CLIENT",
+        message: "Client ID is required for client roles",
       });
     }
   });

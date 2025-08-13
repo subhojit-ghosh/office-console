@@ -13,18 +13,13 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { UserRole, type User } from "@prisma/client";
+import { type User } from "@prisma/client";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
+import { userRoleOptions } from "~/constants/user.constant";
 import { createUserSchema, updateUserSchema } from "~/schemas/user.schema";
-
 import { api, apiClient } from "~/trpc/react";
-
-export const userRoleOptions = [
-  { value: "ADMIN", label: "Admin" },
-  { value: "STAFF", label: "Staff" },
-  { value: "CLIENT", label: "Client" },
-];
+import { isClientRole } from "~/utils/roles";
 
 interface Props {
   mode: "add" | "edit";
@@ -142,7 +137,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
         role: values.role as User["role"],
         password: values.password,
         isActive: values.isActive,
-        clientId: values.role === UserRole.CLIENT ? values.clientId : undefined,
+        clientId: isClientRole(values.role) ? values.clientId : undefined,
       });
     } else if (mode === "edit" && id) {
       updateUser.mutate({
@@ -152,7 +147,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
         role: values.role as User["role"],
         password: values.password || undefined,
         isActive: values.isActive,
-        clientId: values.role === UserRole.CLIENT ? values.clientId : undefined,
+        clientId: isClientRole(values.role) ? values.clientId : undefined,
       });
     }
   };
@@ -192,7 +187,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
               disabled={loading}
             />
           </Grid.Col>
-          {form.values.role === UserRole.CLIENT && (
+          {isClientRole(form.values.role) && (
             <Grid.Col span={12}>
               <Select
                 label="Client"

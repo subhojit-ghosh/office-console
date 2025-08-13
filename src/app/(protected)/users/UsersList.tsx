@@ -29,8 +29,9 @@ import { FaUsers } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
-import UserForm, { userRoleOptions } from "./UserForm";
+import UserForm from "./UserForm";
 import { useSession } from "next-auth/react";
+import { userRoleOptions } from "~/constants/user.constant";
 
 type UsersResponse = inferRouterOutputs<AppRouter>["users"]["getAll"];
 
@@ -166,7 +167,12 @@ export default function UsersList() {
             ),
           },
           { accessor: "email", title: "Email", sortable: true },
-          { accessor: "role", title: "Role", sortable: true },
+          {
+            accessor: "role",
+            title: "Role",
+            sortable: true,
+            render: (row) => userRoleOptions.find((r) => r.value === row.role)?.label,
+          },
           {
             accessor: "isActive",
             title: "Active",
