@@ -56,6 +56,7 @@ model User {
   workLogs         WorkLog[]      @relation("WorkLogs")
   archivedTasks    Task[]         @relation("ArchivedTasks")
   createdRequirements Requirement[] @relation("CreatedRequirements")
+  requirementActivities RequirementActivity[]
 }
 
 enum StaffPosition {
@@ -146,6 +147,31 @@ model Requirement {
 
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @updatedAt
+
+  activities RequirementActivity[] @relation("RequirementActivities")
+}
+
+enum RequirementActivityType {
+  CREATED
+  FIELD_CHANGE
+  UPDATED
+}
+
+model RequirementActivity {
+  id String @id @default(ulid())
+
+  requirementId String
+  requirement   Requirement @relation("RequirementActivities", fields: [requirementId], references: [id])
+
+  type     RequirementActivityType
+  field    String?
+  oldValue String?
+  newValue String?
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
 }
 
 model Module {

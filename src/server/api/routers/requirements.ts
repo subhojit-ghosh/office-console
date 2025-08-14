@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { RequirementPriority, RequirementStatus, RequirementType, UserRole } from "@prisma/client";
+import { RequirementActivityType, RequirementPriority, RequirementStatus, RequirementType, UserRole } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import {
   createRequirementSchema,
@@ -87,6 +87,18 @@ export const requirementsRouter = createTRPCRouter({
         createdBy: { select: { id: true, name: true } },
         createdAt: true,
         updatedAt: true,
+        activities: {
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            type: true,
+            field: true,
+            oldValue: true,
+            newValue: true,
+            createdAt: true,
+            user: { select: { id: true, name: true } },
+          },
+        },
       },
     });
   }),
@@ -100,7 +112,7 @@ export const requirementsRouter = createTRPCRouter({
         throw new TRPCError({ code: "FORBIDDEN", message: "Invalid client" });
       }
 
-      return ctx.db.requirement.create({
+      const req = await ctx.db.requirement.create({
         data: {
           type: input.type,
           title: input.title,
@@ -112,17 +124,46 @@ export const requirementsRouter = createTRPCRouter({
           parentId: input.parentId ?? undefined,
         },
       });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await ctx.db.requirementActivity.create({
+        data: {
+          requirementId: req.id,
+          type: RequirementActivityType.CREATED,
+          userId: ctx.session.user.id,
+        },
+      });
+      return req;
     }),
 
   update: protectedProcedure
     .input(updateRequirementSchema)
     .mutation(async ({ ctx, input }) => {
-      const existing = await ctx.db.requirement.findUnique({ where: { id: input.id }, select: { clientId: true } });
-      if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Requirement not found" });
-      if (ctx.session.user.clientId && existing.clientId !== ctx.session.user.clientId) {
+      const existingForAuth = await ctx.db.requirement.findUnique({ where: { id: input.id }, select: { clientId: true } });
+      if (!existingForAuth) throw new TRPCError({ code: "NOT_FOUND", message: "Requirement not found" });
+      if (ctx.session.user.clientId && existingForAuth.clientId !== ctx.session.user.clientId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
-      return ctx.db.requirement.update({
+      const existing = await ctx.db.requirement.findUnique({ where: { id: input.id } });
+      const logs: Array<{ requirementId: string; userId: string; type: RequirementActivityType; field?: string | null; oldValue?: string | null; newValue?: string | null }> = [];
+      if (existing) {
+        const fieldChangeKeys: (keyof typeof input)[] = ["type", "status", "priority"];
+        const softUpdateKeys: (keyof typeof input)[] = ["title", "description", "parentId"]; 
+        for (const key of fieldChangeKeys) {
+          const newValue = (input as Record<string, unknown>)[key] as string | undefined;
+          const oldValue = (existing as Record<string, unknown>)[key] as string | undefined;
+          if (newValue !== undefined && newValue !== oldValue) {
+            logs.push({ requirementId: input.id, userId: ctx.session.user.id, type: RequirementActivityType.FIELD_CHANGE, field: key as string, oldValue: oldValue ?? null, newValue: newValue ?? null });
+          }
+        }
+        for (const key of softUpdateKeys) {
+          const newValue = (input as Record<string, unknown>)[key] as string | undefined;
+          const oldValue = (existing as Record<string, unknown>)[key] as string | undefined;
+          if (newValue !== undefined && newValue !== oldValue) {
+            logs.push({ requirementId: input.id, userId: ctx.session.user.id, type: RequirementActivityType.UPDATED, field: key as string });
+          }
+        }
+      }
+      const updated = await ctx.db.requirement.update({
         where: { id: input.id },
         data: {
           type: input.type,
@@ -137,6 +178,11 @@ export const requirementsRouter = createTRPCRouter({
             : {}),
         },
       });
+      if (logs.length) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        await ctx.db.requirementActivity.createMany({ data: logs });
+      }
+      return updated;
     }),
 
   delete: protectedProcedure

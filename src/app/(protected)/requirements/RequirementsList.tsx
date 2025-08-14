@@ -221,12 +221,12 @@ export default function RequirementsList() {
               );
             },
           },
-          {
-            accessor: "type",
-            title: "Type",
-            sortable: true,
-            render: (row) => REQUIREMENT_TYPE_OPTIONS.find((t) => t.value === row.type)?.label,
-          },
+          // {
+          //   accessor: "type",
+          //   title: "Type",
+          //   sortable: true,
+          //   render: (row) => REQUIREMENT_TYPE_OPTIONS.find((t) => t.value === row.type)?.label,
+          // },
           {
             accessor: "status",
             title: "Status",

@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Button, Grid, Group, LoadingOverlay, Modal, Select, Tabs, Textarea } from "@mantine/core";
+import { Button, Grid, LoadingOverlay, Modal, Select, Tabs, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { RequirementPriority, RequirementStatus, RequirementType, type Requirement } from "@prisma/client";
@@ -13,7 +13,10 @@ import { isClientRole } from "~/utils/roles";
 import { REQUIREMENT_STATUS_OPTIONS, REQUIREMENT_PRIORITY_OPTIONS, REQUIREMENT_TYPE_OPTIONS } from "~/constants/requirement.constant";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
 import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
-import { IconFileDescription, IconMessage } from "@tabler/icons-react";
+import { IconMessage } from "@tabler/icons-react";
+import { RequirementActivityFeed } from "./RequirementActivityFeed";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "~/server/api/root";
 
 interface Props {
   mode: "add" | "edit";
@@ -28,6 +31,10 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
   const { data: session } = useSession();
   const [editDataLoading, setEditDataLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  type RequirementGetByIdResponse = inferRouterOutputs<AppRouter>["requirements"]["getById"];
+  const [activities, setActivities] = useState<
+    NonNullable<RequirementGetByIdResponse>["activities"]
+  >([]);
 
   const form = useForm({
     initialValues: {
@@ -117,6 +124,7 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
           clientId: detail.clientId ?? "",
           parentId: detail.parentId ?? "",
         });
+        setActivities(detail.activities ?? []);
       }
     } catch (error) {
       console.error("Error loading requirement details:", error);
@@ -195,12 +203,16 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
                 />
               </Grid.Col>
               <Grid.Col span={12}>
-                <Tabs variant="default" defaultValue="details">
-                  <Tabs.List>
-                    <Tabs.Tab value="details" leftSection={<IconFileDescription size={16} />}>Details</Tabs.Tab>
-                  </Tabs.List>
-                  <Tabs.Panel value="details" pt="md">&nbsp;</Tabs.Panel>
-                </Tabs>
+                {mode === "edit" && (
+                  <Tabs variant="default" defaultValue="activities">
+                    <Tabs.List>
+                      <Tabs.Tab value="activities" leftSection={<IconMessage size={16} />}>Activities</Tabs.Tab>
+                    </Tabs.List>
+                    <Tabs.Panel value="activities" pt="md">
+                      <RequirementActivityFeed activities={activities} />
+                    </Tabs.Panel>
+                  </Tabs>
+                )}
               </Grid.Col>
             </Grid>
           </Grid.Col>
