@@ -61,7 +61,7 @@ const presets = [
     label: "Evening",
     values: getTimeRange({
       startTime: "17:00:00",
-      endTime: "19:30:00",
+      endTime: "20:00:00",
       interval: "00:30:00",
     }),
   },
@@ -207,8 +207,8 @@ export default function TaskWorkLogs({
 
     createWorkLog.mutate({
       taskId,
-      startTime: startTime,
-      endTime: endTime,
+      startTime: new Date(startTime),
+      endTime: new Date(endTime),
       note: form.values.note,
     });
   };
@@ -271,6 +271,7 @@ export default function TaskWorkLogs({
                         withinPortal: false,
                         position: "top-start",
                         withArrow: true,
+                        width: "90%",
                       },
                       presets,
                     }}
@@ -288,6 +289,7 @@ export default function TaskWorkLogs({
                         withinPortal: false,
                         position: "top-start",
                         withArrow: true,
+                        width: "90%",
                       },
                       presets,
                     }}
