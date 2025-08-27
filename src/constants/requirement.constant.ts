@@ -1,9 +1,13 @@
-import { RequirementPriority, RequirementStatus, RequirementType } from "@prisma/client";
 import {
-  IconFilePlus,
-  IconBulb,
-  IconGitPullRequest,
+  RequirementPriority,
+  RequirementStatus,
+  RequirementType,
+} from "@prisma/client";
+import {
   IconBug,
+  IconBulb,
+  IconFilePlus,
+  IconGitPullRequest,
 } from "@tabler/icons-react";
 
 export const REQUIREMENT_TYPES = [
@@ -13,13 +17,22 @@ export const REQUIREMENT_TYPES = [
   RequirementType.BUG,
 ] as const;
 
-export const REQUIREMENT_TYPE_MAP: Record<
-  RequirementType,
-  { label: string; color: string; icon: any }
-> = {
-  [RequirementType.NEW_PROJECT]: { label: "New Project", color: "blue", icon: IconFilePlus },
-  [RequirementType.FEATURE_REQUEST]: { label: "Feature Request", color: "green", icon: IconBulb },
-  [RequirementType.CHANGE_REQUEST]: { label: "Change Request", color: "orange", icon: IconGitPullRequest },
+export const REQUIREMENT_TYPE_MAP = {
+  [RequirementType.NEW_PROJECT]: {
+    label: "New Project",
+    color: "blue",
+    icon: IconFilePlus,
+  },
+  [RequirementType.FEATURE_REQUEST]: {
+    label: "Feature Request",
+    color: "green",
+    icon: IconBulb,
+  },
+  [RequirementType.CHANGE_REQUEST]: {
+    label: "Change Request",
+    color: "orange",
+    icon: IconGitPullRequest,
+  },
   [RequirementType.BUG]: { label: "Bug / Issue", color: "red", icon: IconBug },
 };
 
@@ -39,7 +52,10 @@ export const REQUIREMENT_STATUSES = [
   RequirementStatus.COMPLETED,
 ] as const;
 
-export const REQUIREMENT_STATUS_MAP: Record<RequirementStatus, { label: string; color: string }> = {
+export const REQUIREMENT_STATUS_MAP: Record<
+  RequirementStatus,
+  { label: string; color: string }
+> = {
   [RequirementStatus.DRAFT]: { label: "Draft", color: "gray" },
   [RequirementStatus.SUBMITTED]: { label: "Submitted", color: "blue" },
   [RequirementStatus.APPROVED]: { label: "Approved", color: "green" },
@@ -61,7 +77,10 @@ export const REQUIREMENT_STATUS_FILTERS = {
     RequirementStatus.APPROVED,
     RequirementStatus.IN_PROGRESS,
   ] as RequirementStatus[],
-  COMPLETED: [RequirementStatus.COMPLETED, RequirementStatus.REJECTED] as RequirementStatus[],
+  COMPLETED: [
+    RequirementStatus.COMPLETED,
+    RequirementStatus.REJECTED,
+  ] as RequirementStatus[],
 } as const;
 
 export const REQUIREMENT_PRIORITIES = [
@@ -71,7 +90,10 @@ export const REQUIREMENT_PRIORITIES = [
   RequirementPriority.URGENT,
 ] as const;
 
-export const REQUIREMENT_PRIORITY_MAP: Record<RequirementPriority, { label: string; color: string }> = {
+export const REQUIREMENT_PRIORITY_MAP: Record<
+  RequirementPriority,
+  { label: string; color: string }
+> = {
   [RequirementPriority.LOW]: { label: "Low", color: "blue" },
   [RequirementPriority.MEDIUM]: { label: "Medium", color: "yellow" },
   [RequirementPriority.HIGH]: { label: "High", color: "orange" },
@@ -83,6 +105,3 @@ export const REQUIREMENT_PRIORITY_OPTIONS = REQUIREMENT_PRIORITIES.map((p) => ({
   label: REQUIREMENT_PRIORITY_MAP[p].label,
   color: REQUIREMENT_PRIORITY_MAP[p].color,
 }));
-
-
-

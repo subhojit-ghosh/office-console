@@ -40,11 +40,6 @@ import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes"
 dayjs.extend(duration);
 dayjs.extend(isSameOrBefore);
 
-const minDate = dayjs()
-  .subtract(1, "week")
-  .startOf("day")
-  .format("YYYY-MM-DD HH:mm:ss");
-const maxDate = dayjs().format("YYYY-MM-DD HH:mm:ss");
 const presets = [
   {
     label: "Morning",

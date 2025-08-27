@@ -1,8 +1,17 @@
 import { Avatar, Badge, Grid, Text } from "@mantine/core";
-import { RequirementActivityType, RequirementPriority, RequirementStatus, RequirementType } from "@prisma/client";
+import {
+  RequirementActivityType,
+  type RequirementPriority,
+  type RequirementStatus,
+  type RequirementType,
+} from "@prisma/client";
 import { IconArrowRight } from "@tabler/icons-react";
 import dayjs from "dayjs";
-import { REQUIREMENT_PRIORITY_OPTIONS, REQUIREMENT_STATUS_OPTIONS, REQUIREMENT_TYPE_OPTIONS } from "~/constants/requirement.constant";
+import {
+  REQUIREMENT_PRIORITY_OPTIONS,
+  REQUIREMENT_STATUS_OPTIONS,
+  REQUIREMENT_TYPE_OPTIONS,
+} from "~/constants/requirement.constant";
 import { titleCase } from "~/utils/text-formatting";
 
 type Props = {
@@ -17,23 +26,42 @@ type Props = {
   }[];
 };
 
-const getBadgeColorAndLabel = (field: string, value: string): { color: string; label: string } => {
+const getBadgeColorAndLabel = (
+  field: string,
+  value: string,
+): { color: string; label: string } => {
   if (field === "type") {
-    const match = REQUIREMENT_TYPE_OPTIONS.find((opt) => opt.value === (value as unknown as RequirementType));
-    return match ? { color: match.color, label: match.label } : { color: "gray", label: titleCase(value) };
+    const match = REQUIREMENT_TYPE_OPTIONS.find(
+      (opt) => opt.value === (value as unknown as RequirementType),
+    );
+    return match
+      ? { color: match.color, label: match.label }
+      : { color: "gray", label: titleCase(value) };
   }
   if (field === "status") {
-    const match = REQUIREMENT_STATUS_OPTIONS.find((opt) => opt.value === (value as unknown as RequirementStatus));
-    return match ? { color: match.color, label: match.label } : { color: "gray", label: titleCase(value) };
+    const match = REQUIREMENT_STATUS_OPTIONS.find(
+      (opt) => opt.value === (value as unknown as RequirementStatus),
+    );
+    return match
+      ? { color: match.color, label: match.label }
+      : { color: "gray", label: titleCase(value) };
   }
   if (field === "priority") {
-    const match = REQUIREMENT_PRIORITY_OPTIONS.find((opt) => opt.value === (value as unknown as RequirementPriority));
-    return match ? { color: match.color, label: match.label } : { color: "gray", label: titleCase(value) };
+    const match = REQUIREMENT_PRIORITY_OPTIONS.find(
+      (opt) => opt.value === (value as unknown as RequirementPriority),
+    );
+    return match
+      ? { color: match.color, label: match.label }
+      : { color: "gray", label: titleCase(value) };
   }
   return { color: "gray", label: titleCase(value) };
 };
 
-const renderFieldChangeDetail = (activity: { field: string; oldValue: string; newValue: string }) => {
+const renderFieldChangeDetail = (activity: {
+  field: string;
+  oldValue: string;
+  newValue: string;
+}) => {
   const { field, oldValue, newValue } = activity;
   const oldFormatted = getBadgeColorAndLabel(field, oldValue);
   const newFormatted = getBadgeColorAndLabel(field, newValue);
@@ -42,7 +70,10 @@ const renderFieldChangeDetail = (activity: { field: string; oldValue: string; ne
       <Badge variant="outline" color={oldFormatted.color} radius="sm" size="xs">
         {oldFormatted.label}
       </Badge>
-      <IconArrowRight size={12} style={{ marginLeft: 5, marginRight: 5, position: "relative", top: 2 }} />
+      <IconArrowRight
+        size={12}
+        style={{ marginLeft: 5, marginRight: 5, position: "relative", top: 2 }}
+      />
       <Badge variant="outline" color={newFormatted.color} radius="sm" size="xs">
         {newFormatted.label}
       </Badge>
@@ -113,6 +144,3 @@ export const RequirementActivityFeed = ({ activities }: Props) => {
     </>
   );
 };
-
-
-

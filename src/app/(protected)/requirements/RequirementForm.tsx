@@ -1,22 +1,42 @@
 "use client";
 
-import { Button, Grid, LoadingOverlay, Modal, Select, Tabs, Textarea } from "@mantine/core";
+import {
+  Button,
+  Grid,
+  LoadingOverlay,
+  Modal,
+  Select,
+  Tabs,
+  Textarea,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { RequirementPriority, RequirementStatus, RequirementType, type Requirement } from "@prisma/client";
+import {
+  RequirementPriority,
+  RequirementStatus,
+  RequirementType,
+  type Requirement,
+} from "@prisma/client";
+import { IconMessage } from "@tabler/icons-react";
+import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
-import { createRequirementSchema, updateRequirementSchema } from "~/schemas/requirement.schema";
-import { api, apiClient } from "~/trpc/react";
-import { isClientRole } from "~/utils/roles";
-import { REQUIREMENT_STATUS_OPTIONS, REQUIREMENT_PRIORITY_OPTIONS, REQUIREMENT_TYPE_OPTIONS } from "~/constants/requirement.constant";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
 import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
-import { IconMessage } from "@tabler/icons-react";
-import { RequirementActivityFeed } from "./RequirementActivityFeed";
-import type { inferRouterOutputs } from "@trpc/server";
+import {
+  REQUIREMENT_PRIORITY_OPTIONS,
+  REQUIREMENT_STATUS_OPTIONS,
+  REQUIREMENT_TYPE_OPTIONS,
+} from "~/constants/requirement.constant";
+import {
+  createRequirementSchema,
+  updateRequirementSchema,
+} from "~/schemas/requirement.schema";
 import type { AppRouter } from "~/server/api/root";
+import { api, apiClient } from "~/trpc/react";
+import { isClientRole } from "~/utils/roles";
+import { RequirementActivityFeed } from "./RequirementActivityFeed";
 
 interface Props {
   mode: "add" | "edit";
@@ -25,13 +45,13 @@ interface Props {
   id?: string | null;
 }
 
-
 export default function RequirementForm({ mode, opened, close, id }: Props) {
   const utils = api.useUtils();
   const { data: session } = useSession();
   const [editDataLoading, setEditDataLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  type RequirementGetByIdResponse = inferRouterOutputs<AppRouter>["requirements"]["getById"];
+  type RequirementGetByIdResponse =
+    inferRouterOutputs<AppRouter>["requirements"]["getById"];
   const [activities, setActivities] = useState<
     NonNullable<RequirementGetByIdResponse>["activities"]
   >([]);
@@ -47,7 +67,9 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
       clientId: "",
       parentId: "",
     },
-    validate: zodResolver(mode === "add" ? createRequirementSchema : updateRequirementSchema),
+    validate: zodResolver(
+      mode === "add" ? createRequirementSchema : updateRequirementSchema,
+    ),
   });
 
   const parentsQuery = api.requirements.getAllMinimalParents.useQuery();
@@ -74,11 +96,15 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
     ) {
       form.setFieldValue("clientId", targetClientId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.clientId, session?.user?.role, form.values.clientId]);
 
   const createRequirement = api.requirements.create.useMutation({
     onSuccess: async () => {
-      notifications.show({ message: "Requirement has been created successfully.", color: "green" });
+      notifications.show({
+        message: "Requirement has been created successfully.",
+        color: "green",
+      });
       void utils.requirements.getAll.invalidate();
       setLoading(false);
       close();
@@ -97,13 +123,20 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
 
   const updateRequirement = api.requirements.update.useMutation({
     onSuccess: async () => {
-      notifications.show({ message: "Requirement has been updated successfully.", color: "green" });
+      notifications.show({
+        message: "Requirement has been updated successfully.",
+        color: "green",
+      });
       void utils.requirements.getAll.invalidate();
       setLoading(false);
       close();
     },
     onError: (error) => {
-      notifications.show({ title: "Error", message: error.message, color: "red" });
+      notifications.show({
+        title: "Error",
+        message: error.message,
+        color: "red",
+      });
       setLoading(false);
     },
   });
@@ -128,7 +161,10 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
       }
     } catch (error) {
       console.error("Error loading requirement details:", error);
-      notifications.show({ message: "Failed to load requirement details.", color: "red" });
+      notifications.show({
+        message: "Failed to load requirement details.",
+        color: "red",
+      });
     } finally {
       setEditDataLoading(false);
     }
@@ -143,8 +179,13 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
         description: values.description,
         status: values.status,
         priority: values.priority,
-        clientId: isClientRole(session?.user.role) ? session?.user.clientId : values.clientId,
-        parentId: values.type === RequirementType.CHANGE_REQUEST ? values.parentId : undefined,
+        clientId: isClientRole(session?.user.role)
+          ? session?.user.clientId
+          : values.clientId,
+        parentId:
+          values.type === RequirementType.CHANGE_REQUEST
+            ? values.parentId
+            : undefined,
       });
     } else if (mode === "edit" && id) {
       updateRequirement.mutate({
@@ -154,16 +195,30 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
         description: values.description,
         status: values.status,
         priority: values.priority,
-        clientId: isClientRole(session?.user.role) ? session?.user.clientId : values.clientId,
-        parentId: values.type === RequirementType.CHANGE_REQUEST ? values.parentId : undefined,
+        clientId: isClientRole(session?.user.role)
+          ? session?.user.clientId
+          : values.clientId,
+        parentId:
+          values.type === RequirementType.CHANGE_REQUEST
+            ? values.parentId
+            : undefined,
       });
     }
   };
 
-  const isChangeRequest = useMemo(() => form.values.type === RequirementType.CHANGE_REQUEST, [form.values.type]);
+  const isChangeRequest = useMemo(
+    () => form.values.type === RequirementType.CHANGE_REQUEST,
+    [form.values.type],
+  );
 
   return (
-    <Modal opened={opened} onClose={close} centered size="90%" withCloseButton={false}>
+    <Modal
+      opened={opened}
+      onClose={close}
+      centered
+      size="90%"
+      withCloseButton={false}
+    >
       <LoadingOverlay visible={editDataLoading} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
@@ -198,7 +253,9 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
                 <AppRichTextEditor
                   id={form.values.id}
                   content={form.values.description}
-                  onUpdate={(content) => form.setFieldValue("description", content)}
+                  onUpdate={(content) =>
+                    form.setFieldValue("description", content)
+                  }
                   placeholder="Add description..."
                 />
               </Grid.Col>
@@ -206,7 +263,12 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
                 {mode === "edit" && (
                   <Tabs variant="default" defaultValue="activities">
                     <Tabs.List>
-                      <Tabs.Tab value="activities" leftSection={<IconMessage size={16} />}>Activities</Tabs.Tab>
+                      <Tabs.Tab
+                        value="activities"
+                        leftSection={<IconMessage size={16} />}
+                      >
+                        Activities
+                      </Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="activities" pt="md">
                       <RequirementActivityFeed activities={activities} />
@@ -242,11 +304,20 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
                 <Grid.Col span={12}>
                   <Select
                     label="Client"
-                    data={clientsQuery.data?.map((c) => ({ value: c.id, label: c.name })) ?? []}
+                    data={
+                      clientsQuery.data?.map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                      })) ?? []
+                    }
                     {...form.getInputProps("clientId")}
                     searchable
                     disabled={loading || clientsQuery.isLoading}
-                    placeholder={clientsQuery.isLoading ? "Loading clients..." : "Select client (optional)"}
+                    placeholder={
+                      clientsQuery.isLoading
+                        ? "Loading clients..."
+                        : "Select client (optional)"
+                    }
                   />
                 </Grid.Col>
               )}
@@ -254,12 +325,21 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
                 <Grid.Col span={12}>
                   <Select
                     label="Parent Requirement"
-                    data={parentsQuery.data?.map((p) => ({ value: p.id, label: `${p.title} (${p.type.replace("_", " ")})` })) ?? []}
+                    data={
+                      parentsQuery.data?.map((p) => ({
+                        value: p.id,
+                        label: `${p.title} (${p.type.replace("_", " ")})`,
+                      })) ?? []
+                    }
                     {...form.getInputProps("parentId")}
                     withAsterisk
                     searchable
                     disabled={loading || parentsQuery.isLoading}
-                    placeholder={parentsQuery.isLoading ? "Loading requirements..." : "Select parent requirement"}
+                    placeholder={
+                      parentsQuery.isLoading
+                        ? "Loading requirements..."
+                        : "Select parent requirement"
+                    }
                   />
                 </Grid.Col>
               )}
@@ -285,5 +365,3 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
     </Modal>
   );
 }
-
-

@@ -20,7 +20,7 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { UserRole, type Task, type TaskStatus } from "@prisma/client";
+import { type Task, type TaskStatus } from "@prisma/client";
 import {
   IconArchive,
   IconDotsVertical,
@@ -35,7 +35,6 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { isClientRole } from "~/utils/roles";
 import { FaTasks } from "react-icons/fa";
 import AppTable from "~/components/AppTable";
 import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
@@ -47,6 +46,7 @@ import {
 } from "~/constants/task.constant";
 import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
+import { isClientRole } from "~/utils/roles";
 import TaskForm from "./TaskForm";
 
 type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
@@ -79,7 +79,9 @@ export default function TasksList() {
   );
 
   const shouldHideAssignees = useMemo(() => {
-    return isClientRole(session?.user.role) && !session?.user.client?.showAssignees;
+    return (
+      isClientRole(session?.user.role) && !session?.user.client?.showAssignees
+    );
   }, [session?.user]);
 
   const router = useRouter();

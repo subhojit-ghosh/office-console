@@ -14,7 +14,7 @@ import {
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { UserRole, type Task } from "@prisma/client";
+import { type Task } from "@prisma/client";
 import {
   IconActivity,
   IconClockHour4,
@@ -25,7 +25,6 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
-import { isClientRole } from "~/utils/roles";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
 import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
 import {
@@ -36,11 +35,12 @@ import {
 import { createTaskSchema, updateTaskSchema } from "~/schemas/task.schema";
 import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
+import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
+import { isClientRole } from "~/utils/roles";
 import { TaskActivityFeed } from "./TaskActivityFeed";
 import TaskComments from "./TaskComments";
 import TaskLinks, { type TaskTemporaryLink } from "./TaskLinks";
 import TaskWorkLogs from "./TaskWorkLogs";
-import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
 
 type TaskGetByIdResponse = inferRouterOutputs<AppRouter>["tasks"]["getById"];
 
@@ -102,7 +102,9 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
   );
 
   const shouldHideAssignees = useMemo(() => {
-    return isClientRole(session?.user.role) && !session?.user.client?.showAssignees;
+    return (
+      isClientRole(session?.user.role) && !session?.user.client?.showAssignees
+    );
   }, [session?.user]);
 
   useEffect(() => {
@@ -263,8 +265,8 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   }
                   styles={{
                     input: {
-                      paddingTop:5,
-                    }
+                      paddingTop: 5,
+                    },
                   }}
                 />
               </Grid.Col>
@@ -281,34 +283,33 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               <Grid.Col span={12}>
                 <Tabs
                   variant="default"
-                    defaultValue={
-                      mode === "add" || isClientRole(session?.user.role)
-                        ? "links"
-                        : "comments"
-                    }
+                  defaultValue={
+                    mode === "add" || isClientRole(session?.user.role)
+                      ? "links"
+                      : "comments"
+                  }
                 >
                   <Tabs.List>
-                    {mode === "edit" &&
-                      !isClientRole(session?.user.role) && (
-                        <Tabs.Tab
-                          value="comments"
-                          leftSection={<IconMessage size={16} />}
-                        >
-                          Comments
-                          {!!commentsCount && (
-                            <Badge
-                              variant="light"
-                              ml="xs"
-                              style={{
-                                textTransform: "none",
-                                cursor: "pointer",
-                              }}
-                            >
-                              {commentsCount}
-                            </Badge>
-                          )}
-                        </Tabs.Tab>
-                      )}
+                    {mode === "edit" && !isClientRole(session?.user.role) && (
+                      <Tabs.Tab
+                        value="comments"
+                        leftSection={<IconMessage size={16} />}
+                      >
+                        Comments
+                        {!!commentsCount && (
+                          <Badge
+                            variant="light"
+                            ml="xs"
+                            style={{
+                              textTransform: "none",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {commentsCount}
+                          </Badge>
+                        )}
+                      </Tabs.Tab>
+                    )}
 
                     <Tabs.Tab
                       value="links"
@@ -326,35 +327,34 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       )}
                     </Tabs.Tab>
 
-                    {mode === "edit" &&
-                      !isClientRole(session?.user.role) && (
-                        <>
-                          <Tabs.Tab
-                            value="work-logs"
-                            leftSection={<IconClockHour4 size={16} />}
-                          >
-                            Work Logs
-                            {!!totalWorkLogMinutes && (
-                              <Badge
-                                variant="light"
-                                ml="xs"
-                                style={{
-                                  textTransform: "none",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {formatDurationFromMinutes(totalWorkLogMinutes)}
-                              </Badge>
-                            )}
-                          </Tabs.Tab>
-                          <Tabs.Tab
-                            value="activities"
-                            leftSection={<IconActivity size={16} />}
-                          >
-                            Activities
-                          </Tabs.Tab>
-                        </>
-                      )}
+                    {mode === "edit" && !isClientRole(session?.user.role) && (
+                      <>
+                        <Tabs.Tab
+                          value="work-logs"
+                          leftSection={<IconClockHour4 size={16} />}
+                        >
+                          Work Logs
+                          {!!totalWorkLogMinutes && (
+                            <Badge
+                              variant="light"
+                              ml="xs"
+                              style={{
+                                textTransform: "none",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {formatDurationFromMinutes(totalWorkLogMinutes)}
+                            </Badge>
+                          )}
+                        </Tabs.Tab>
+                        <Tabs.Tab
+                          value="activities"
+                          leftSection={<IconActivity size={16} />}
+                        >
+                          Activities
+                        </Tabs.Tab>
+                      </>
+                    )}
                   </Tabs.List>
 
                   <Tabs.Panel value="links" pt="md">

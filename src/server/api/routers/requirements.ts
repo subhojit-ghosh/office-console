@@ -124,7 +124,7 @@ export const requirementsRouter = createTRPCRouter({
           parentId: input.parentId ?? undefined,
         },
       });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      
       await ctx.db.requirementActivity.create({
         data: {
           requirementId: req.id,
@@ -179,7 +179,6 @@ export const requirementsRouter = createTRPCRouter({
         },
       });
       if (logs.length) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         await ctx.db.requirementActivity.createMany({ data: logs });
       }
       return updated;

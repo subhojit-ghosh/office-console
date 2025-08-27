@@ -79,6 +79,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
     ) {
       form.setFieldValue("clientId", session.user.clientId);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user.clientId, session?.user.role, form.values.role]);
 
   const createUser = api.users.create.useMutation({
