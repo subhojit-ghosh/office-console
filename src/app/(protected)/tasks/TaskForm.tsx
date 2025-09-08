@@ -9,6 +9,7 @@ import {
   MultiSelect,
   Select,
   Tabs,
+  TextInput,
   Textarea,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
@@ -77,6 +78,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       id: "",
       title: "",
       description: "",
+      crId: "",
       type: "TASK",
       status: "PENDING",
       priority: "MEDIUM",
@@ -134,6 +136,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
           id: taskDetail.id,
           title: taskDetail.title,
           description: taskDetail.description ?? "",
+          crId: taskDetail.crId ?? "",
           type: taskDetail.type,
           status: taskDetail.status,
           priority: taskDetail.priority,
@@ -203,6 +206,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       createTask.mutate({
         title: values.title,
         description: values.description,
+        crId: values.crId,
         type: values.type as Task["type"],
         status: values.status as Task["status"],
         priority: values.priority as Task["priority"],
@@ -217,6 +221,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
         id: values.id,
         title: values.title,
         description: values.description,
+        crId: values.crId,
         type: values.type as Task["type"],
         status: values.status as Task["status"],
         priority: values.priority as Task["priority"],
@@ -469,6 +474,14 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                         ? "Select module"
                         : "No modules available"
                   }
+                />
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <TextInput
+                  label="CR ID"
+                  placeholder="Enter Change Request ID"
+                  {...form.getInputProps("crId")}
+                  disabled={loading}
                 />
               </Grid.Col>
               {!shouldHideAssignees && (

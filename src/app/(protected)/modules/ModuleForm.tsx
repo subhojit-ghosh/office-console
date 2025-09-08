@@ -43,6 +43,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
       id: "",
       name: "",
       description: "",
+      crId: "",
       projectId: "",
       timeDisplayMultiplier: null as number | null,
     },
@@ -72,6 +73,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
           id: moduleDetail.id,
           name: moduleDetail.name,
           description: moduleDetail.description ?? "",
+          crId: moduleDetail.crId ?? "",
           projectId: moduleDetail.projectId ?? "",
           timeDisplayMultiplier: moduleDetail.timeDisplayMultiplier
             ? Number(moduleDetail.timeDisplayMultiplier)
@@ -135,6 +137,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
       createModule.mutate({
         name: values.name,
         description: values.description,
+        crId: values.crId,
         projectId: values.projectId,
         timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
@@ -143,6 +146,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
         id: values.id,
         name: values.name,
         description: values.description,
+        crId: values.crId,
         projectId: values.projectId,
         timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
@@ -171,6 +175,14 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
             <Textarea
               label="Description"
               {...form.getInputProps("description")}
+              disabled={loading}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <TextInput
+              label="CR ID"
+              placeholder="Enter Change Request ID"
+              {...form.getInputProps("crId")}
               disabled={loading}
             />
           </Grid.Col>
