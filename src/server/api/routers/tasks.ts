@@ -230,7 +230,7 @@ export const tasksRouter = createTRPCRouter({
   create: protectedProcedure
     .input(sanitizeInputSchema(createTaskSchema))
     .mutation(async ({ ctx, input }) => {
-      const { assigneeIds, links, ...rest } = input;
+      const { assigneeIds, links, crId, ...rest } = input;
 
       const projectMembers = await ctx.db.project.findUnique({
         where: { id: input.projectId },
@@ -252,6 +252,7 @@ export const tasksRouter = createTRPCRouter({
       const task = await ctx.db.task.create({
         data: {
           ...rest,
+          crId,
           createdById: userId,
           assignees: assigneeIds
             ? { connect: assigneeIds.map((id) => ({ id })) }
@@ -312,6 +313,7 @@ export const tasksRouter = createTRPCRouter({
         "status",
         "priority",
         "dueDate",
+        "crId",
       ];
       const softUpdateKeys: (keyof typeof rest)[] = ["title", "description"];
 

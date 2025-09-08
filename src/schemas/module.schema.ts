@@ -21,6 +21,7 @@ export const getModuleByIdSchema = z.object({
 export const createModuleSchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z.string().optional().nullable(),
+  crId: z.string().optional().nullable(),
   projectId: z.string().nonempty("Project is required"),
   timeDisplayMultiplier: zOptionalInput(
     z
@@ -36,6 +37,7 @@ export const updateModuleSchema = z.object({
   id: z.string().nonempty("ID is required"),
   name: z.string().nonempty("Name is required"),
   description: z.string().optional().nullable(),
+  crId: z.string().optional().nullable(),
   projectId: z.string().nonempty("Project is required"),
   timeDisplayMultiplier: zOptionalInput(
     z
