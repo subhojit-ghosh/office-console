@@ -43,17 +43,20 @@ export function ProjectModules({
           accessor: 'name',
           width: '40%',
           noWrap: true,
-          render: ({ id, name }) => (
-            <Group gap="xs" align="center" wrap="nowrap">
-              <IconChevronRight
-                className={clsx(classes.icon, classes.expandIcon, {
-                  [classes.expandIconRotated!]: expandedModuleIds.includes(id),
-                })}
-              />
-              <FaCubes className={classes.icon} />
-              <span className={classes.moduleRow}>{name}</span>
-            </Group>
-          ),
+          render: ({ id, name, crId }) => {
+            const displayName = crId ? `[${crId}] ${name}` : name;
+            return (
+              <Group gap="xs" align="center" wrap="nowrap">
+                <IconChevronRight
+                  className={clsx(classes.icon, classes.expandIcon, {
+                    [classes.expandIconRotated!]: expandedModuleIds.includes(id),
+                  })}
+                />
+                <FaCubes className={classes.icon} />
+                <span className={classes.moduleRow}>{displayName}</span>
+              </Group>
+            );
+          },
         },
         {
           accessor: 'firstWorkLogDate',

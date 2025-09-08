@@ -30,6 +30,7 @@ type WorkLogWithHierarchy = {
     id: string;
     title: string;
     type: string;
+    crId: string | null;
     module: {
       id: string;
       name: string;
@@ -49,6 +50,7 @@ type TaskData = {
   id: string;
   title: string;
   type: string;
+  crId: string | null;
   moduleId: string;
   workLogs: WorkLogWithHierarchy[];
   totalDuration: number;
@@ -101,6 +103,7 @@ export const workLogsRouter = createTRPCRouter({
               id: true,
               title: true,
               type: true,
+              crId: true,
             },
           },
         },
@@ -279,6 +282,7 @@ export const workLogsRouter = createTRPCRouter({
         select: {
           id: true,
           name: true,
+          crId: true,
         },
         orderBy: { name: 'asc' },
       });
@@ -356,6 +360,7 @@ export const workLogsRouter = createTRPCRouter({
             return {
               id: module.id,
               name: module.name,
+              crId: module.crId,
               projectId: input.projectId,
               totalDuration: workLogData.totalDuration,
               totalWorkLogs: workLogData.totalWorkLogs,
@@ -370,6 +375,7 @@ export const workLogsRouter = createTRPCRouter({
           modulesWithData.push({
             id: `no-module-${input.projectId}`,
             name: 'No Module',
+            crId: null,
             projectId: input.projectId,
             totalDuration: noModuleData.totalDuration,
             totalWorkLogs: noModuleData.totalWorkLogs,
@@ -392,6 +398,7 @@ export const workLogsRouter = createTRPCRouter({
         return {
           id: module.id,
           name: module.name,
+          crId: module.crId,
           projectId: input.projectId,
           totalDuration: workLogData.totalDuration,
           totalWorkLogs: workLogData.totalWorkLogs,
@@ -406,6 +413,7 @@ export const workLogsRouter = createTRPCRouter({
         modulesWithData.push({
           id: `no-module-${input.projectId}`,
           name: 'No Module',
+          crId: null,
           projectId: input.projectId,
           totalDuration: noModuleData.totalDuration,
           totalWorkLogs: noModuleData.totalWorkLogs,
@@ -462,6 +470,7 @@ export const workLogsRouter = createTRPCRouter({
           id: true,
           title: true,
           type: true,
+          crId: true,
         },
         orderBy: { title: 'asc' },
       });
@@ -539,6 +548,7 @@ export const workLogsRouter = createTRPCRouter({
               id: task.id,
               title: task.title,
               type: task.type,
+              crId: task.crId,
               moduleId: input.moduleId,
               totalDuration: workLogData.totalDuration,
               totalWorkLogs: workLogData.totalWorkLogs,
@@ -560,6 +570,7 @@ export const workLogsRouter = createTRPCRouter({
           id: task.id,
           title: task.title,
           type: task.type,
+          crId: task.crId,
           moduleId: input.moduleId,
           totalDuration: workLogData.totalDuration,
           totalWorkLogs: workLogData.totalWorkLogs,
@@ -632,6 +643,13 @@ export const workLogsRouter = createTRPCRouter({
               name: true,
             },
           },
+          task: {
+            select: {
+              id: true,
+              title: true,
+              crId: true,
+            },
+          },
         },
       });
     }),
@@ -666,6 +684,7 @@ export const workLogsRouter = createTRPCRouter({
               id: true,
               title: true,
               type: true,
+              crId: true,
               module: {
                 select: {
                   id: true,
@@ -745,12 +764,13 @@ export const workLogsRouter = createTRPCRouter({
           
           if (taskId && taskTitle) {
             let task = moduleData.tasks.find(t => t.id === taskId);
-            
+
             if (!task) {
               task = {
                 id: taskId,
                 title: taskTitle,
                 type: taskType,
+                crId: workLog.task?.crId ?? null,
                 moduleId,
                 workLogs: [],
                 totalDuration: 0,
@@ -787,12 +807,13 @@ export const workLogsRouter = createTRPCRouter({
             moduleData.totalWorkLogs += 1;
             
             let task = moduleData.tasks.find(t => t.id === taskId);
-            
+
             if (!task) {
               task = {
                 id: taskId,
                 title: taskTitle,
                 type: taskType,
+                crId: workLog.task?.crId ?? null,
                 moduleId: noModuleId,
                 workLogs: [],
                 totalDuration: 0,
@@ -985,6 +1006,7 @@ export const workLogsRouter = createTRPCRouter({
           id: true,
           title: true,
           type: true,
+          crId: true,
           projectId: true,
           moduleId: true,
           project: {
@@ -997,6 +1019,7 @@ export const workLogsRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
+              crId: true,
             },
           },
         },
@@ -1040,8 +1063,8 @@ export const workLogsRouter = createTRPCRouter({
 
         exportData.push({
           projectName: task.project.name,
-          moduleName: task.module?.name ?? 'No Module',
-          taskTitle: task.title,
+          moduleName: task.module?.name ? `${task.module?.crId ? `[${task.module?.crId}] ` : ''}${task.module?.name}` : 'No Module',
+          taskTitle: task.crId ? `[${task.crId}] ${task.title}` : task.title,
           taskType: task.type,
           totalDuration: durationToUse,
           totalWorkLogs: workLogData.totalWorkLogs,

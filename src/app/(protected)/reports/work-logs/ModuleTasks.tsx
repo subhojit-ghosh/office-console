@@ -40,18 +40,19 @@ export function ModuleTasks({
           accessor: 'name',
           width: '40%',
           noWrap: false,
-          render: ({ title, type }) => {
+          render: ({ title, type, crId }) => {
             const typeOption = TASK_TYPE_OPTIONS.find(t => t.value === type);
+            const displayTitle = crId ? `[${crId}] ${title}` : title;
             return (
               <Group gap="xs" align="flex-start" wrap="wrap">
                 {typeOption && (
-                  <typeOption.icon 
-                    className={classes.icon} 
-                    size={16} 
-                    color={theme.colors[typeOption.color][4]} 
+                  <typeOption.icon
+                    className={classes.icon}
+                    size={16}
+                    color={theme.colors[typeOption.color][4]}
                   />
                 )}
-                <span 
+                <span
                   className={classes.taskRow}
                   style={{
                     display: '-webkit-box',
@@ -64,7 +65,7 @@ export function ModuleTasks({
                     maxWidth: '100%'
                   }}
                 >
-                  {title}
+                  {displayTitle}
                 </span>
               </Group>
             );
@@ -75,7 +76,7 @@ export function ModuleTasks({
           title: 'First Entry',
           width: '20%',
           textAlign: 'left',
-          render: ({ firstWorkLogDate }) => 
+          render: ({ firstWorkLogDate }) =>
             firstWorkLogDate ? dayjs(firstWorkLogDate).format('MMM D, YYYY') : '-',
         },
         {
@@ -83,7 +84,7 @@ export function ModuleTasks({
           title: 'Last Entry',
           width: '20%',
           textAlign: 'left',
-          render: ({ lastWorkLogDate }) => 
+          render: ({ lastWorkLogDate }) =>
             lastWorkLogDate ? dayjs(lastWorkLogDate).format('MMM D, YYYY') : '-',
         },
         {

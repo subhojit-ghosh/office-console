@@ -8,6 +8,7 @@ type WorkLogExportData = {
   moduleName: string;
   taskTitle: string;
   taskType: string;
+  crId: string;
   totalDuration: number;
   totalWorkLogs: number;
   firstWorkLogDate: Date | null;
@@ -40,6 +41,7 @@ type TaskData = {
   id: string;
   title: string;
   type: string;
+  crId: string;
   moduleId: string;
   totalDuration: number;
   totalWorkLogs: number;
@@ -62,6 +64,7 @@ function createNestedExportData(
       moduleName: "",
       taskTitle: "",
       taskType: "",
+      crId: "",
       totalDuration: project.totalDuration,
       totalWorkLogs: project.totalWorkLogs,
       firstWorkLogDate: project.firstWorkLogDate,
@@ -79,6 +82,7 @@ function createNestedExportData(
         moduleName: "No Module",
         taskTitle: "",
         taskType: "",
+        crId: "",
         totalDuration: 0,
         totalWorkLogs: 0,
         firstWorkLogDate: null,
@@ -95,6 +99,7 @@ function createNestedExportData(
           moduleName: moduleData.name,
           taskTitle: "",
           taskType: "",
+          crId: "",
           totalDuration: moduleData.totalDuration,
           totalWorkLogs: moduleData.totalWorkLogs,
           firstWorkLogDate: moduleData.firstWorkLogDate,
@@ -113,6 +118,7 @@ function createNestedExportData(
             moduleName: "",
             taskTitle: "No Tasks",
             taskType: "",
+            crId: "",
             totalDuration: 0,
             totalWorkLogs: 0,
             firstWorkLogDate: null,
@@ -129,6 +135,7 @@ function createNestedExportData(
               moduleName: "",
               taskTitle: task.title,
               taskType: task.type,
+              crId: task.crId,
               totalDuration: task.totalDuration,
               totalWorkLogs: task.totalWorkLogs,
               firstWorkLogDate: task.firstWorkLogDate,
@@ -153,7 +160,7 @@ function convertToExcelRowsWithStyling(data: WorkLogExportData[]): {
 } {
   const headers = [
     "Project",
-    "Module", 
+    "Module",
     "Task",
     "Task Type",
     "Total Duration (Hours)",
@@ -172,10 +179,13 @@ function convertToExcelRowsWithStyling(data: WorkLogExportData[]): {
   data.forEach((item, index) => {
     const rowIndex = index + 1; // +1 because headers are at row 0
     
+    // Format names with crId prefix if available
+    const formattedTaskTitle = item.crId ? `[${item.crId}] ${item.taskTitle}` : item.taskTitle;
+
     const row = [
       item.projectName,
       item.moduleName,
-      item.taskTitle,
+      formattedTaskTitle,
       item.taskType,
       item.totalDuration / 60, // Convert minutes to hours
       formatDurationFromMinutes(item.totalDuration),
@@ -343,6 +353,7 @@ export async function exportServerDataToExcel(
     moduleName: string;
     taskTitle: string;
     taskType: string;
+    crId: string;
     totalDuration: number;
     totalWorkLogs: number;
     firstWorkLogDate: Date | null;
@@ -371,8 +382,12 @@ export async function exportServerDataToExcel(
         moduleId = item.moduleName || undefined;
       }
 
+      // Format task title with crId prefix if available
+      const formattedTaskTitle = item.crId ? `[${item.crId}] ${item.taskTitle}` : item.taskTitle;
+
       return {
         ...item,
+        taskTitle: formattedTaskTitle,
         level,
         projectId,
         moduleId,
