@@ -20,17 +20,20 @@ export const deleteWorkLogSchema = z.object({
 // New schemas for work logs router
 export const getProjectsSchema = z.object({
   dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
+  clientId: z.string().optional(),
 });
 
 export const getModulesSchema = z.object({
   projectId: z.string(),
   dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
+  clientId: z.string().optional(),
 });
 
 export const getTasksSchema = z.object({
   moduleId: z.string(),
   projectId: z.string(),
   dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
+  clientId: z.string().optional(),
 });
 
 export const getWorkLogsForTaskSchema = z.object({
@@ -40,4 +43,5 @@ export const getWorkLogsForTaskSchema = z.object({
 export const getExportDataSchema = z.object({
   dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
   projectId: z.string().optional(),
+  clientId: z.string().optional(),
 });

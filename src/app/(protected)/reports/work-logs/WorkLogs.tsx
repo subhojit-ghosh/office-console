@@ -12,18 +12,27 @@ import {
 import clsx from "clsx";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import AppTable from "~/components/AppTable";
 import { api, apiClient } from "~/trpc/react";
+import { UserRole } from "@prisma/client";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
 import { exportServerDataToExcel } from "~/utils/excel-export";
 import { ProjectModules } from "./ProjectModules";
 import classes from "./WorkLogs.module.css";
 
 export default function WorkLogs() {
+  const { data: session } = useSession();
   const projectsQuery = api.projects.getAllMinimal.useQuery();
+  const clientsQuery = api.clients.getAllMinimal.useQuery(undefined, {
+    enabled:
+      session?.user?.role !== UserRole.CLIENT_ADMIN &&
+      session?.user?.role !== UserRole.CLIENT_USER,
+  });
   const [filters, setFilters] = useDebouncedState(
     {
       projectId: "",
+      clientId: "",
       dateRange: [null, null] as DatesRangeValue,
     },
     300,
@@ -39,6 +48,11 @@ export default function WorkLogs() {
   const { data: projects, isPending: projectsLoading } =
     api.workLogs.getProjects.useQuery({
       dateRange: dateRangeForAPI,
+      clientId:
+        session?.user?.role !== UserRole.CLIENT_ADMIN &&
+        session?.user?.role !== UserRole.CLIENT_USER
+          ? filters.clientId || undefined
+          : undefined,
     });
 
   const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>([]);
@@ -100,6 +114,11 @@ export default function WorkLogs() {
       const exportData = await apiClient.workLogs.getExportData.query({
         dateRange: dateRangeForAPI,
         projectId: filters.projectId || undefined,
+        clientId:
+          session?.user?.role !== UserRole.CLIENT_ADMIN &&
+          session?.user?.role !== UserRole.CLIENT_USER
+            ? filters.clientId || undefined
+            : undefined,
       });
 
       // Export to Excel
@@ -131,6 +150,26 @@ export default function WorkLogs() {
             clearable
             style={{ width: 250 }}
           />
+          {session?.user?.role !== UserRole.CLIENT_ADMIN &&
+            session?.user?.role !== UserRole.CLIENT_USER && (
+            <Select
+              placeholder="All Clients"
+              clearable
+              searchable
+              data={
+                clientsQuery.data?.map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                })) ?? []
+              }
+              value={filters.clientId}
+              onChange={(value) =>
+                setFilters({ ...filters, clientId: value ?? "" })
+              }
+              disabled={clientsQuery.isLoading}
+              style={{ width: 200 }}
+            />
+          )}
           <Select
             placeholder="All Projects"
             clearable
@@ -226,6 +265,12 @@ export default function WorkLogs() {
               <ProjectModules
                 projectId={project.id}
                 dateRange={dateRangeForAPI}
+                clientId={
+                  session?.user?.role !== UserRole.CLIENT_ADMIN &&
+                  session?.user?.role !== UserRole.CLIENT_USER
+                    ? filters.clientId || undefined
+                    : undefined
+                }
                 expandedModuleIds={expandedModuleIds}
                 setExpandedModuleIds={setExpandedModuleIds}
               />

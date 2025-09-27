@@ -114,7 +114,7 @@ export const workLogsRouter = createTRPCRouter({
   getProjects: protectedProcedure
     .input(getProjectsSchema)
     .query(async ({ ctx, input }) => {
-      const clientId = ctx.session.user.clientId;
+      const clientId = input.clientId ?? ctx.session.user.clientId;
 
       // Apply the same filtering logic as projects router
       const projectWhere: Prisma.ProjectWhereInput = {
@@ -246,7 +246,7 @@ export const workLogsRouter = createTRPCRouter({
   getModules: protectedProcedure
     .input(getModulesSchema)
     .query(async ({ ctx, input }) => {
-      const clientId = ctx.session.user.clientId;
+      const clientId = input.clientId ?? ctx.session.user.clientId;
 
       // Apply the same filtering logic as projects router to verify user has access to this project
       const projectWhere: Prisma.ProjectWhereInput = {
@@ -429,7 +429,7 @@ export const workLogsRouter = createTRPCRouter({
   getTasks: protectedProcedure
     .input(getTasksSchema)
     .query(async ({ ctx, input }) => {
-      const clientId = ctx.session.user.clientId;
+      const clientId = input.clientId ?? ctx.session.user.clientId;
 
       // Apply the same filtering logic as projects router to verify user has access to this project
       const projectWhere: Prisma.ProjectWhereInput = {
@@ -945,7 +945,7 @@ export const workLogsRouter = createTRPCRouter({
   getExportData: protectedProcedure
     .input(getExportDataSchema)
     .query(async ({ ctx, input }) => {
-      const clientId = ctx.session.user.clientId;
+      const clientId = input.clientId ?? ctx.session.user.clientId;
 
       // Apply the same filtering logic as projects router
       const projectWhere: Prisma.ProjectWhereInput = {

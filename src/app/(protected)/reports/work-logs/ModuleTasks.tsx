@@ -12,18 +12,21 @@ interface ModuleTasksProps {
   moduleId: string;
   projectId: string;
   dateRange: [Date | null, Date | null];
+  clientId?: string;
 }
 
-export function ModuleTasks({ 
-  moduleId, 
+export function ModuleTasks({
+  moduleId,
   projectId,
-  dateRange
+  dateRange,
+  clientId
 }: ModuleTasksProps) {
   const theme = useMantineTheme();
   const { data: tasks, isPending: tasksLoading } = api.workLogs.getTasks.useQuery({
     moduleId,
     projectId,
     dateRange,
+    clientId,
   }, {
     enabled: !!moduleId && !!projectId,
   });

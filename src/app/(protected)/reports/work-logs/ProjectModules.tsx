@@ -14,19 +14,22 @@ import { ModuleTasks } from "./ModuleTasks";
 interface ProjectModulesProps {
   projectId: string;
   dateRange: [Date | null, Date | null];
+  clientId?: string;
   expandedModuleIds: string[];
   setExpandedModuleIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export function ProjectModules({ 
-  projectId, 
+export function ProjectModules({
+  projectId,
   dateRange,
-  expandedModuleIds, 
+  clientId,
+  expandedModuleIds,
   setExpandedModuleIds
 }: ProjectModulesProps) {
   const { data: modules, isPending: modulesLoading } = api.workLogs.getModules.useQuery({
     projectId,
     dateRange,
+    clientId,
   }, {
     enabled: !!projectId,
   });
@@ -85,10 +88,11 @@ export function ProjectModules({
         allowMultiple: true,
         expanded: { recordIds: expandedModuleIds, onRecordIdsChange: setExpandedModuleIds },
         content: ({ record: module }) => (
-          <ModuleTasks 
+          <ModuleTasks
             moduleId={module.id}
             projectId={projectId}
             dateRange={dateRange}
+            clientId={clientId}
           />
         ),
       }}
