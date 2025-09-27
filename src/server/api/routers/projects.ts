@@ -3,6 +3,7 @@ import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import {
   createProjectSchema,
   deleteProjectSchema,
+  getAllMinimalProjectsSchema,
   getAllProjectsSchema,
   getProjectByIdSchema,
   updateProjectSchema,
@@ -104,24 +105,26 @@ export const projectsRouter = createTRPCRouter({
       };
     }),
 
-  getAllMinimal: protectedProcedure.query(async ({ ctx }) => {
-    const clientId = ctx.session.user.clientId;
+  getAllMinimal: protectedProcedure
+    .input(getAllMinimalProjectsSchema)
+    .query(async ({ ctx, input }) => {
+      const clientId = input?.clientId ?? ctx.session.user.clientId;
 
-    const where: Prisma.ProjectWhereInput = {
-      ...(clientId ? { clientId } : {}),
-      ...(ctx.session.user.role === UserRole.STAFF
-        ? {
-            OR: [
-              { createdById: ctx.session.user.id },
-              {
-                members: {
-                  some: { id: ctx.session.user.id },
+      const where: Prisma.ProjectWhereInput = {
+        ...(clientId ? { clientId } : {}),
+        ...(ctx.session.user.role === UserRole.STAFF
+          ? {
+              OR: [
+                { createdById: ctx.session.user.id },
+                {
+                  members: {
+                    some: { id: ctx.session.user.id },
+                  },
                 },
-              },
-            ],
-          }
-        : {}),
-    };
+              ],
+            }
+          : {}),
+      };
 
     return ctx.db.project.findMany({
       where,

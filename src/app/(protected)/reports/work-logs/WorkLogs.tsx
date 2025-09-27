@@ -23,12 +23,6 @@ import classes from "./WorkLogs.module.css";
 
 export default function WorkLogs() {
   const { data: session } = useSession();
-  const projectsQuery = api.projects.getAllMinimal.useQuery();
-  const clientsQuery = api.clients.getAllMinimal.useQuery(undefined, {
-    enabled:
-      session?.user?.role !== UserRole.CLIENT_ADMIN &&
-      session?.user?.role !== UserRole.CLIENT_USER,
-  });
   const [filters, setFilters] = useDebouncedState(
     {
       projectId: "",
@@ -37,6 +31,15 @@ export default function WorkLogs() {
     },
     300,
   );
+
+  const projectsQuery = api.projects.getAllMinimal.useQuery(
+    filters.clientId ? { clientId: filters.clientId } : undefined
+  );
+  const clientsQuery = api.clients.getAllMinimal.useQuery(undefined, {
+    enabled:
+      session?.user?.role !== UserRole.CLIENT_ADMIN &&
+      session?.user?.role !== UserRole.CLIENT_USER,
+  });
 
   // Convert string dates to Date objects for API
   const dateRangeForAPI: [Date | null, Date | null] = [

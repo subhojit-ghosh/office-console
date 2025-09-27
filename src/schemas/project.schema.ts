@@ -14,6 +14,10 @@ export const getAllProjectsSchema = z.object({
   clientId: z.string().optional().nullable(),
 });
 
+export const getAllMinimalProjectsSchema = z.object({
+  clientId: z.string().optional().nullable(),
+}).optional();
+
 export const getProjectByIdSchema = z.object({
   id: z.string().nonempty("ID is required"),
 });
