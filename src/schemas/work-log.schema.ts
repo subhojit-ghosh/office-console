@@ -45,3 +45,25 @@ export const getExportDataSchema = z.object({
   projectId: z.string().optional(),
   clientId: z.string().optional(),
 });
+
+export const getFlatWorkLogsSchema = z.object({
+  page: z.number().int().min(1).default(1).optional(),
+  pageSize: z.number().int().min(1).max(100).default(10).optional(),
+  sortBy: z.string().default("startTime").optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
+  dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
+  clientId: z.string().optional(),
+  projectId: z.string().optional(),
+  userId: z.string().optional(),
+  moduleId: z.string().optional(),
+});
+
+export const getFlatWorkLogsForExportSchema = z.object({
+  sortBy: z.string().default("startTime").optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
+  dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
+  clientId: z.string().optional(),
+  projectId: z.string().optional(),
+  userId: z.string().optional(),
+  moduleId: z.string().optional(),
+});

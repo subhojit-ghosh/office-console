@@ -334,6 +334,129 @@ export async function exportVisibleWorkLogsToExcel(
     console.error("Error exporting to Excel:", error);
     throw new Error("Failed to export work logs to Excel");
   }
+}
+
+// Type for flat work log entry
+type FlatWorkLogEntry = {
+  id: string;
+  note: string | null;
+  startTime: Date;
+  endTime: Date;
+  duration: number;
+  user: {
+    id: string;
+    name: string;
+  };
+  task: {
+    id: string;
+    title: string;
+    type: string;
+    crId: string | null;
+    project: {
+      id: string;
+      name: string;
+    };
+    module: {
+      id: string;
+      name: string;
+    } | null;
+  } | null;
+};
+
+// Export function for flat timesheet structure
+export async function exportFlatWorkLogsToExcel(
+  workLogs: FlatWorkLogEntry[],
+  dateRange: [Date | null, Date | null] | null,
+): Promise<void> {
+  try {
+    const headers = [
+      "Date",
+      "User",
+      "Project",
+      "Module",
+      "Task",
+      "Task Type",
+      "CR ID",
+      "Duration",
+      "Note",
+    ];
+
+    const rows: (string | number | null)[][] = [];
+
+    // Add headers
+    rows.push(headers);
+
+    // Add data rows
+    workLogs.forEach((workLog) => {
+      const row = [
+        dayjs(workLog.startTime).format("MMM D, YYYY"),
+        workLog.user.name,
+        workLog.task?.project.name ?? "-",
+        workLog.task?.module?.name ?? "-",
+        workLog.task
+          ? workLog.task.crId
+            ? `[${workLog.task.crId}] ${workLog.task.title}`
+            : workLog.task.title
+          : "-",
+        workLog.task?.type ?? "-",
+        workLog.task?.crId ?? "-",
+        formatDurationFromMinutes(workLog.duration),
+        workLog.note ?? "-",
+      ];
+
+      rows.push(row);
+    });
+
+    // Create workbook and worksheet
+    const workbook = utils.book_new();
+    const worksheet = utils.aoa_to_sheet(rows);
+
+    // Set column widths
+    const columnWidths = [
+      { wch: 12 }, // Date
+      { wch: 15 }, // User
+      { wch: 20 }, // Project
+      { wch: 18 }, // Module
+      { wch: 30 }, // Task
+      { wch: 12 }, // Task Type
+      { wch: 10 }, // CR ID
+      { wch: 12 }, // Duration
+      { wch: 30 }, // Note
+    ];
+    worksheet["!cols"] = columnWidths;
+
+    // Style header row
+    const headerStyle = {
+      fill: { fgColor: { rgb: "E3F2FD" } }, // Light blue background
+      font: { bold: true },
+    };
+
+    const range = utils.decode_range(worksheet["!ref"] ?? "A1");
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cellAddress = utils.encode_cell({ r: 0, c: col });
+      worksheet[cellAddress] ??= { v: "" };
+      worksheet[cellAddress].s = headerStyle;
+    }
+
+    // Add worksheet to workbook
+    utils.book_append_sheet(workbook, worksheet, "Work Logs Timesheet");
+
+    // Generate filename with date range
+    const now = dayjs().format("YYYY-MM-DD_HH-mm");
+    let filename = `work_logs_timesheet_${now}.xlsx`;
+
+    if (dateRange?.[0] && dateRange?.[1]) {
+      const startDate = dayjs(dateRange[0]).format("YYYY-MM-DD");
+      const endDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
+      filename = `work_logs_timesheet_${startDate}_to_${endDate}_${now}.xlsx`;
+    }
+
+    // Write file
+    writeFileXLSX(workbook, filename);
+  } catch (error) {
+    console.error("Error exporting to Excel:", error);
+    throw new Error("Failed to export work logs to Excel");
+  }
 } 
 
 // Function to handle server-side data format (without level and projectId)
@@ -429,4 +552,5 @@ export async function exportServerDataToExcel(
     console.error("Error exporting to Excel:", error);
     throw new Error("Failed to export work logs to Excel");
   }
-} 
+}
+

@@ -8,6 +8,8 @@ import {
   getTasksSchema,
   getWorkLogsForTaskSchema,
   getExportDataSchema,
+  getFlatWorkLogsSchema,
+  getFlatWorkLogsForExportSchema,
 } from "~/schemas/work-log.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -1078,6 +1080,242 @@ export const workLogsRouter = createTRPCRouter({
         totalRecords: exportData.length,
         dateRange: input.dateRange,
         exportedAt: new Date(),
+      };
+    }),
+
+  // Get flat work logs (individual entries) with pagination
+  getFlatWorkLogs: protectedProcedure
+    .input(getFlatWorkLogsSchema)
+    .query(async ({ ctx, input }) => {
+      const page = input.page ?? 1;
+      const pageSize = input.pageSize ?? 10;
+      const sortBy = input.sortBy ?? "startTime";
+      const sortOrder = input.sortOrder ?? "desc";
+      const clientId = input.clientId ?? ctx.session.user.clientId;
+
+      // Apply the same filtering logic as projects router
+      const projectWhere: Prisma.ProjectWhereInput = {
+        ...(clientId ? { clientId } : {}),
+        ...(input.projectId ? { id: input.projectId } : {}),
+        ...(ctx.session.user.role === UserRole.STAFF
+          ? {
+              OR: [
+                { createdById: ctx.session.user.id },
+                {
+                  members: {
+                    some: { id: ctx.session.user.id },
+                  },
+                },
+              ],
+            }
+          : {}),
+      };
+
+      // Build work log where clause
+      const workLogWhere: Prisma.WorkLogWhereInput = {
+        ...(input.dateRange?.[0] && input.dateRange?.[1]
+          ? {
+              startTime: {
+                gte: input.dateRange[0],
+                lte: input.dateRange[1],
+              },
+            }
+          : {}),
+        ...(input.userId ? { userId: input.userId } : {}),
+        task: {
+          project: projectWhere,
+          ...(input.moduleId ? { moduleId: input.moduleId } : {}),
+        },
+      };
+
+      // Build orderBy clause
+      let orderBy: Prisma.WorkLogOrderByWithRelationInput;
+      
+      // Handle nested sorting (e.g., user.name, task.title, etc.)
+      if (sortBy === "user.name") {
+        orderBy = { user: { name: sortOrder } };
+      } else if (sortBy === "task.title") {
+        orderBy = { task: { title: sortOrder } };
+      } else if (sortBy === "task.project.name") {
+        orderBy = { task: { project: { name: sortOrder } } };
+      } else if (sortBy === "task.module.name") {
+        orderBy = { task: { module: { name: sortOrder } } };
+      } else {
+        // Direct field sorting
+        orderBy = { [sortBy]: sortOrder };
+      }
+
+      const [workLogs, total] = await Promise.all([
+        ctx.db.workLog.findMany({
+          where: workLogWhere,
+          orderBy,
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+          select: {
+            id: true,
+            note: true,
+            startTime: true,
+            endTime: true,
+            durationMin: true,
+            clientAdjustedDurationMin: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            task: {
+              select: {
+                id: true,
+                title: true,
+                type: true,
+                crId: true,
+                project: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                module: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        }),
+        ctx.db.workLog.count({ where: workLogWhere }),
+      ]);
+
+      // Transform data to include computed duration based on role
+      const transformedWorkLogs = workLogs.map((workLog) => ({
+        ...workLog,
+        duration: isClientRole(ctx.session.user.role)
+          ? workLog.clientAdjustedDurationMin
+          : workLog.durationMin,
+      }));
+
+      return {
+        workLogs: transformedWorkLogs,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      };
+    }),
+
+  // Get all flat work logs for export (no pagination)
+  getFlatWorkLogsForExport: protectedProcedure
+    .input(getFlatWorkLogsForExportSchema)
+    .query(async ({ ctx, input }) => {
+      const sortBy = input.sortBy ?? "startTime";
+      const sortOrder = input.sortOrder ?? "desc";
+      const clientId = input.clientId ?? ctx.session.user.clientId;
+
+      // Apply the same filtering logic as projects router
+      const projectWhere: Prisma.ProjectWhereInput = {
+        ...(clientId ? { clientId } : {}),
+        ...(input.projectId ? { id: input.projectId } : {}),
+        ...(ctx.session.user.role === UserRole.STAFF
+          ? {
+              OR: [
+                { createdById: ctx.session.user.id },
+                {
+                  members: {
+                    some: { id: ctx.session.user.id },
+                  },
+                },
+              ],
+            }
+          : {}),
+      };
+
+      // Build work log where clause
+      const workLogWhere: Prisma.WorkLogWhereInput = {
+        ...(input.dateRange?.[0] && input.dateRange?.[1]
+          ? {
+              startTime: {
+                gte: input.dateRange[0],
+                lte: input.dateRange[1],
+              },
+            }
+          : {}),
+        ...(input.userId ? { userId: input.userId } : {}),
+        task: {
+          project: projectWhere,
+          ...(input.moduleId ? { moduleId: input.moduleId } : {}),
+        },
+      };
+
+      // Build orderBy clause
+      let orderBy: Prisma.WorkLogOrderByWithRelationInput;
+      
+      // Handle nested sorting (e.g., user.name, task.title, etc.)
+      if (sortBy === "user.name") {
+        orderBy = { user: { name: sortOrder } };
+      } else if (sortBy === "task.title") {
+        orderBy = { task: { title: sortOrder } };
+      } else if (sortBy === "task.project.name") {
+        orderBy = { task: { project: { name: sortOrder } } };
+      } else if (sortBy === "task.module.name") {
+        orderBy = { task: { module: { name: sortOrder } } };
+      } else {
+        // Direct field sorting
+        orderBy = { [sortBy]: sortOrder };
+      }
+
+      // Fetch all work logs without pagination
+      const workLogs = await ctx.db.workLog.findMany({
+        where: workLogWhere,
+        orderBy,
+        select: {
+          id: true,
+          note: true,
+          startTime: true,
+          endTime: true,
+          durationMin: true,
+          clientAdjustedDurationMin: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          task: {
+            select: {
+              id: true,
+              title: true,
+              type: true,
+              crId: true,
+              project: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              module: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // Transform data to include computed duration based on role
+      const transformedWorkLogs = workLogs.map((workLog) => ({
+        ...workLog,
+        duration: isClientRole(ctx.session.user.role)
+          ? workLog.clientAdjustedDurationMin
+          : workLog.durationMin,
+      }));
+
+      return {
+        workLogs: transformedWorkLogs,
       };
     }),
 });
