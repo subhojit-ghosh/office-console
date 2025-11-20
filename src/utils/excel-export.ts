@@ -1,6 +1,7 @@
 import { utils, writeFileXLSX } from "xlsx";
 import dayjs from "dayjs";
 import { formatDurationFromMinutes } from "./format-duration-from-minutes";
+import { TASK_STATUS_MAP } from "~/constants/task.constant";
 
 // Types for the hierarchical data structure
 type WorkLogExportData = {
@@ -351,6 +352,7 @@ type FlatWorkLogEntry = {
     id: string;
     title: string;
     type: string;
+    status: string;
     crId: string | null;
     project: {
       id: string;
@@ -376,6 +378,7 @@ export async function exportFlatWorkLogsToExcel(
       "Module",
       "Task",
       "Task Type",
+      "Status",
       "CR ID",
       "Duration",
       "Note",
@@ -399,6 +402,10 @@ export async function exportFlatWorkLogsToExcel(
             : workLog.task.title
           : "-",
         workLog.task?.type ?? "-",
+        workLog.task?.status
+          ? TASK_STATUS_MAP[workLog.task.status as keyof typeof TASK_STATUS_MAP]
+              ?.label ?? workLog.task.status
+          : "-",
         workLog.task?.crId ?? "-",
         formatDurationFromMinutes(workLog.duration),
         workLog.note ?? "-",
@@ -419,6 +426,7 @@ export async function exportFlatWorkLogsToExcel(
       { wch: 18 }, // Module
       { wch: 30 }, // Task
       { wch: 12 }, // Task Type
+      { wch: 12 }, // Status
       { wch: 10 }, // CR ID
       { wch: 12 }, // Duration
       { wch: 30 }, // Note

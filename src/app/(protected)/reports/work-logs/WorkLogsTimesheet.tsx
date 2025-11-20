@@ -7,10 +7,12 @@ import { useState } from "react";
 import AppTable from "~/components/AppTable";
 import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
+import { TASK_STATUS_MAP } from "~/constants/task.constant";
 import type { AppRouter } from "~/server/api/root";
 import type { inferRouterOutputs } from "@trpc/server";
 
-type FlatWorkLogsResponse = inferRouterOutputs<AppRouter>["workLogs"]["getFlatWorkLogs"];
+type FlatWorkLogsResponse =
+  inferRouterOutputs<AppRouter>["workLogs"]["getFlatWorkLogs"];
 type WorkLogEntry = FlatWorkLogsResponse["workLogs"][0];
 
 interface WorkLogsTimesheetProps {
@@ -30,7 +32,9 @@ export default function WorkLogsTimesheet({
 }: WorkLogsTimesheetProps) {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
-  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<WorkLogEntry>>({
+  const [sortStatus, setSortStatus] = useState<
+    DataTableSortStatus<WorkLogEntry>
+  >({
     columnAccessor: "startTime",
     direction: "desc",
   });
@@ -66,8 +70,7 @@ export default function WorkLogsTimesheet({
             title: "Date",
             sortable: true,
             width: "10%",
-            render: ({ startTime }) =>
-              dayjs(startTime).format("MMM D, YYYY"),
+            render: ({ startTime }) => dayjs(startTime).format("MMM D, YYYY"),
           },
           {
             accessor: "user.name",
@@ -110,6 +113,17 @@ export default function WorkLogsTimesheet({
             render: ({ task }) => task?.type ?? "-",
           },
           {
+            accessor: "task.status",
+            title: "Status",
+            sortable: true,
+            width: "10%",
+            render: ({ task }) =>
+              task?.status
+                ? (TASK_STATUS_MAP[task.status as keyof typeof TASK_STATUS_MAP]
+                    ?.label ?? task.status)
+                : "-",
+          },
+          {
             accessor: "task.crId",
             title: "CR ID",
             sortable: true,
@@ -139,4 +153,3 @@ export default function WorkLogsTimesheet({
     </>
   );
 }
-

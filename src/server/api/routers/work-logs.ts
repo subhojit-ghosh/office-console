@@ -142,17 +142,19 @@ export const workLogsRouter = createTRPCRouter({
           id: true,
           name: true,
         },
-        orderBy: { name: 'asc' },
+        orderBy: { name: "asc" },
       });
 
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
-        ...(input.dateRange?.[0] && input.dateRange?.[1] ? {
-          startTime: {
-            gte: input.dateRange[0],
-            lte: input.dateRange[1],
-          },
-        } : {}),
+        ...(input.dateRange?.[0] && input.dateRange?.[1]
+          ? {
+              startTime: {
+                gte: input.dateRange[0],
+                lte: input.dateRange[1],
+              },
+            }
+          : {}),
       };
 
       const workLogs = await ctx.db.workLog.findMany({
@@ -170,17 +172,20 @@ export const workLogsRouter = createTRPCRouter({
       });
 
       // Create a map of project work log data
-      const projectWorkLogMap = new Map<string, { 
-        totalDuration: number; 
-        totalWorkLogs: number;
-        firstWorkLogDate: Date | null;
-        lastWorkLogDate: Date | null;
-      }>();
-      
+      const projectWorkLogMap = new Map<
+        string,
+        {
+          totalDuration: number;
+          totalWorkLogs: number;
+          firstWorkLogDate: Date | null;
+          lastWorkLogDate: Date | null;
+        }
+      >();
+
       for (const workLog of workLogs) {
         if (workLog.task?.projectId) {
           const projectId = workLog.task.projectId;
-          
+
           if (!projectWorkLogMap.has(projectId)) {
             projectWorkLogMap.set(projectId, {
               totalDuration: 0,
@@ -189,7 +194,7 @@ export const workLogsRouter = createTRPCRouter({
               lastWorkLogDate: null,
             });
           }
-          
+
           const projectData = projectWorkLogMap.get(projectId)!;
           // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
           const durationToUse = isClientRole(ctx.session.user.role)
@@ -197,12 +202,18 @@ export const workLogsRouter = createTRPCRouter({
             : workLog.durationMin;
           projectData.totalDuration += durationToUse;
           projectData.totalWorkLogs += 1;
-          
+
           // Track first and last work log dates
-          if (!projectData.firstWorkLogDate || workLog.startTime < projectData.firstWorkLogDate) {
+          if (
+            !projectData.firstWorkLogDate ||
+            workLog.startTime < projectData.firstWorkLogDate
+          ) {
             projectData.firstWorkLogDate = workLog.startTime;
           }
-          if (!projectData.lastWorkLogDate || workLog.startTime > projectData.lastWorkLogDate) {
+          if (
+            !projectData.lastWorkLogDate ||
+            workLog.startTime > projectData.lastWorkLogDate
+          ) {
             projectData.lastWorkLogDate = workLog.startTime;
           }
         }
@@ -211,8 +222,8 @@ export const workLogsRouter = createTRPCRouter({
       // If date range is applied, only return projects that have work logs in that range
       if (input.dateRange?.[0] && input.dateRange?.[1]) {
         return allProjects
-          .filter(project => projectWorkLogMap.has(project.id))
-          .map(project => {
+          .filter((project) => projectWorkLogMap.has(project.id))
+          .map((project) => {
             const workLogData = projectWorkLogMap.get(project.id)!;
             return {
               id: project.id,
@@ -226,9 +237,9 @@ export const workLogsRouter = createTRPCRouter({
       }
 
       // If no date range, return all projects with their work log data
-      return allProjects.map(project => {
-        const workLogData = projectWorkLogMap.get(project.id) ?? { 
-          totalDuration: 0, 
+      return allProjects.map((project) => {
+        const workLogData = projectWorkLogMap.get(project.id) ?? {
+          totalDuration: 0,
           totalWorkLogs: 0,
           firstWorkLogDate: null,
           lastWorkLogDate: null,
@@ -286,17 +297,19 @@ export const workLogsRouter = createTRPCRouter({
           name: true,
           crId: true,
         },
-        orderBy: { name: 'asc' },
+        orderBy: { name: "asc" },
       });
 
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
-        ...(input.dateRange?.[0] && input.dateRange?.[1] ? {
-          startTime: {
-            gte: input.dateRange[0],
-            lte: input.dateRange[1],
-          },
-        } : {}),
+        ...(input.dateRange?.[0] && input.dateRange?.[1]
+          ? {
+              startTime: {
+                gte: input.dateRange[0],
+                lte: input.dateRange[1],
+              },
+            }
+          : {}),
         task: {
           projectId: input.projectId,
         },
@@ -317,16 +330,20 @@ export const workLogsRouter = createTRPCRouter({
       });
 
       // Create a map of module work log data
-      const moduleWorkLogMap = new Map<string, { 
-        totalDuration: number; 
-        totalWorkLogs: number;
-        firstWorkLogDate: Date | null;
-        lastWorkLogDate: Date | null;
-      }>();
-      
+      const moduleWorkLogMap = new Map<
+        string,
+        {
+          totalDuration: number;
+          totalWorkLogs: number;
+          firstWorkLogDate: Date | null;
+          lastWorkLogDate: Date | null;
+        }
+      >();
+
       for (const workLog of workLogs) {
-        const moduleId = workLog.task?.moduleId ?? `no-module-${input.projectId}`;
-        
+        const moduleId =
+          workLog.task?.moduleId ?? `no-module-${input.projectId}`;
+
         if (!moduleWorkLogMap.has(moduleId)) {
           moduleWorkLogMap.set(moduleId, {
             totalDuration: 0,
@@ -335,7 +352,7 @@ export const workLogsRouter = createTRPCRouter({
             lastWorkLogDate: null,
           });
         }
-        
+
         const moduleData = moduleWorkLogMap.get(moduleId)!;
         // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
         const durationToUse = isClientRole(ctx.session.user.role)
@@ -343,12 +360,18 @@ export const workLogsRouter = createTRPCRouter({
           : workLog.durationMin;
         moduleData.totalDuration += durationToUse;
         moduleData.totalWorkLogs += 1;
-        
+
         // Track first and last work log dates
-        if (!moduleData.firstWorkLogDate || workLog.startTime < moduleData.firstWorkLogDate) {
+        if (
+          !moduleData.firstWorkLogDate ||
+          workLog.startTime < moduleData.firstWorkLogDate
+        ) {
           moduleData.firstWorkLogDate = workLog.startTime;
         }
-        if (!moduleData.lastWorkLogDate || workLog.startTime > moduleData.lastWorkLogDate) {
+        if (
+          !moduleData.lastWorkLogDate ||
+          workLog.startTime > moduleData.lastWorkLogDate
+        ) {
           moduleData.lastWorkLogDate = workLog.startTime;
         }
       }
@@ -356,8 +379,8 @@ export const workLogsRouter = createTRPCRouter({
       // If date range is applied, only return modules that have work logs in that range
       if (input.dateRange?.[0] && input.dateRange?.[1]) {
         const modulesWithData = allModules
-          .filter(module => moduleWorkLogMap.has(module.id))
-          .map(module => {
+          .filter((module) => moduleWorkLogMap.has(module.id))
+          .map((module) => {
             const workLogData = moduleWorkLogMap.get(module.id)!;
             return {
               id: module.id,
@@ -372,11 +395,13 @@ export const workLogsRouter = createTRPCRouter({
           });
 
         // Add "No Module" entry if there are work logs without modules
-        const noModuleData = moduleWorkLogMap.get(`no-module-${input.projectId}`);
+        const noModuleData = moduleWorkLogMap.get(
+          `no-module-${input.projectId}`,
+        );
         if (noModuleData && noModuleData.totalWorkLogs > 0) {
           modulesWithData.push({
             id: `no-module-${input.projectId}`,
-            name: 'No Module',
+            name: "No Module",
             crId: null,
             projectId: input.projectId,
             totalDuration: noModuleData.totalDuration,
@@ -390,9 +415,9 @@ export const workLogsRouter = createTRPCRouter({
       }
 
       // If no date range, return all modules with their work log data
-      const modulesWithData = allModules.map(module => {
-        const workLogData = moduleWorkLogMap.get(module.id) ?? { 
-          totalDuration: 0, 
+      const modulesWithData = allModules.map((module) => {
+        const workLogData = moduleWorkLogMap.get(module.id) ?? {
+          totalDuration: 0,
           totalWorkLogs: 0,
           firstWorkLogDate: null,
           lastWorkLogDate: null,
@@ -414,7 +439,7 @@ export const workLogsRouter = createTRPCRouter({
       if (noModuleData && noModuleData.totalWorkLogs > 0) {
         modulesWithData.push({
           id: `no-module-${input.projectId}`,
-          name: 'No Module',
+          name: "No Module",
           crId: null,
           projectId: input.projectId,
           totalDuration: noModuleData.totalDuration,
@@ -462,7 +487,7 @@ export const workLogsRouter = createTRPCRouter({
       }
 
       // First, get all tasks for the module/project
-      const taskWhere = input.moduleId.startsWith('no-module-') 
+      const taskWhere = input.moduleId.startsWith("no-module-")
         ? { projectId: input.projectId, moduleId: null }
         : { projectId: input.projectId, moduleId: input.moduleId };
 
@@ -474,20 +499,24 @@ export const workLogsRouter = createTRPCRouter({
           type: true,
           crId: true,
         },
-        orderBy: { title: 'asc' },
+        orderBy: { title: "asc" },
       });
 
       // Then, get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
-        ...(input.dateRange?.[0] && input.dateRange?.[1] ? {
-          startTime: {
-            gte: input.dateRange[0],
-            lte: input.dateRange[1],
-          },
-        } : {}),
+        ...(input.dateRange?.[0] && input.dateRange?.[1]
+          ? {
+              startTime: {
+                gte: input.dateRange[0],
+                lte: input.dateRange[1],
+              },
+            }
+          : {}),
         task: {
           projectId: input.projectId,
-          ...(input.moduleId.startsWith('no-module-') ? { moduleId: null } : { moduleId: input.moduleId }),
+          ...(input.moduleId.startsWith("no-module-")
+            ? { moduleId: null }
+            : { moduleId: input.moduleId }),
         },
       };
 
@@ -502,16 +531,19 @@ export const workLogsRouter = createTRPCRouter({
       });
 
       // Create a map of task work log data
-      const taskWorkLogMap = new Map<string, { 
-        totalDuration: number; 
-        totalWorkLogs: number;
-        firstWorkLogDate: Date | null;
-        lastWorkLogDate: Date | null;
-      }>();
-      
+      const taskWorkLogMap = new Map<
+        string,
+        {
+          totalDuration: number;
+          totalWorkLogs: number;
+          firstWorkLogDate: Date | null;
+          lastWorkLogDate: Date | null;
+        }
+      >();
+
       for (const workLog of workLogs) {
         const taskId = workLog.taskId;
-        
+
         if (taskId && !taskWorkLogMap.has(taskId)) {
           taskWorkLogMap.set(taskId, {
             totalDuration: 0,
@@ -520,7 +552,7 @@ export const workLogsRouter = createTRPCRouter({
             lastWorkLogDate: null,
           });
         }
-        
+
         if (taskId) {
           const taskData = taskWorkLogMap.get(taskId)!;
           // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
@@ -529,12 +561,18 @@ export const workLogsRouter = createTRPCRouter({
             : workLog.durationMin;
           taskData.totalDuration += durationToUse;
           taskData.totalWorkLogs += 1;
-          
+
           // Track first and last work log dates
-          if (!taskData.firstWorkLogDate || workLog.startTime < taskData.firstWorkLogDate) {
+          if (
+            !taskData.firstWorkLogDate ||
+            workLog.startTime < taskData.firstWorkLogDate
+          ) {
             taskData.firstWorkLogDate = workLog.startTime;
           }
-          if (!taskData.lastWorkLogDate || workLog.startTime > taskData.lastWorkLogDate) {
+          if (
+            !taskData.lastWorkLogDate ||
+            workLog.startTime > taskData.lastWorkLogDate
+          ) {
             taskData.lastWorkLogDate = workLog.startTime;
           }
         }
@@ -543,8 +581,8 @@ export const workLogsRouter = createTRPCRouter({
       // If date range is applied, only return tasks that have work logs in that range
       if (input.dateRange?.[0] && input.dateRange?.[1]) {
         return allTasks
-          .filter(task => taskWorkLogMap.has(task.id))
-          .map(task => {
+          .filter((task) => taskWorkLogMap.has(task.id))
+          .map((task) => {
             const workLogData = taskWorkLogMap.get(task.id)!;
             return {
               id: task.id,
@@ -561,9 +599,9 @@ export const workLogsRouter = createTRPCRouter({
       }
 
       // If no date range, return all tasks with their work log data
-      return allTasks.map(task => {
-        const workLogData = taskWorkLogMap.get(task.id) ?? { 
-          totalDuration: 0, 
+      return allTasks.map((task) => {
+        const workLogData = taskWorkLogMap.get(task.id) ?? {
+          totalDuration: 0,
           totalWorkLogs: 0,
           firstWorkLogDate: null,
           lastWorkLogDate: null,
@@ -610,16 +648,17 @@ export const workLogsRouter = createTRPCRouter({
       }
 
       // Apply the same filtering logic as projects router to verify user has access to this project
-      const hasAccess = 
+      const hasAccess =
         // Admin/Manager can access all projects
         ctx.session.user.role !== UserRole.STAFF ||
         // Staff can only access projects they created or are members of
-        (ctx.session.user.role === UserRole.STAFF && (
-          task.project.createdById === ctx.session.user.id ||
-          task.project.members.some(member => member.id === ctx.session.user.id)
-        )) &&
-        // User's client must match project's client (if user has a client)
-        (!clientId || task.project.clientId === clientId);
+        (ctx.session.user.role === UserRole.STAFF &&
+          (task.project.createdById === ctx.session.user.id ||
+            task.project.members.some(
+              (member) => member.id === ctx.session.user.id,
+            )) &&
+          // User's client must match project's client (if user has a client)
+          (!clientId || task.project.clientId === clientId));
 
       if (!hasAccess) {
         throw new Error("Access denied to this task");
@@ -665,7 +704,7 @@ export const workLogsRouter = createTRPCRouter({
       };
 
       // Get all work logs with full hierarchy
-      const workLogs = await ctx.db.workLog.findMany({
+      const workLogs = (await ctx.db.workLog.findMany({
         where,
         orderBy: { startTime: "desc" },
         select: {
@@ -708,17 +747,17 @@ export const workLogsRouter = createTRPCRouter({
             },
           },
         },
-      }) as WorkLogWithHierarchy[];
+      })) as WorkLogWithHierarchy[];
 
       // Group by project
       const projectsMap = new Map<string, ProjectData>();
-      
+
       workLogs.forEach((workLog) => {
         const projectId = workLog.task?.project?.id;
         const projectName = workLog.task?.project?.name;
-        
+
         if (!projectId || !projectName) return;
-        
+
         if (!projectsMap.has(projectId)) {
           projectsMap.set(projectId, {
             id: projectId,
@@ -728,7 +767,7 @@ export const workLogsRouter = createTRPCRouter({
             totalWorkLogs: 0,
           });
         }
-        
+
         const project = projectsMap.get(projectId)!;
         // Use clientAdjustedDurationMin for clients, regular durationMin for staff/admin
         const durationToUse = isClientRole(ctx.session.user.role)
@@ -736,14 +775,14 @@ export const workLogsRouter = createTRPCRouter({
           : workLog.durationMin;
         project.totalDuration += durationToUse;
         project.totalWorkLogs += 1;
-        
+
         // Group by module
         const moduleId = workLog.task?.module?.id;
         const moduleName = workLog.task?.module?.name;
-        
+
         if (moduleId && moduleName) {
-          let moduleData = project.modules.find(m => m.id === moduleId);
-          
+          let moduleData = project.modules.find((m) => m.id === moduleId);
+
           if (!moduleData) {
             moduleData = {
               id: moduleId,
@@ -755,17 +794,17 @@ export const workLogsRouter = createTRPCRouter({
             };
             project.modules.push(moduleData);
           }
-          
+
           moduleData.totalDuration += durationToUse;
           moduleData.totalWorkLogs += 1;
-          
+
           // Group by task
           const taskId = workLog.task?.id;
           const taskTitle = workLog.task?.title;
           const taskType = workLog.task?.type;
-          
+
           if (taskId && taskTitle) {
-            let task = moduleData.tasks.find(t => t.id === taskId);
+            let task = moduleData.tasks.find((t) => t.id === taskId);
 
             if (!task) {
               task = {
@@ -779,7 +818,7 @@ export const workLogsRouter = createTRPCRouter({
               };
               moduleData.tasks.push(task);
             }
-            
+
             task.workLogs.push(workLog);
             task.totalDuration += durationToUse;
           }
@@ -788,15 +827,15 @@ export const workLogsRouter = createTRPCRouter({
           const taskId = workLog.task?.id;
           const taskTitle = workLog.task?.title;
           const taskType = workLog.task?.type;
-          
+
           if (taskId && taskTitle) {
             const noModuleId = `no-module-${projectId}`;
-            let moduleData = project.modules.find(m => m.id === noModuleId);
-            
+            let moduleData = project.modules.find((m) => m.id === noModuleId);
+
             if (!moduleData) {
               moduleData = {
                 id: noModuleId,
-                name: 'No Module',
+                name: "No Module",
                 projectId,
                 tasks: [],
                 totalDuration: 0,
@@ -804,11 +843,11 @@ export const workLogsRouter = createTRPCRouter({
               };
               project.modules.push(moduleData);
             }
-            
+
             moduleData.totalDuration += durationToUse;
             moduleData.totalWorkLogs += 1;
-            
-            let task = moduleData.tasks.find(t => t.id === taskId);
+
+            let task = moduleData.tasks.find((t) => t.id === taskId);
 
             if (!task) {
               task = {
@@ -822,13 +861,13 @@ export const workLogsRouter = createTRPCRouter({
               };
               moduleData.tasks.push(task);
             }
-            
+
             task.workLogs.push(workLog);
             task.totalDuration += durationToUse;
           }
         }
       });
-      
+
       return Array.from(projectsMap.values());
     }),
 
@@ -969,12 +1008,14 @@ export const workLogsRouter = createTRPCRouter({
 
       // Get work log data for filtering
       const workLogWhere: Prisma.WorkLogWhereInput = {
-        ...(input.dateRange?.[0] && input.dateRange?.[1] ? {
-          startTime: {
-            gte: input.dateRange[0],
-            lte: input.dateRange[1],
-          },
-        } : {}),
+        ...(input.dateRange?.[0] && input.dateRange?.[1]
+          ? {
+              startTime: {
+                gte: input.dateRange[0],
+                lte: input.dateRange[1],
+              },
+            }
+          : {}),
         task: {
           project: projectWhere,
         },
@@ -982,7 +1023,7 @@ export const workLogsRouter = createTRPCRouter({
 
       // Get aggregated work log data
       const workLogAggregates = await ctx.db.workLog.groupBy({
-        by: ['taskId'],
+        by: ["taskId"],
         where: workLogWhere,
         _sum: {
           durationMin: true,
@@ -1025,12 +1066,12 @@ export const workLogsRouter = createTRPCRouter({
             },
           },
         },
-        orderBy: { title: 'asc' },
+        orderBy: { title: "asc" },
       });
 
       // Create maps for efficient lookup
       const workLogMap = new Map(
-        workLogAggregates.map(wl => [
+        workLogAggregates.map((wl) => [
           wl.taskId,
           {
             totalDuration: wl._sum.durationMin ?? 0,
@@ -1038,8 +1079,8 @@ export const workLogsRouter = createTRPCRouter({
             totalWorkLogs: wl._count.id,
             firstWorkLogDate: wl._min.startTime,
             lastWorkLogDate: wl._max.startTime,
-          }
-        ])
+          },
+        ]),
       );
 
       // Process data in memory-efficient way
@@ -1065,7 +1106,9 @@ export const workLogsRouter = createTRPCRouter({
 
         exportData.push({
           projectName: task.project.name,
-          moduleName: task.module?.name ? `${task.module?.crId ? `[${task.module?.crId}] ` : ''}${task.module?.name}` : 'No Module',
+          moduleName: task.module?.name
+            ? `${task.module?.crId ? `[${task.module?.crId}] ` : ""}${task.module?.name}`
+            : "No Module",
           taskTitle: task.crId ? `[${task.crId}] ${task.title}` : task.title,
           taskType: task.type,
           totalDuration: durationToUse,
@@ -1130,7 +1173,7 @@ export const workLogsRouter = createTRPCRouter({
 
       // Build orderBy clause
       let orderBy: Prisma.WorkLogOrderByWithRelationInput;
-      
+
       // Handle nested sorting (e.g., user.name, task.title, etc.)
       if (sortBy === "user.name") {
         orderBy = { user: { name: sortOrder } };
@@ -1169,6 +1212,7 @@ export const workLogsRouter = createTRPCRouter({
                 id: true,
                 title: true,
                 type: true,
+                status: true,
                 crId: true,
                 project: {
                   select: {
@@ -1251,7 +1295,7 @@ export const workLogsRouter = createTRPCRouter({
 
       // Build orderBy clause
       let orderBy: Prisma.WorkLogOrderByWithRelationInput;
-      
+
       // Handle nested sorting (e.g., user.name, task.title, etc.)
       if (sortBy === "user.name") {
         orderBy = { user: { name: sortOrder } };
@@ -1288,6 +1332,7 @@ export const workLogsRouter = createTRPCRouter({
               id: true,
               title: true,
               type: true,
+              status: true,
               crId: true,
               project: {
                 select: {
