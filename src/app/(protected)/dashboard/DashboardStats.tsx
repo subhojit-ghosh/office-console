@@ -185,7 +185,9 @@ function AnalyticsDashboard() {
       <Group justify="space-between" px="md" mb="sm">
         <Group gap="xs">
           <IconHomeFilled />
-          <Title size="lg">Dashboard Analytics</Title>
+          <Title size="lg">
+            Dashboard Analytics <span className="text-xs">(Experimental)</span>
+          </Title>
         </Group>
       </Group>
 
