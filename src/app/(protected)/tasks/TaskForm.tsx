@@ -380,7 +380,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       />
                     )}
                   </Tabs.Panel>
-                  {mode === "edit" && (
+                  {mode === "edit" && !isClientRole(session?.user.role) && (
                     <Tabs.Panel value="comments" pt="md">
                       <TaskComments
                         taskId={id!}
@@ -388,7 +388,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                       />
                     </Tabs.Panel>
                   )}
-                  {mode === "edit" && (
+                  {mode === "edit" && !isClientRole(session?.user.role) && (
                     <>
                       <Tabs.Panel value="work-logs" pt="md">
                         <TaskWorkLogs
