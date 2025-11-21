@@ -10,6 +10,7 @@ import {
   getExportDataSchema,
   getFlatWorkLogsSchema,
   getFlatWorkLogsForExportSchema,
+  getRecentTasksSchema,
 } from "~/schemas/work-log.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -1362,5 +1363,143 @@ export const workLogsRouter = createTRPCRouter({
       return {
         workLogs: transformedWorkLogs,
       };
+    }),
+
+  // Get recent tasks for quick log modal
+  getRecentTasks: protectedProcedure
+    .input(getRecentTasksSchema)
+    .query(async ({ ctx, input }) => {
+      const { limit = 10, includeTaskId } = input;
+      const userId = ctx.session.user.id;
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      // Get tasks user has logged time to in last 7 days
+      const recentWorkLogs = await ctx.db.workLog.findMany({
+        where: {
+          userId,
+          startTime: { gte: sevenDaysAgo },
+        },
+        select: {
+          taskId: true,
+          startTime: true,
+        },
+        orderBy: { startTime: "desc" },
+      });
+
+      // Get active tasks assigned to user (IN_PROGRESS or IN_REVIEW)
+      const activeTasks = await ctx.db.task.findMany({
+        where: {
+          assignees: { some: { id: userId } },
+          status: { in: ["IN_PROGRESS", "IN_REVIEW"] },
+          archivedAt: null,
+        },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          type: true,
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          module: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      // Deduplicate task IDs from recent worklogs
+      const recentTaskIds = [
+        ...new Set(
+          recentWorkLogs
+            .map((wl) => wl.taskId)
+            .filter((id): id is string => id !== null)
+        ),
+      ];
+
+      if (includeTaskId && !recentTaskIds.includes(includeTaskId)) {
+        recentTaskIds.push(includeTaskId);
+      }
+
+      // Fetch full task details for recent worklogs
+      const recentTasks = await ctx.db.task.findMany({
+        where: {
+          id: { in: recentTaskIds },
+          archivedAt: null,
+        },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          type: true,
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          module: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      // Combine and deduplicate
+      type TaskWithActivity = {
+        id: string;
+        title: string;
+        status: string;
+        type: string;
+        project: { id: string; name: string };
+        module: { id: string; name: string } | null;
+        lastActivity: Date;
+      };
+
+      const taskMap = new Map<string, TaskWithActivity>();
+
+      // Add recent tasks first (most recent from worklogs)
+      recentTasks.forEach((task) => {
+        const mostRecentLog = recentWorkLogs.find(
+          (wl) => wl.taskId === task.id
+        );
+        
+        // If this is the included task, prioritize it
+        const activityDate =
+          task.id === includeTaskId
+            ? new Date()
+            : mostRecentLog?.startTime ?? new Date(0);
+
+        taskMap.set(task.id, {
+          ...task,
+          lastActivity: activityDate,
+        });
+      });
+
+      // Add active tasks (if not already in map)
+      activeTasks.forEach((task) => {
+        if (!taskMap.has(task.id)) {
+          taskMap.set(task.id, {
+            ...task,
+            lastActivity: new Date(0), // Lower priority than recent logs
+          });
+        }
+      });
+
+      // Sort by lastActivity and limit
+      const sortedTasks = Array.from(taskMap.values())
+        .sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime())
+        .slice(0, limit)
+        .map(({ lastActivity, ...task }) => task);
+
+      return sortedTasks;
     }),
 });

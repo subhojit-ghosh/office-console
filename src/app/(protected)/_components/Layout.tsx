@@ -5,7 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 import MobileHeader from "./MobileHeader";
 import { Navbar } from "./Navbar";
 
-import Feedback from "./Feedback";
+import QuickLogFab from "./QuickLogFab";
 import classes from "./Layout.module.css";
 
 export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -29,7 +29,7 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
       </AppShell.Navbar>
       <AppShell.Main pt="md" className={classes.mainWithMobileHeader}>
         {children}
-        <Feedback />
+        <QuickLogFab />
         <div style={{ height: 100 }} />
       </AppShell.Main>
       {/* <div

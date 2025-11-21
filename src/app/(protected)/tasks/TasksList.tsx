@@ -26,6 +26,7 @@ import {
   IconArchive,
   IconCalendar,
   IconCheck,
+  IconClock,
   IconDotsVertical,
   IconFilter2,
   IconPlus,
@@ -51,6 +52,7 @@ import type { AppRouter } from "~/server/api/root";
 import { api, apiClient } from "~/trpc/react";
 import { isClientRole } from "~/utils/roles";
 import TaskForm from "./TaskForm";
+import QuickLogModal from "~/components/QuickLogModal";
 
 type TasksResponse = inferRouterOutputs<AppRouter>["tasks"]["getAll"];
 
@@ -93,6 +95,11 @@ export default function TasksList() {
   useEffect(() => {
     const currentFilters = { ...filters };
 
+    // Default to current user if not hidden and no assignee filter set
+    if (!shouldHideAssignees && session?.user.id && !filters.assignee) {
+      currentFilters.assignee = session.user.id;
+    }
+
     const projectId = searchParams.get("projectId");
     if (projectId) {
       currentFilters.projectId = projectId;
@@ -106,13 +113,21 @@ export default function TasksList() {
     setFilters(currentFilters);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [session?.user.id, shouldHideAssignees]);
 
   const assigneesQuery = api.users.getAllMinimal.useQuery();
   const projectsQuery = api.projects.getAllMinimal.useQuery();
   const modulesQuery = api.modules.getAllMinimal.useQuery({
     projectId: filters.projectId,
   });
+
+  const { data: recentTasks } = api.workLogs.getRecentTasks.useQuery({
+    limit: 50,
+  });
+  const recentTaskIds = useMemo(
+    () => new Set(recentTasks?.map((t) => t.id)),
+    [recentTasks],
+  );
 
   const { data, isPending } = api.tasks.getAll.useQuery({
     page,
@@ -147,6 +162,7 @@ export default function TasksList() {
   });
 
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const [quickLogTaskId, setQuickLogTaskId] = useState<string | null>(null);
 
   const updateStatus = api.tasks.updateField.useMutation({
     onSuccess: async () => {
@@ -470,11 +486,7 @@ export default function TasksList() {
               />
             ),
           },
-          {
-            accessor: "module.name",
-            title: "Module",
-            render: (t) => t.module?.name ?? "-",
-          },
+
           {
             accessor: "project.name",
             title: "Project",
@@ -518,7 +530,7 @@ export default function TasksList() {
             title: "Assignees",
             hidden: shouldHideAssignees,
             render: (row) => {
-              const maxVisible = 4;
+              const maxVisible = 3;
               const assignees = row.assignees;
               const visibleAssignees = assignees.slice(0, maxVisible);
               const extraAssignees = assignees.slice(maxVisible);
@@ -549,7 +561,17 @@ export default function TasksList() {
             width: 100,
             render: (row) => (
               <Group gap={4} justify="center" wrap="nowrap">
-                {selectedStatusGroup === "PENDING" && (
+                <Tooltip label="Log Time" withArrow>
+                  <ActionIcon
+                    variant="subtle"
+                    color="violet"
+                    onClick={() => setQuickLogTaskId(row.id)}
+                  >
+                    <IconClock size={18} />
+                  </ActionIcon>
+                </Tooltip>
+                {(selectedStatusGroup === "PENDING" ||
+                  selectedStatusGroup === "ACTIVE") && (
                   <Tooltip label="Mark as Done" withArrow>
                     <ActionIcon
                       variant="subtle"
@@ -612,6 +634,11 @@ export default function TasksList() {
         }}
         mode={searchParams.get("selectedTask") === "new" ? "add" : "edit"}
         id={searchParams.get("selectedTask") ?? null}
+      />
+      <QuickLogModal
+        opened={!!quickLogTaskId}
+        onClose={() => setQuickLogTaskId(null)}
+        preSelectedTaskId={quickLogTaskId ?? undefined}
       />
     </>
   );

@@ -243,12 +243,16 @@ export default function TaskWorkLogs({
           ))}
         </div>
         <Button
+          type="button"
           variant="subtle"
           size="xs"
           leftSection={
             opened ? <IconX size={14} /> : <IconClockPlus size={14} />
           }
-          onClick={() => toggle()}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggle();
+          }}
           color={opened ? "red" : "blue"}
         >
           {opened ? "Cancel" : "Add"}

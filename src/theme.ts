@@ -48,7 +48,7 @@ export const theme = createTheme({
     },
     Paper: {
       defaultProps: {
-        shadow: "md",
+        // shadow: "md",
         radius: "md",
       },
     },

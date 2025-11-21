@@ -67,3 +67,8 @@ export const getFlatWorkLogsForExportSchema = z.object({
   userId: z.string().optional(),
   moduleId: z.string().optional(),
 });
+
+export const getRecentTasksSchema = z.object({
+  limit: z.number().int().min(1).max(50).default(10).optional(),
+  includeTaskId: z.string().optional(),
+});
