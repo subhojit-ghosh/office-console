@@ -208,22 +208,28 @@ export const dashboardRouter = createTRPCRouter({
         0,
       );
 
-      // Calculate pending tasks (Total - Completed)
-      const pendingTasks = totalTasks - completedTasks;
+      // Calculate pending tasks (Backlog, Todo, Blocked) - Current State (No Date Filter)
+      const pendingTasks = await ctx.db.task.count({
+        where: {
+          assignees: { some: { id: targetUserId } },
+          status: { in: TASK_STATUS_FILTERS.PENDING },
+        },
+      });
 
-      // Calculate overdue tasks
+      // Calculate active tasks (In Progress, In Review) - Current State (No Date Filter)
+      const activeTasks = await ctx.db.task.count({
+        where: {
+          assignees: { some: { id: targetUserId } },
+          status: { in: TASK_STATUS_FILTERS.ACTIVE },
+        },
+      });
+
+      // Calculate overdue tasks - Current State (No Date Filter)
       const overdueTasks = await ctx.db.task.count({
         where: {
-          assignees: {
-            some: { id: targetUserId },
-          },
-          status: {
-            not: "DONE",
-          },
-          dueDate: {
-            lt: new Date(),
-          },
-          ...(taskDateFilter || {}),
+          assignees: { some: { id: targetUserId } },
+          status: { notIn: TASK_STATUS_FILTERS.COMPLETED },
+          dueDate: { lt: new Date() },
         },
       });
 
@@ -231,8 +237,9 @@ export const dashboardRouter = createTRPCRouter({
         completionRate: Math.round(completionRate),
         onTimeDelivery: Math.round(onTimeDelivery),
         tasksCompleted: completedTasks,
-        hoursLogged: Math.round(totalHours * 10) / 10, // Round to 1 decimal
+        hoursLogged: Math.round(totalHours * 10) / 10,
         pendingTasks,
+        activeTasks,
         overdueTasks,
       };
     }),
