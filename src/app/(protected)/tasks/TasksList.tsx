@@ -146,6 +146,8 @@ export default function TasksList() {
     },
   });
 
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+
   const updateStatus = api.tasks.updateField.useMutation({
     onSuccess: async () => {
       await utils.tasks.getAll.invalidate();
@@ -153,6 +155,10 @@ export default function TasksList() {
         message: "Task completed successfully",
         color: "green",
       });
+      setUpdatingTaskId(null);
+    },
+    onError: () => {
+      setUpdatingTaskId(null);
     },
   });
 
@@ -547,14 +553,15 @@ export default function TasksList() {
                     <ActionIcon
                       variant="subtle"
                       color="green"
-                      onClick={() =>
+                      onClick={() => {
+                        setUpdatingTaskId(row.id);
                         updateStatus.mutate({
                           id: row.id,
                           key: "status",
                           value: "DONE",
-                        })
-                      }
-                      loading={updateStatus.isPending}
+                        });
+                      }}
+                      loading={updatingTaskId === row.id}
                     >
                       <IconCheck size={18} />
                     </ActionIcon>
