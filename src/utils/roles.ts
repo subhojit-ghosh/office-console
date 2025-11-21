@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/generated/browser";
 
 // NOTE: Keep legacy "CLIENT" check temporarily to support existing sessions/data during migration.
 export function isClientRole(role: UserRole | null | undefined): boolean {

@@ -1,4 +1,4 @@
-import { UserRole, type Prisma } from "@prisma/client";
+import { UserRole, type Prisma } from "@prisma/generated/server";
 import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import {
   createModuleSchema,

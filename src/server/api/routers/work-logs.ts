@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/generated/server";
 import {
   createWotkLogSchema,
   deleteWorkLogSchema,
@@ -13,7 +13,7 @@ import {
 } from "~/schemas/work-log.schema";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/generated/server";
 import { isClientRole } from "~/utils/roles";
 
 // Type definitions for hierarchical structure

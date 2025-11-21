@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/generated/browser";
 import { isClientRole } from "~/utils/roles";
 
 const userRoleEnum = z.nativeEnum(UserRole);

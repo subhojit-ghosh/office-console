@@ -21,7 +21,7 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { type Task, type TaskStatus } from "@prisma/client";
+import { type Task, type TaskStatus } from "@prisma/generated/browser";
 import {
   IconArchive,
   IconCalendar,

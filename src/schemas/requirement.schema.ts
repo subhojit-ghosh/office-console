@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { RequirementPriority, RequirementStatus, RequirementType } from "@prisma/client";
+import { RequirementPriority, RequirementStatus, RequirementType } from "@prisma/generated/browser";
 
 export const getAllRequirementsSchema = z.object({
   page: z.number().int().min(1).default(1).optional().nullable(),

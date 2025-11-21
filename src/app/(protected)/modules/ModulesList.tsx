@@ -14,7 +14,7 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/generated/browser";
 import {
   IconDotsVertical,
   IconPlus,

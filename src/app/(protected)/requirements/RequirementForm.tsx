@@ -16,7 +16,7 @@ import {
   RequirementStatus,
   RequirementType,
   type Requirement,
-} from "@prisma/client";
+} from "@prisma/generated/browser";
 import { IconMessage } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import { zodResolver } from "mantine-form-zod-resolver";

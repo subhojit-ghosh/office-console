@@ -1,5 +1,5 @@
 import { Avatar, Badge, Grid, Text } from "@mantine/core";
-import { TaskActivityType } from "@prisma/client";
+import { TaskActivityType } from "@prisma/generated/browser";
 import { IconArrowRight } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import {

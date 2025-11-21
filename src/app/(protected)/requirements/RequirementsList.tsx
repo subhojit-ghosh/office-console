@@ -4,7 +4,7 @@ import { ActionIcon, Box, Button, Group, Menu, Popover, Select, Text, TextInput,
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { RequirementPriority, RequirementStatus, RequirementType } from "@prisma/client";
+import type { RequirementPriority, RequirementStatus, RequirementType } from "@prisma/generated/browser";
 import { IconDotsVertical, IconFileDescriptionFilled, IconFilter2, IconPlus, IconSearch, IconTrash } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";

@@ -1,6 +1,12 @@
-import { PrismaClient, UserRole } from "@prisma/client";
+import { PrismaClient, UserRole } from "@prisma/generated/server";
+import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
+import 'dotenv/config';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL!;
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   // Map legacy CLIENT users to CLIENT_USER

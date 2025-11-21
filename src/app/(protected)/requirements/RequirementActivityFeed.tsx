@@ -4,7 +4,7 @@ import {
   type RequirementPriority,
   type RequirementStatus,
   type RequirementType,
-} from "@prisma/client";
+} from "@prisma/generated/browser";
 import { IconArrowRight } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import {

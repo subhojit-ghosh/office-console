@@ -13,7 +13,7 @@ import {
 import { useDebouncedState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import type { User } from "@prisma/client";
+import type { User } from "@prisma/generated/browser";
 import {
   IconDotsVertical,
   IconPlus,
@@ -24,7 +24,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 import dayjs from "dayjs";
 import { type DataTableSortStatus } from "mantine-datatable";
 import { useMemo, useState } from "react";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/generated/browser";
 
 import { FaUsers } from "react-icons/fa";
 import AppTable from "~/components/AppTable";

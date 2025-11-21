@@ -1,4 +1,4 @@
-import { UserRole, type Prisma } from "@prisma/client";
+import { UserRole, type Prisma } from "@prisma/generated/server";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import {

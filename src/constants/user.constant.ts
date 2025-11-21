@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/generated/browser";
 
 export const userRoleOptions = [
   { value: UserRole.ADMIN, label: "Admin" },

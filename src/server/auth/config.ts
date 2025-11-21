@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import type { UserRole } from "@prisma/client";
+import type { UserRole } from "@prisma/generated/server";
 import bcrypt from "bcryptjs";
 import {
   type DefaultSession,

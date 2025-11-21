@@ -15,7 +15,7 @@ import {
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { type Task } from "@prisma/client";
+import { type Task } from "@prisma/generated/browser";
 import {
   IconActivity,
   IconClockHour4,

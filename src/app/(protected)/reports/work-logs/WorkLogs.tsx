@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import AppTable from "~/components/AppTable";
 import { api, apiClient } from "~/trpc/react";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/generated/browser";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
 import { exportServerDataToExcel } from "~/utils/excel-export";
 import { ProjectModules } from "./ProjectModules";

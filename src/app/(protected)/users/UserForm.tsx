@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { UserRole, type User } from "@prisma/client";
+import { UserRole, type User } from "@prisma/generated/browser";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";

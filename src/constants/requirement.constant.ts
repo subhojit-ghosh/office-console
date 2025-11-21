@@ -2,7 +2,7 @@ import {
   RequirementPriority,
   RequirementStatus,
   RequirementType,
-} from "@prisma/client";
+} from "@prisma/generated/browser";
 import {
   IconBug,
   IconBulb,

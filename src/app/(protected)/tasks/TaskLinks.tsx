@@ -18,7 +18,7 @@ import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { TaskLinkType } from "@prisma/client";
+import { TaskLinkType } from "@prisma/generated/browser";
 import {
   IconCheck,
   IconLink,

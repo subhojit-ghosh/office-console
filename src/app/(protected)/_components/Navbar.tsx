@@ -25,7 +25,7 @@ import { BsBarChartLineFill } from "react-icons/bs";
 import { FaCubes, FaTasks, FaUsers, FaUserTie } from "react-icons/fa";
 
 import { useMediaQuery } from "@mantine/hooks";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/generated/browser";
 import { useState } from "react";
 import { env } from "~/env";
 import classes from "./Navbar.module.css";

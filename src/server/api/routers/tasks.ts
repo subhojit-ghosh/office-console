@@ -3,7 +3,7 @@ import {
   TaskStatus,
   UserRole,
   type Prisma,
-} from "@prisma/client";
+} from "@prisma/generated/server";
 import {
   archiveTaskSchema,
   createTaskCommentSchema,

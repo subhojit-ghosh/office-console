@@ -1,5 +1,5 @@
-import type { Prisma } from "@prisma/client";
-import { RequirementActivityType, RequirementPriority, RequirementStatus, RequirementType, UserRole } from "@prisma/client";
+import type { Prisma } from "@prisma/generated/server";
+import { RequirementActivityType, RequirementPriority, RequirementStatus, RequirementType, UserRole } from "@prisma/generated/server";
 import { TRPCError } from "@trpc/server";
 import {
   createRequirementSchema,
