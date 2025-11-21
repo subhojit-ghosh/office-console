@@ -43,7 +43,10 @@ export default function WorkLogs() {
       session?.user?.role !== UserRole.CLIENT_ADMIN &&
       session?.user?.role !== UserRole.CLIENT_USER,
   });
-  const usersQuery = api.users.getAllMinimal.useQuery();
+  // Fetch users only for ADMIN role
+  const usersQuery = api.users.getAllMinimal.useQuery(undefined, {
+    enabled: session?.user?.role === UserRole.ADMIN,
+  });
   const modulesQuery = api.modules.getAllMinimal.useQuery({
     projectId: filters.projectId || undefined,
   });
@@ -53,6 +56,12 @@ export default function WorkLogs() {
     filters.dateRange[0] ? new Date(filters.dateRange[0]) : null,
     filters.dateRange[1] ? new Date(filters.dateRange[1]) : null,
   ];
+
+  // Auto-set userId for STAFF (they can only see their own logs)
+  const effectiveUserId =
+    session?.user?.role === UserRole.STAFF
+      ? session.user.id
+      : filters.userId || undefined;
 
   // Load projects (first level)
   const { data: projects, isPending: projectsLoading } =
@@ -135,7 +144,7 @@ export default function WorkLogs() {
               session?.user?.role !== UserRole.CLIENT_USER
                 ? filters.clientId || undefined
                 : undefined,
-            userId: filters.userId || undefined,
+            userId: effectiveUserId,
             moduleId: filters.moduleId || undefined,
           });
 
@@ -234,23 +243,26 @@ export default function WorkLogs() {
             disabled={modulesQuery.isLoading || !filters.projectId}
             style={{ width: 200 }}
           />
-          <Select
-            placeholder="All Users"
-            clearable
-            searchable
-            data={
-              usersQuery.data?.map((u) => ({
-                value: u.id,
-                label: u.name,
-              })) ?? []
-            }
-            value={filters.userId}
-            onChange={(value) =>
-              setFilters({ ...filters, userId: value ?? "" })
-            }
-            disabled={usersQuery.isLoading}
-            style={{ width: 200 }}
-          />
+          {/* User selection - ADMIN only */}
+          {session?.user?.role === UserRole.ADMIN && (
+            <Select
+              placeholder="All Users"
+              clearable
+              searchable
+              data={
+                usersQuery.data?.map((u) => ({
+                  value: u.id,
+                  label: u.name, // Names only, no emails
+                })) ?? []
+              }
+              value={filters.userId}
+              onChange={(value) =>
+                setFilters({ ...filters, userId: value ?? "" })
+              }
+              disabled={usersQuery.isLoading}
+              style={{ width: 200 }}
+            />
+          )}
         </Group>
         <Button
           leftSection={isExporting ? undefined : <IconDownload size={16} />}
@@ -367,7 +379,7 @@ export default function WorkLogs() {
                 : undefined
             }
             projectId={filters.projectId || undefined}
-            userId={filters.userId || undefined}
+            userId={effectiveUserId}
             moduleId={filters.moduleId || undefined}
           />
         </Tabs.Panel>
