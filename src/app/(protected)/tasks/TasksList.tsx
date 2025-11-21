@@ -500,7 +500,8 @@ export default function TasksList() {
               if (!row.dueDate) return "-";
               const isOverdue =
                 dayjs(row.dueDate).isBefore(dayjs(), "day") &&
-                TASK_STATUS_FILTERS.PENDING.includes(row.status);
+                (TASK_STATUS_FILTERS.PENDING.includes(row.status) ||
+                  TASK_STATUS_FILTERS.ACTIVE.includes(row.status));
               return (
                 <Group gap={4}>
                   <IconCalendar size={14} color={isOverdue ? "red" : "gray"} />
