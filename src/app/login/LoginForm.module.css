@@ -1,11 +1,30 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: light-dark(
+    linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%),
+    linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%)
+  );
+  padding: 20px;
+}
+
 .title {
-  font-family: Outfit, var(--mantine-font-family);
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: light-dark(#1f2937, #f9fafb);
 }
 
 .subtitle {
-  color: var(--mantine-color-dimmed);
-  font-size: var(--mantine-font-size-sm);
+  font-size: 16px;
+  color: light-dark(#6b7280, #d1d5db);
+  margin-bottom: 32px;
   text-align: center;
-  margin-top: 5px;
+}
+
+.paper {
+  width: 100%;
+  max-width: 420px;
 }

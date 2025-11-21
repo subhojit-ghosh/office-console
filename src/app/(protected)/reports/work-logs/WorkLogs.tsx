@@ -260,7 +260,7 @@ export default function WorkLogs() {
             projectsLoading || filteredProjects.length === 0 || isExporting
           }
           variant="light"
-          color="blue"
+          color="violet"
           style={{ minWidth: 140 }}
         >
           {isExporting ? "Exporting..." : "Export to Excel"}

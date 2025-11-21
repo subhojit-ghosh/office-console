@@ -4,8 +4,8 @@
   padding: var(--mantine-spacing-md);
   display: flex;
   flex-direction: column;
-  background-color: light-dark(#ffffff, #090909);
-  border-right: 1px solid light-dark(#e7e7e7, #191b1f);
+  background-color: light-dark(#ffffff, #0a0a0b);
+  border-right: 1px solid light-dark(#f0f0f0, #1a1a1a);
 
   @media (max-width: 48em) {
     width: 100%;
@@ -19,13 +19,14 @@
 .header {
   padding-bottom: var(--mantine-spacing-xs);
   margin-bottom: var(--mantine-spacing-md);
-  border-bottom: 1px solid light-dark(#e7e7e7, #191b1f);
+  border-bottom: 1px solid light-dark(#f0f0f0, #1a1a1a);
 }
 
 .footer {
   padding-top: var(--mantine-spacing-xs);
   margin-top: var(--mantine-spacing-xs);
-  border-top: 1px solid light-dark(#e7e7e7, #191b1f);
+  border-top: 1px solid light-dark(#f0f0f0, #1a1a1a);
+  box-shadow: 0 -1px 3px rgb(0 0 0 / 0.03);
 }
 .link {
   display: flex;
@@ -34,17 +35,19 @@
   font-size: var(--mantine-font-size-sm);
   color: light-dark(#3f3f46, #e3e4e6);
   padding: 6px 10px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   border-radius: var(--mantine-radius-md);
   font-weight: 500;
+  position: relative;
+  transition: all 200ms ease;
 
   @mixin hover {
-    background-color: light-dark(#e1e1e3, #17181b);
+    background-color: light-dark(#f5f3ff, #2e1065);
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
     text-decoration: none;
 
     .linkIcon {
-      color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+      color: light-dark(#8b5cf6, #a78bfa);
     }
   }
 }
@@ -52,21 +55,23 @@
 /* 🔷 Active styles (text color + weight) always apply when data-active is present */
 .link[data-active] {
   color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-  font-weight: 500;
+  font-weight: 600;
 
   .linkIcon {
-    color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+    color: light-dark(#8b5cf6, #a78bfa);
   }
 }
 
-/* 🔶 Background only when NOT suppressed */
+/* 🔶 Background and border only when NOT suppressed */
 .link[data-active]:not([data-active-no-background]) {
-  background-color: light-dark(#e1e1e3, #17181b);
+  background-color: light-dark(#f5f3ff, #2e1065);
+  border-left: 3px solid light-dark(#8b5cf6, #a78bfa);
+  padding-left: 7px;
 }
 
 /* 🔶 Hover background only if allowed */
 .link[data-active]:not([data-active-no-background]):hover {
-  background-color: light-dark(#e1e1e3, #17181b);
+  background-color: light-dark(#ede9fe, #3b1d7a);
 }
 
 .linkIcon {
@@ -74,6 +79,7 @@
   margin-right: var(--mantine-spacing-sm);
   width: 20px;
   height: 20px;
+  transition: color 200ms ease;
 }
 
 .colorSchemeLightIcon {

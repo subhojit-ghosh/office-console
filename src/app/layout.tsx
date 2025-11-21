@@ -11,7 +11,6 @@ import "~/styles/globals.css";
 import {
   ColorSchemeScript,
   MantineProvider,
-  createTheme,
   mantineHtmlProps,
 } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
@@ -22,13 +21,9 @@ import { type Metadata } from "next";
 import { Outfit } from "next/font/google";
 
 import { env } from "~/env";
+import { theme } from "~/theme";
 import { TRPCReactProvider } from "~/trpc/react";
 import { HydrateClient } from "~/trpc/server";
-
-const theme = createTheme({
-  fontFamily: "var(--font-outfit-sans)",
-  defaultRadius: "md",
-});
 
 export const metadata: Metadata = {
   title: env.NEXT_PUBLIC_APP_TITLE,

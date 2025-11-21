@@ -4,7 +4,7 @@
 /* @tailwind utilities; */
 
 :root[data-mantine-color-scheme="light"] {
-  --mantine-color-body: #f5f5f5;
+  --mantine-color-body: #fafbfc;
 }
 :root[data-mantine-color-scheme="dark"] {
   --mantine-color-body: #101012;
@@ -12,10 +12,21 @@
 
 .mantine-datatable-header {
   background-color: light-dark(#e1e1e3, #17181b);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
 }
 
 :where([data-mantine-color-scheme="dark"]) .mantine-datatable-row {
   --table-border-color: #191b1f;
+}
+
+.mantine-datatable-row:hover {
+  @mixin light {
+    background-color: #f5f5f7;
+  }
+  @mixin dark {
+    background-color: #1a1b1f;
+  }
 }
 
 .mantine-datatable-table thead tr th:first-child,

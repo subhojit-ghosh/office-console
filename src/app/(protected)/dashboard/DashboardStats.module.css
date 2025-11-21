@@ -1,33 +1,47 @@
 .card {
+  transition: all 200ms ease;
+  border: 1px solid light-dark(#f0f0f0, #1f1f23);
+
   @mixin light {
     background-color: var(--mantine-color-white);
   }
   @mixin dark {
-    background-color: #17181b;
+    background-color: #0f0f11;
     color: var(--mantine-color-white);
+  }
+
+  @mixin hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+    border-color: light-dark(#8b5cf6, #6d28d9);
   }
 }
 
 .value {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1;
+  color: light-dark(#1f2937, #f9fafb);
+  margin-bottom: 8px;
 }
 
 .diff {
   line-height: 1;
   display: flex;
   align-items: center;
+  font-size: 14px;
 }
 
 .icon {
-  color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-1));
+  color: light-dark(#8b5cf6, #a78bfa);
+  opacity: 0.9;
 }
 
 .title {
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 13px;
   text-transform: uppercase;
-  @mixin dark {
-    color: var(--mantine-color-white);
-  }
+  letter-spacing: 0.5px;
+  color: light-dark(#6b7280, #9ca3af);
+  margin-bottom: 12px;
 }

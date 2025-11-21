@@ -8,6 +8,7 @@ import {
   Container,
   Paper,
   PasswordInput,
+  Text as MantineText,
   TextInput,
   Title,
 } from "@mantine/core";
@@ -62,45 +63,53 @@ export default function LoginForm() {
   };
 
   return (
-    <Container size={420} my={40}>
-      <Title ta="center" className={classes.title}>
-        {env.NEXT_PUBLIC_APP_TITLE}
-      </Title>
-      <Paper withBorder shadow="sm" p={22} mt={30}>
-        <form onSubmit={form.onSubmit(submitHandler)}>
-          <TextInput
-            label="Email"
-            withAsterisk
-            key={form.key("email")}
-            {...form.getInputProps("email")}
-          />
-          <PasswordInput
-            label="Password"
-            mt="md"
-            withAsterisk
-            key={form.key("password")}
-            {...form.getInputProps("password")}
-          />
-          {!!form.errors.api && (
-            <Alert
-              variant="light"
-              color="red"
-              title={form.errors.api}
-              icon={<IconInfoCircle />}
-              mt="xl"
+    <div className={classes.container}>
+      <div className={classes.paper}>
+        <Title ta="center" className={classes.title}>
+          {env.NEXT_PUBLIC_APP_TITLE}
+        </Title>
+        <MantineText className={classes.subtitle}>
+          Sign in to your account to continue
+        </MantineText>
+        <Paper withBorder shadow="lg" p={32} radius="md">
+          <form onSubmit={form.onSubmit(submitHandler)}>
+            <TextInput
+              label="Email"
+              placeholder="your@email.com"
+              withAsterisk
+              key={form.key("email")}
+              {...form.getInputProps("email")}
             />
-          )}
-          <Button
-            fullWidth
-            mt="xl"
-            type="submit"
-            loading={isLoading}
-            disabled={isLoading}
-          >
-            Login
-          </Button>
-        </form>
-      </Paper>
-    </Container>
+            <PasswordInput
+              label="Password"
+              placeholder="Enter your password"
+              mt="md"
+              withAsterisk
+              key={form.key("password")}
+              {...form.getInputProps("password")}
+            />
+            {!!form.errors.api && (
+              <Alert
+                variant="light"
+                color="red"
+                title={form.errors.api}
+                icon={<IconInfoCircle />}
+                mt="xl"
+              />
+            )}
+            <Button
+              fullWidth
+              mt="xl"
+              type="submit"
+              loading={isLoading}
+              disabled={isLoading}
+              size="md"
+            >
+              Sign In
+            </Button>
+          </form>
+        </Paper>
+      </div>
+    </div>
   );
 }
