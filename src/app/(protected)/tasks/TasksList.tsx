@@ -9,6 +9,7 @@ import {
   Group,
   Menu,
   Popover,
+  SegmentedControl,
   Select,
   Text,
   TextInput,
@@ -23,6 +24,8 @@ import { notifications } from "@mantine/notifications";
 import { type Task, type TaskStatus } from "@prisma/client";
 import {
   IconArchive,
+  IconCalendar,
+  IconCheck,
   IconDotsVertical,
   IconFilter2,
   IconPlus,
@@ -143,6 +146,16 @@ export default function TasksList() {
     },
   });
 
+  const updateStatus = api.tasks.updateField.useMutation({
+    onSuccess: async () => {
+      await utils.tasks.getAll.invalidate();
+      notifications.show({
+        message: "Task completed successfully",
+        color: "green",
+      });
+    },
+  });
+
   const deleteConfirmation = (task: TasksResponse["tasks"][0]) => {
     modals.openConfirmModal({
       title: "Archive Task",
@@ -161,25 +174,18 @@ export default function TasksList() {
         <Group gap="xs">
           <FaTasks />
           <Title size="lg">Tasks</Title>
-          <Button.Group ml="md">
-            <Button
-              variant={selectedStatusGroup == "PENDING" ? "filled" : "default"}
-              onClick={() => setSelectedStatusGroup("PENDING")}
-              size="xs"
-            >
-              Pending
-            </Button>
-            <Button
-              variant={
-                selectedStatusGroup == "COMPLETED" ? "filled" : "default"
-              }
-              onClick={() => setSelectedStatusGroup("COMPLETED")}
-              size="xs"
-              color="green"
-            >
-              Completed
-            </Button>
-          </Button.Group>
+          <SegmentedControl
+            ml="md"
+            size="xs"
+            value={selectedStatusGroup}
+            onChange={(value) =>
+              setSelectedStatusGroup(value as keyof typeof TASK_STATUS_FILTERS)
+            }
+            data={[
+              { label: "Pending", value: "PENDING" },
+              { label: "Completed", value: "COMPLETED" },
+            ]}
+          />
           <TextInput
             size="xs"
             type="search"
@@ -319,7 +325,7 @@ export default function TasksList() {
         </Group>
         <Button
           style={{ float: "right" }}
-          variant="outline"
+          variant="filled"
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             const params = new URLSearchParams(searchParams);
@@ -477,9 +483,16 @@ export default function TasksList() {
                 dayjs(row.dueDate).isBefore(dayjs(), "day") &&
                 TASK_STATUS_FILTERS.PENDING.includes(row.status);
               return (
-                <span style={isOverdue ? { color: "red" } : undefined}>
-                  {dayjs(row.dueDate).format("DD MMM YYYY")}
-                </span>
+                <Group gap={4}>
+                  <IconCalendar size={14} color={isOverdue ? "red" : "gray"} />
+                  <Text
+                    size="sm"
+                    c={isOverdue ? "red" : undefined}
+                    fw={isOverdue ? 700 : 400}
+                  >
+                    {dayjs(row.dueDate).format("DD MMM YYYY")}
+                  </Text>
+                </Group>
               );
             },
           },
@@ -527,24 +540,45 @@ export default function TasksList() {
             title: "",
             textAlign: "center",
             width: 100,
-            hidden: session?.user.role !== "ADMIN",
             render: (row) => (
-              <Menu withArrow position="bottom-end">
-                <Menu.Target>
-                  <ActionIcon variant="subtle">
-                    <IconDotsVertical size={18} />
-                  </ActionIcon>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item
-                    color="red"
-                    leftSection={<IconArchive size={14} />}
-                    onClick={() => deleteConfirmation(row)}
-                  >
-                    Archive
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
+              <Group gap={4} justify="center" wrap="nowrap">
+                {selectedStatusGroup === "PENDING" && (
+                  <Tooltip label="Mark as Completed" withArrow>
+                    <ActionIcon
+                      variant="subtle"
+                      color="green"
+                      onClick={() =>
+                        updateStatus.mutate({
+                          id: row.id,
+                          key: "status",
+                          value: "DONE",
+                        })
+                      }
+                      loading={updateStatus.isPending}
+                    >
+                      <IconCheck size={18} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+                {session?.user.role === "ADMIN" && (
+                  <Menu withArrow position="bottom-end">
+                    <Menu.Target>
+                      <ActionIcon variant="subtle">
+                        <IconDotsVertical size={18} />
+                      </ActionIcon>
+                    </Menu.Target>
+                    <Menu.Dropdown>
+                      <Menu.Item
+                        color="red"
+                        leftSection={<IconArchive size={14} />}
+                        onClick={() => deleteConfirmation(row)}
+                      >
+                        Archive
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                )}
+              </Group>
             ),
           },
         ]}
