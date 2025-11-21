@@ -549,16 +549,28 @@ export default function TasksList() {
             render: (row) => (
               <Group gap={4} justify="center" wrap="nowrap">
                 {selectedStatusGroup === "PENDING" && (
-                  <Tooltip label="Mark as Completed" withArrow>
+                  <Tooltip label="Mark as Done" withArrow>
                     <ActionIcon
                       variant="subtle"
                       color="green"
                       onClick={() => {
-                        setUpdatingTaskId(row.id);
-                        updateStatus.mutate({
-                          id: row.id,
-                          key: "status",
-                          value: "DONE",
+                        modals.openConfirmModal({
+                          title: "Mark as Done",
+                          children: (
+                            <Text size="sm">
+                              Are you sure you want to mark this task as done?
+                            </Text>
+                          ),
+                          labels: { confirm: "Mark as Done", cancel: "Cancel" },
+                          confirmProps: { color: "green" },
+                          onConfirm: () => {
+                            setUpdatingTaskId(row.id);
+                            updateStatus.mutate({
+                              id: row.id,
+                              key: "status",
+                              value: "DONE",
+                            });
+                          },
                         });
                       }}
                       loading={updatingTaskId === row.id}
