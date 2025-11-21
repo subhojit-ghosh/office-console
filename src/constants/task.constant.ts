@@ -38,13 +38,8 @@ export const TASK_STATUS_OPTIONS = TASK_STATUSES.map((status) => ({
 }));
 
 export const TASK_STATUS_FILTERS = {
-  PENDING: [
-    "BACKLOG",
-    "TODO",
-    "IN_PROGRESS",
-    "IN_REVIEW",
-    "BLOCKED",
-  ] as TaskStatus[],
+  PENDING: ["BACKLOG", "TODO", "BLOCKED"] as TaskStatus[],
+  ACTIVE: ["IN_PROGRESS", "IN_REVIEW"] as TaskStatus[],
   COMPLETED: ["DONE", "CANCELED"] as TaskStatus[],
 };
 

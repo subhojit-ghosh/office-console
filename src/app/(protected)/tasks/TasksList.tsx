@@ -61,7 +61,7 @@ export default function TasksList() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [selectedStatusGroup, setSelectedStatusGroup] =
-    useState<keyof typeof TASK_STATUS_FILTERS>("PENDING");
+    useState<keyof typeof TASK_STATUS_FILTERS>("ACTIVE");
   const [sortStatus, setSortStatus] = useState<
     DataTableSortStatus<TasksResponse["tasks"][0]>
   >({
@@ -189,6 +189,7 @@ export default function TasksList() {
             }
             data={[
               { label: "Pending", value: "PENDING" },
+              { label: "Active", value: "ACTIVE" },
               { label: "Completed", value: "COMPLETED" },
             ]}
           />
