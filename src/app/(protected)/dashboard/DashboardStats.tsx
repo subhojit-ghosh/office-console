@@ -347,22 +347,49 @@ function AnalyticsDashboard() {
       </SimpleGrid>
 
       {/* Additional Metrics Row */}
-      <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }} px="md" mb="lg">
+      <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} px="md" mb="lg">
+        {/* Pending Tasks */}
         <Paper withBorder p="md" radius="md" className={classes.card}>
-          <Text className={classes.title} mb="sm">
-            Avg. Completion Time
+          <Text className={classes.title} mb="md">
+            Pending Tasks
           </Text>
           {personalMetricsQuery.isLoading ? (
-            <Skeleton height={40} />
+            <Skeleton height={120} />
           ) : (
-            <Group align="flex-end" gap="xs">
-              <Text size="xl" fw={700}>
-                {personalMetricsQuery.data?.avgCompletionDays || 0}
+            <Stack align="center" justify="center" style={{ minHeight: 120 }}>
+              <Text className={classes.value}>
+                {personalMetricsQuery.data?.pendingTasks || 0}
               </Text>
-              <Text size="sm" c="dimmed" pb={2}>
-                days
+              <Text size="sm" c="dimmed">
+                tasks
               </Text>
-            </Group>
+            </Stack>
+          )}
+        </Paper>
+
+        {/* Overdue Tasks */}
+        <Paper withBorder p="md" radius="md" className={classes.card}>
+          <Text className={classes.title} mb="md">
+            Overdue Tasks
+          </Text>
+          {personalMetricsQuery.isLoading ? (
+            <Skeleton height={120} />
+          ) : (
+            <Stack align="center" justify="center" style={{ minHeight: 120 }}>
+              <Text
+                className={classes.value}
+                c={
+                  (personalMetricsQuery.data?.overdueTasks || 0) > 0
+                    ? "red"
+                    : undefined
+                }
+              >
+                {personalMetricsQuery.data?.overdueTasks || 0}
+              </Text>
+              <Text size="sm" c="dimmed">
+                tasks
+              </Text>
+            </Stack>
           )}
         </Paper>
       </SimpleGrid>

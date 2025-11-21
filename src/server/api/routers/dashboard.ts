@@ -208,41 +208,32 @@ export const dashboardRouter = createTRPCRouter({
         0,
       );
 
-      // Calculate average task completion time
-      const completedTasksWithDates = await ctx.db.task.findMany({
+      // Calculate pending tasks (Total - Completed)
+      const pendingTasks = totalTasks - completedTasks;
+
+      // Calculate overdue tasks
+      const overdueTasks = await ctx.db.task.count({
         where: {
           assignees: {
             some: { id: targetUserId },
           },
-          status: "DONE",
-          completedAt: {
-            not: null,
+          status: {
+            not: "DONE",
+          },
+          dueDate: {
+            lt: new Date(),
           },
           ...(taskDateFilter || {}),
         },
-        select: {
-          createdAt: true,
-          completedAt: true,
-        },
       });
-
-      const avgCompletionDays =
-        completedTasksWithDates.length > 0
-          ? completedTasksWithDates.reduce((sum, task) => {
-              if (!task.completedAt) return sum;
-              const days =
-                (task.completedAt.getTime() - task.createdAt.getTime()) /
-                (1000 * 60 * 60 * 24);
-              return sum + days;
-            }, 0) / completedTasksWithDates.length
-          : 0;
 
       return {
         completionRate: Math.round(completionRate),
         onTimeDelivery: Math.round(onTimeDelivery),
         tasksCompleted: completedTasks,
         hoursLogged: Math.round(totalHours * 10) / 10, // Round to 1 decimal
-        avgCompletionDays: Math.round(avgCompletionDays * 10) / 10,
+        pendingTasks,
+        overdueTasks,
       };
     }),
 
