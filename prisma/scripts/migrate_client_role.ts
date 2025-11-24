@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole } from "@prisma/generated/server";
+import { PrismaClient } from "@prisma/generated/server";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import 'dotenv/config';
@@ -9,13 +9,16 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Map legacy CLIENT users to CLIENT_USER
-  const updated = await prisma.user.updateMany({
-    where: { role: "CLIENT" as unknown as UserRole },
-    data: { role: UserRole.CLIENT_USER },
-  });
+  // Use raw SQL to update CLIENT users to CLIENT_USER
+  // This bypasses Prisma's type checking since CLIENT is no longer in the enum
+  const result = await prisma.$executeRawUnsafe(`
+    UPDATE "User" 
+    SET role = 'CLIENT_USER'::"UserRole"
+    WHERE role = 'CLIENT'::"UserRole"
+  `);
+  
   // eslint-disable-next-line no-console
-  console.log(`Updated ${updated.count} users from CLIENT to CLIENT_USER.`);
+  console.log(`Updated ${result} users from CLIENT to CLIENT_USER.`);
 }
 
 main()
