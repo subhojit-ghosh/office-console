@@ -23,12 +23,8 @@
   }
 
   th.mantine-datatable-header-cell-sortable {
-    background-color: red !important;
+    transition: background-color 200ms ease;
   }
-}
-
-.header th .mantine-datatable-header-cell-sortable {
-  background-color: red;
 }
 
 .pagination {
