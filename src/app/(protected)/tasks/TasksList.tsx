@@ -348,7 +348,7 @@ export default function TasksList() {
         </Group>
         <Button
           style={{ float: "right" }}
-          variant="filled"
+          variant="outline"
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             const params = new URLSearchParams(searchParams);
