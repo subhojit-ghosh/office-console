@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import AppTable from "~/components/AppTable";
 import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
+import { type TaskType } from "~/constants/task.constant";
 import classes from "./WorkLogs.module.css";
 import clsx from "clsx";
 import { ModuleTasks } from "./ModuleTasks";
@@ -15,6 +16,7 @@ interface ProjectModulesProps {
   projectId: string;
   dateRange: [Date | null, Date | null];
   clientId?: string;
+  taskType?: TaskType;
   expandedModuleIds: string[];
   setExpandedModuleIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
@@ -23,6 +25,7 @@ export function ProjectModules({
   projectId,
   dateRange,
   clientId,
+  taskType,
   expandedModuleIds,
   setExpandedModuleIds
 }: ProjectModulesProps) {
@@ -30,6 +33,7 @@ export function ProjectModules({
     projectId,
     dateRange,
     clientId,
+    taskType,
   }, {
     enabled: !!projectId,
   });
@@ -93,6 +97,7 @@ export function ProjectModules({
             projectId={projectId}
             dateRange={dateRange}
             clientId={clientId}
+            taskType={taskType}
           />
         ),
       }}

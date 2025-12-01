@@ -113,7 +113,8 @@ export const TaskType = {
   RESEARCH: 'RESEARCH',
   DOCUMENTATION: 'DOCUMENTATION',
   TEST: 'TEST',
-  MEETING: 'MEETING'
+  MEETING: 'MEETING',
+  SUPPORT: 'SUPPORT'
 } as const
 
 export type TaskType = (typeof TaskType)[keyof typeof TaskType]

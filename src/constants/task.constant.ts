@@ -2,6 +2,7 @@ import {
   IconBug,
   IconCalendarEvent,
   IconCircleCheck,
+  IconLifebuoy,
   IconSparkles,
   IconTestPipe,
   IconTrendingUp,
@@ -69,6 +70,7 @@ export const TASK_TYPES = [
   "DOCUMENTATION",
   "TEST",
   "MEETING",
+  "SUPPORT",
 ] as const;
 
 export type TaskType = (typeof TASK_TYPES)[number];
@@ -113,6 +115,11 @@ export const TASK_TYPE_MAP = {
     label: "Meeting",
     icon: IconCalendarEvent,
     color: "cyan",
+  },
+  SUPPORT: {
+    label: "Support",
+    icon: IconLifebuoy,
+    color: "indigo",
   },
 } as const;
 

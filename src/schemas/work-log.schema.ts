@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { parseDate } from "~/utils/date";
+import { TASK_TYPES } from "~/constants/task.constant";
 
 export const getWorkLogsSchema = z.object({
   taskId: z.string().optional().nullable(),
@@ -21,12 +22,14 @@ export const deleteWorkLogSchema = z.object({
 export const getProjectsSchema = z.object({
   dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
   clientId: z.string().optional(),
+  taskType: z.enum(TASK_TYPES).optional(),
 });
 
 export const getModulesSchema = z.object({
   projectId: z.string(),
   dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
   clientId: z.string().optional(),
+  taskType: z.enum(TASK_TYPES).optional(),
 });
 
 export const getTasksSchema = z.object({
@@ -34,6 +37,7 @@ export const getTasksSchema = z.object({
   projectId: z.string(),
   dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
   clientId: z.string().optional(),
+  taskType: z.enum(TASK_TYPES).optional(),
 });
 
 export const getWorkLogsForTaskSchema = z.object({
@@ -44,6 +48,7 @@ export const getExportDataSchema = z.object({
   dateRange: z.tuple([z.date().nullable(), z.date().nullable()]).optional(),
   projectId: z.string().optional(),
   clientId: z.string().optional(),
+  taskType: z.enum(TASK_TYPES).optional(),
 });
 
 export const getFlatWorkLogsSchema = z.object({
@@ -56,6 +61,7 @@ export const getFlatWorkLogsSchema = z.object({
   projectId: z.string().optional(),
   userId: z.string().optional(),
   moduleId: z.string().optional(),
+  taskType: z.enum(TASK_TYPES).optional(),
 });
 
 export const getFlatWorkLogsForExportSchema = z.object({
@@ -66,6 +72,7 @@ export const getFlatWorkLogsForExportSchema = z.object({
   projectId: z.string().optional(),
   userId: z.string().optional(),
   moduleId: z.string().optional(),
+  taskType: z.enum(TASK_TYPES).optional(),
 });
 
 export const getRecentTasksSchema = z.object({

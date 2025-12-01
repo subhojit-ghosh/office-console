@@ -18,6 +18,7 @@ import { api, apiClient } from "~/trpc/react";
 import { UserRole } from "@prisma/generated/browser";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
 import { exportServerDataToExcel } from "~/utils/excel-export";
+import { TASK_TYPE_OPTIONS, type TaskType } from "~/constants/task.constant";
 import { ProjectModules } from "./ProjectModules";
 import WorkLogsTimesheet from "./WorkLogsTimesheet";
 import classes from "./WorkLogs.module.css";
@@ -30,6 +31,7 @@ export default function WorkLogs() {
       clientId: "",
       userId: "",
       moduleId: "",
+      taskType: "",
       dateRange: [null, null] as DatesRangeValue,
     },
     300,
@@ -72,6 +74,7 @@ export default function WorkLogs() {
         session?.user?.role !== UserRole.CLIENT_USER
           ? filters.clientId || undefined
           : undefined,
+      taskType: (filters.taskType as TaskType) || undefined,
     });
 
   const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>([]);
@@ -146,6 +149,7 @@ export default function WorkLogs() {
                 : undefined,
             userId: effectiveUserId,
             moduleId: filters.moduleId || undefined,
+            taskType: (filters.taskType as TaskType) || undefined,
           });
 
         await exportFlatWorkLogsToExcel(exportData.workLogs, dateRangeForAPI);
@@ -159,6 +163,7 @@ export default function WorkLogs() {
             session?.user?.role !== UserRole.CLIENT_USER
               ? filters.clientId || undefined
               : undefined,
+          taskType: (filters.taskType as TaskType) || undefined,
         });
 
         await exportServerDataToExcel(exportData.data, dateRangeForAPI);
@@ -241,6 +246,20 @@ export default function WorkLogs() {
               setFilters({ ...filters, moduleId: value ?? "" })
             }
             disabled={modulesQuery.isLoading || !filters.projectId}
+            style={{ width: 200 }}
+          />
+          <Select
+            placeholder="All Task Types"
+            clearable
+            searchable
+            data={TASK_TYPE_OPTIONS.map((option) => ({
+              value: option.value,
+              label: option.label,
+            }))}
+            value={filters.taskType}
+            onChange={(value) =>
+              setFilters({ ...filters, taskType: value ?? "" })
+            }
             style={{ width: 200 }}
           />
           {/* User selection - ADMIN only */}
@@ -360,6 +379,7 @@ export default function WorkLogs() {
                         ? filters.clientId || undefined
                         : undefined
                     }
+                    taskType={(filters.taskType as TaskType) || undefined}
                     expandedModuleIds={expandedModuleIds}
                     setExpandedModuleIds={setExpandedModuleIds}
                   />
@@ -381,6 +401,7 @@ export default function WorkLogs() {
             projectId={filters.projectId || undefined}
             userId={effectiveUserId}
             moduleId={filters.moduleId || undefined}
+            taskType={(filters.taskType as TaskType) || undefined}
           />
         </Tabs.Panel>
       </Tabs>

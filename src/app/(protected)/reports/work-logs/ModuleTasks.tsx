@@ -3,7 +3,7 @@
 import { useMantineTheme, Group } from "@mantine/core";
 import dayjs from "dayjs";
 import AppTable from "~/components/AppTable";
-import { TASK_TYPE_OPTIONS } from "~/constants/task.constant";
+import { TASK_TYPE_OPTIONS, type TaskType } from "~/constants/task.constant";
 import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
 import classes from "./WorkLogs.module.css";
@@ -13,13 +13,15 @@ interface ModuleTasksProps {
   projectId: string;
   dateRange: [Date | null, Date | null];
   clientId?: string;
+  taskType?: TaskType;
 }
 
 export function ModuleTasks({
   moduleId,
   projectId,
   dateRange,
-  clientId
+  clientId,
+  taskType
 }: ModuleTasksProps) {
   const theme = useMantineTheme();
   const { data: tasks, isPending: tasksLoading } = api.workLogs.getTasks.useQuery({
@@ -27,6 +29,7 @@ export function ModuleTasks({
     projectId,
     dateRange,
     clientId,
+    taskType,
   }, {
     enabled: !!moduleId && !!projectId,
   });

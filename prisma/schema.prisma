@@ -215,6 +215,7 @@ enum TaskType {
   DOCUMENTATION
   TEST
   MEETING
+  SUPPORT
 }
 
 model Task {

@@ -156,6 +156,13 @@ export const workLogsRouter = createTRPCRouter({
               },
             }
           : {}),
+        ...(input.taskType
+          ? {
+              task: {
+                type: input.taskType,
+              },
+            }
+          : {}),
       };
 
       const workLogs = await ctx.db.workLog.findMany({
@@ -313,6 +320,7 @@ export const workLogsRouter = createTRPCRouter({
           : {}),
         task: {
           projectId: input.projectId,
+          ...(input.taskType ? { type: input.taskType } : {}),
         },
       };
 
@@ -518,6 +526,7 @@ export const workLogsRouter = createTRPCRouter({
           ...(input.moduleId.startsWith("no-module-")
             ? { moduleId: null }
             : { moduleId: input.moduleId }),
+          ...(input.taskType ? { type: input.taskType } : {}),
         },
       };
 
@@ -1019,6 +1028,7 @@ export const workLogsRouter = createTRPCRouter({
           : {}),
         task: {
           project: projectWhere,
+          ...(input.taskType ? { type: input.taskType } : {}),
         },
       };
 
@@ -1169,6 +1179,7 @@ export const workLogsRouter = createTRPCRouter({
         task: {
           project: projectWhere,
           ...(input.moduleId ? { moduleId: input.moduleId } : {}),
+          ...(input.taskType ? { type: input.taskType } : {}),
         },
       };
 
@@ -1291,6 +1302,7 @@ export const workLogsRouter = createTRPCRouter({
         task: {
           project: projectWhere,
           ...(input.moduleId ? { moduleId: input.moduleId } : {}),
+          ...(input.taskType ? { type: input.taskType } : {}),
         },
       };
 

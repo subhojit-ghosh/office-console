@@ -7,7 +7,7 @@ import { useState } from "react";
 import AppTable from "~/components/AppTable";
 import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
-import { TASK_STATUS_MAP } from "~/constants/task.constant";
+import { TASK_STATUS_MAP, type TaskType } from "~/constants/task.constant";
 import type { AppRouter } from "~/server/api/root";
 import type { inferRouterOutputs } from "@trpc/server";
 
@@ -21,6 +21,7 @@ interface WorkLogsTimesheetProps {
   projectId?: string;
   userId?: string;
   moduleId?: string;
+  taskType?: TaskType;
 }
 
 export default function WorkLogsTimesheet({
@@ -29,6 +30,7 @@ export default function WorkLogsTimesheet({
   projectId,
   userId,
   moduleId,
+  taskType,
 }: WorkLogsTimesheetProps) {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
@@ -47,6 +49,7 @@ export default function WorkLogsTimesheet({
     projectId,
     userId,
     moduleId,
+    taskType,
     sortBy: sortStatus.columnAccessor,
     sortOrder: sortStatus.direction,
   });
