@@ -384,6 +384,22 @@ export const tasksRouter = createTRPCRouter({
         });
       }
 
+      // Only update completedAt if status is being changed
+      const statusChanged =
+        rest.status !== undefined && rest.status !== existingTask.status;
+      const completedAtUpdate: { completedAt?: Date | null } = {};
+
+      if (statusChanged) {
+        // Status is being changed TO DONE
+        if (rest.status === TaskStatus.DONE) {
+          completedAtUpdate.completedAt = new Date();
+        }
+        // Status is being changed FROM DONE to something else
+        else if (existingTask.status === TaskStatus.DONE) {
+          completedAtUpdate.completedAt = null;
+        }
+      }
+
       const updatedTask = await ctx.db.task.update({
         where: { id },
         data: {
@@ -391,7 +407,7 @@ export const tasksRouter = createTRPCRouter({
           assignees: assigneeIds
             ? { set: assigneeIds.map((id) => ({ id })) }
             : undefined,
-          completedAt: rest.status === TaskStatus.DONE ? new Date() : null,
+          ...completedAtUpdate,
         },
         include: {
           project: true,
@@ -433,7 +449,14 @@ export const tasksRouter = createTRPCRouter({
       if (key === "status") {
         oldValue = task.status;
         data.status = value;
-        data.completedAt = value === TaskStatus.DONE ? new Date() : null;
+        // Only update completedAt if status is actually changing
+        if (value !== task.status) {
+          if (value === TaskStatus.DONE) {
+            data.completedAt = new Date();
+          } else if (task.status === TaskStatus.DONE) {
+            data.completedAt = null;
+          }
+        }
       } else if (key === "priority") {
         oldValue = task.priority;
         data.priority = value;
