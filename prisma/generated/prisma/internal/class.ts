@@ -17,8 +17,8 @@ import type * as Prisma from "./prismaNamespace.ts"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.0.0",
-  "engineVersion": "0c19ccc313cf9911a90d99d2ac2eb0280c76c513",
+  "clientVersion": "7.1.0",
+  "engineVersion": "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba",
   "activeProvider": "postgresql",
   "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Client {\n  id                    String   @id @default(ulid())\n  name                  String   @unique\n  timeDisplayMultiplier Decimal  @default(1.00) @db.Decimal(4, 2)\n  showAssignees         Boolean  @default(true)\n  isActive              Boolean  @default(true)\n  createdAt             DateTime @default(now())\n  updatedAt             DateTime @updatedAt\n\n  users        User[]\n  projects     Project[]\n  requirements Requirement[]\n}\n\nenum UserRole {\n  SUPER_ADMIN\n  ADMIN\n  STAFF\n  CLIENT_ADMIN\n  CLIENT_USER\n}\n\nmodel User {\n  id        String   @id @default(ulid())\n  name      String\n  email     String   @unique\n  role      UserRole\n  clientId  String?\n  client    Client?  @relation(fields: [clientId], references: [id])\n  password  String\n  isActive  Boolean  @default(true)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  staffProfile          StaffProfile?\n  projects              Project[]\n  createdTasks          Task[]                @relation(\"CreatedTasks\")\n  assignedTasks         Task[]                @relation(\"AssignedTasks\")\n  modules               Module[]              @relation(\"CreatedModules\")\n  taskActivities        TaskActivity[]        @relation(\"TaskActivities\")\n  taskComments          TaskComment[]         @relation(\"TaskComments\")\n  projectsAsMember      Project[]             @relation(\"ProjectMembers\")\n  feedbacks             Feedback[]            @relation(\"Feedbacks\")\n  workLogs              WorkLog[]             @relation(\"WorkLogs\")\n  archivedTasks         Task[]                @relation(\"ArchivedTasks\")\n  createdRequirements   Requirement[]         @relation(\"CreatedRequirements\")\n  requirementActivities RequirementActivity[]\n}\n\nenum StaffPosition {\n  MANAGER\n  EMPLOYEE\n  DESIGNER\n  DEVELOPER\n  TEAM_LEAD\n}\n\nmodel StaffProfile {\n  id         String        @id @default(cuid())\n  userId     String        @unique\n  user       User          @relation(fields: [userId], references: [id])\n  position   StaffPosition\n  department String?\n  joinedAt   DateTime\n  phone      String?\n  createdAt  DateTime      @default(now())\n  updatedAt  DateTime      @updatedAt\n}\n\nenum ProjectStatus {\n  ONGOING\n  COMPLETED\n  CANCELLED\n  ON_HOLD\n}\n\nmodel Project {\n  id                    String        @id @default(ulid())\n  name                  String\n  description           String?\n  status                ProjectStatus @default(ONGOING)\n  clientId              String?\n  client                Client?       @relation(fields: [clientId], references: [id])\n  timeDisplayMultiplier Decimal?      @db.Decimal(4, 2)\n  createdById           String\n  createdBy             User          @relation(fields: [createdById], references: [id])\n  createdAt             DateTime      @default(now())\n  updatedAt             DateTime      @updatedAt\n\n  modules Module[]\n  tasks   Task[]\n  members User[]   @relation(\"ProjectMembers\")\n}\n\nenum RequirementStatus {\n  DRAFT\n  SUBMITTED\n  APPROVED\n  REJECTED\n  IN_PROGRESS\n  COMPLETED\n}\n\nenum RequirementPriority {\n  LOW\n  MEDIUM\n  HIGH\n  URGENT\n}\n\nenum RequirementType {\n  NEW_PROJECT\n  FEATURE_REQUEST\n  CHANGE_REQUEST\n  BUG\n}\n\nmodel Requirement {\n  id          String              @id @default(ulid())\n  type        RequirementType\n  title       String\n  description String?\n  status      RequirementStatus   @default(DRAFT)\n  priority    RequirementPriority @default(MEDIUM)\n\n  clientId String?\n  client   Client? @relation(fields: [clientId], references: [id])\n\n  createdById String\n  createdBy   User   @relation(\"CreatedRequirements\", fields: [createdById], references: [id])\n\n  parentId String?\n  parent   Requirement?  @relation(\"RequirementChildren\", fields: [parentId], references: [id])\n  children Requirement[] @relation(\"RequirementChildren\")\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  activities RequirementActivity[] @relation(\"RequirementActivities\")\n}\n\nenum RequirementActivityType {\n  CREATED\n  FIELD_CHANGE\n  UPDATED\n}\n\nmodel RequirementActivity {\n  id String @id @default(ulid())\n\n  requirementId String\n  requirement   Requirement @relation(\"RequirementActivities\", fields: [requirementId], references: [id])\n\n  type     RequirementActivityType\n  field    String?\n  oldValue String?\n  newValue String?\n\n  userId String\n  user   User   @relation(fields: [userId], references: [id])\n\n  createdAt DateTime @default(now())\n}\n\nmodel Module {\n  id                    String   @id @default(ulid())\n  name                  String\n  description           String?\n  crId                  String?\n  projectId             String\n  project               Project  @relation(fields: [projectId], references: [id])\n  timeDisplayMultiplier Decimal? @db.Decimal(4, 2)\n  createdById           String\n  createdBy             User     @relation(\"CreatedModules\", fields: [createdById], references: [id])\n  createdAt             DateTime @default(now())\n  updatedAt             DateTime @updatedAt\n  tasks                 Task[]\n}\n\nenum TaskStatus {\n  BACKLOG\n  TODO\n  IN_PROGRESS\n  IN_REVIEW\n  BLOCKED\n  DONE\n  CANCELED\n}\n\nenum TaskPriority {\n  LOW\n  MEDIUM\n  HIGH\n  URGENT\n}\n\nenum TaskType {\n  TASK\n  BUG\n  FEATURE\n  IMPROVEMENT\n  RESEARCH\n  DOCUMENTATION\n  TEST\n  MEETING\n  SUPPORT\n}\n\nmodel Task {\n  id          String       @id @default(ulid())\n  type        TaskType     @default(TASK)\n  title       String\n  description String?\n  crId        String?\n  status      TaskStatus   @default(TODO)\n  priority    TaskPriority @default(MEDIUM)\n\n  projectId String\n  project   Project @relation(fields: [projectId], references: [id])\n\n  moduleId String?\n  module   Module? @relation(fields: [moduleId], references: [id])\n\n  createdById String\n  createdBy   User   @relation(\"CreatedTasks\", fields: [createdById], references: [id])\n\n  assignees User[] @relation(\"AssignedTasks\")\n\n  dueDate      DateTime?\n  completedAt  DateTime?\n  archivedAt   DateTime?\n  archivedById String?\n  archivedBy   User?     @relation(\"ArchivedTasks\", fields: [archivedById], references: [id])\n  createdAt    DateTime  @default(now())\n  updatedAt    DateTime  @updatedAt\n\n  activities TaskActivity[] @relation(\"TaskActivities\")\n  comments   TaskComment[]  @relation(\"TaskComments\")\n  workLogs   WorkLog[]      @relation(\"WorkLogs\")\n  linksFrom  TaskLink[]     @relation(\"SourceLinks\")\n  linksTo    TaskLink[]     @relation(\"TargetLinks\")\n}\n\nenum TaskActivityType {\n  CREATED\n  FIELD_CHANGE\n  UPDATED\n  ASSIGNED\n  UNASSIGNED\n}\n\nmodel TaskActivity {\n  id String @id @default(ulid())\n\n  taskId String\n  task   Task   @relation(\"TaskActivities\", fields: [taskId], references: [id])\n\n  type     TaskActivityType\n  field    String? // Only used when type = FIELD_CHANGE\n  oldValue String?\n  newValue String?\n\n  userId String\n  user   User   @relation(\"TaskActivities\", fields: [userId], references: [id])\n\n  createdAt DateTime @default(now())\n}\n\nenum TaskCommentType {\n  GENERAL\n  BLOCK_REASON\n  ON_HOLD_REASON\n}\n\nmodel TaskComment {\n  id        String          @id @default(ulid())\n  taskId    String\n  task      Task            @relation(\"TaskComments\", fields: [taskId], references: [id])\n  userId    String\n  user      User            @relation(\"TaskComments\", fields: [userId], references: [id])\n  content   String\n  type      TaskCommentType @default(GENERAL)\n  edited    Boolean         @default(false)\n  createdAt DateTime        @default(now())\n  updatedAt DateTime        @updatedAt\n}\n\nenum FeedbackType {\n  FEEDBACK\n  BUG\n  FEATURE\n  OTHER\n}\n\nmodel Feedback {\n  id      String       @id @default(ulid())\n  type    FeedbackType @default(FEEDBACK)\n  message String\n  rating  Int? // Only for type = FEEDBACK\n\n  userId String\n  user   User?  @relation(\"Feedbacks\", fields: [userId], references: [id])\n\n  createdAt DateTime @default(now())\n}\n\nenum LogSource {\n  MANUAL\n  AUTOMATIC\n}\n\nmodel WorkLog {\n  id String @id @default(ulid())\n\n  taskId String?\n  task   Task?   @relation(\"WorkLogs\", fields: [taskId], references: [id])\n\n  userId String\n  user   User   @relation(\"WorkLogs\", fields: [userId], references: [id])\n\n  startTime                 DateTime\n  endTime                   DateTime\n  durationMin               Int\n  clientAdjustedDurationMin Int\n  note                      String?\n  source                    LogSource @default(MANUAL)\n\n  createdAt DateTime @default(now())\n}\n\nenum TaskLinkType {\n  BLOCKS\n  DEPENDS_ON\n}\n\nmodel TaskLink {\n  id   String       @id @default(ulid())\n  type TaskLinkType\n\n  sourceId String\n  source   Task   @relation(\"SourceLinks\", fields: [sourceId], references: [id])\n\n  targetId String\n  target   Task   @relation(\"TargetLinks\", fields: [targetId], references: [id])\n\n  createdAt DateTime @default(now())\n\n  @@unique([sourceId, targetId, type])\n}\n",
   "runtimeDataModel": {
@@ -62,7 +62,7 @@ export interface PrismaClientConstructor {
    * const clients = await prisma.client.findMany()
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+   * Read more in our [docs](https://pris.ly/d/client).
    */
 
   new <
@@ -84,7 +84,7 @@ export interface PrismaClientConstructor {
  * const clients = await prisma.client.findMany()
  * ```
  * 
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
 
 export interface PrismaClient<
@@ -113,7 +113,7 @@ export interface PrismaClient<
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -125,7 +125,7 @@ export interface PrismaClient<
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -136,7 +136,7 @@ export interface PrismaClient<
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -148,7 +148,7 @@ export interface PrismaClient<
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
 
