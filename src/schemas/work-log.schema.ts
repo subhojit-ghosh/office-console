@@ -9,25 +9,29 @@ export const getWorkLogsSchema = z.object({
 });
 
 // Helper function to parse time string (hh:mm or hh:mm:ss format)
-function parseTimeString(timeStr: string): { hours: number; minutes: number } | null {
+function parseTimeString(
+  timeStr: string,
+): { hours: number; minutes: number } | null {
   if (!timeStr || typeof timeStr !== "string") return null;
-  
+
   // Handle 12h format with AM/PM
-  const amPmMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  const amPmMatch = timeStr.match(
+    /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i,
+  );
   if (amPmMatch) {
     let hours = parseInt(amPmMatch[1]!, 10);
     const minutes = parseInt(amPmMatch[2]!, 10);
     const isPm = amPmMatch[4]?.toUpperCase() === "PM";
-    
+
     if (hours === 12) {
       hours = isPm ? 12 : 0;
     } else {
       hours = isPm ? hours + 12 : hours;
     }
-    
+
     return { hours, minutes };
   }
-  
+
   // Handle 24h format (hh:mm or hh:mm:ss)
   const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
   if (timeMatch) {
@@ -35,20 +39,23 @@ function parseTimeString(timeStr: string): { hours: number; minutes: number } | 
     const minutes = parseInt(timeMatch[2]!, 10);
     return { hours, minutes };
   }
-  
+
   return null;
 }
 
 // Helper function to combine date and time string into a Date object
-function combineDateAndTime(date: Date | string | null | undefined, timeStr: string | null | undefined): Date | null {
+function combineDateAndTime(
+  date: Date | string | null | undefined,
+  timeStr: string | null | undefined,
+): Date | null {
   if (!date || !timeStr) return null;
-  
+
   const parsedDate = typeof date === "string" ? new Date(date) : date;
   if (isNaN(parsedDate.getTime())) return null;
-  
+
   const timeParts = parseTimeString(timeStr);
   if (!timeParts) return null;
-  
+
   return dayjs(parsedDate)
     .hour(timeParts.hours)
     .minute(timeParts.minutes)
@@ -60,10 +67,14 @@ function combineDateAndTime(date: Date | string | null | undefined, timeStr: str
 export const createWotkLogSchema = z
   .object({
     taskId: z.string().nonempty("Task ID is required"),
-    date: z.preprocess(parseDate, z.date({ required_error: "Date is required" })),
+    date: z.preprocess(parseDate, z.date()),
     startTime: z.string().nonempty("Start time is required"),
     endTime: z.string().nonempty("End time is required"),
     note: z.string().optional().nullable(),
+  })
+  .refine((data) => data.date !== undefined && data.date !== null, {
+    message: "Date is required",
+    path: ["date"],
   })
   .refine(
     (data) => {
@@ -74,12 +85,12 @@ export const createWotkLogSchema = z
     {
       message: "Invalid time format. Use hh:mm or hh:mm AM/PM format.",
       path: ["startTime"],
-    }
+    },
   )
   .transform((data) => {
     const startDateTime = combineDateAndTime(data.date, data.startTime);
     const endDateTime = combineDateAndTime(data.date, data.endTime);
-    
+
     if (!startDateTime || !endDateTime) {
       throw new z.ZodError([
         {
@@ -89,11 +100,11 @@ export const createWotkLogSchema = z
         },
       ]);
     }
-    
+
     // Validate that both times are on the same date
     const startDate = dayjs(startDateTime).format("YYYY-MM-DD");
     const endDate = dayjs(endDateTime).format("YYYY-MM-DD");
-    
+
     if (startDate !== endDate) {
       throw new z.ZodError([
         {
@@ -103,7 +114,7 @@ export const createWotkLogSchema = z
         },
       ]);
     }
-    
+
     // Validate that end time is after start time
     if (endDateTime <= startDateTime) {
       throw new z.ZodError([
@@ -114,7 +125,7 @@ export const createWotkLogSchema = z
         },
       ]);
     }
-    
+
     return {
       taskId: data.taskId,
       startTime: startDateTime,

@@ -449,7 +449,6 @@ export default function QuickLogModal({
             <Grid.Col span={6}>
               <TimePicker
                 label="Start Time"
-                placeholder="Select start time"
                 format="12h"
                 withDropdown
                 withSeconds={false}
@@ -461,7 +460,6 @@ export default function QuickLogModal({
             <Grid.Col span={6}>
               <TimePicker
                 label="End Time"
-                placeholder="Select end time"
                 format="12h"
                 withDropdown
                 withSeconds={false}
