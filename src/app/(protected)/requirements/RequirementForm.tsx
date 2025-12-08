@@ -114,7 +114,7 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
       if (zodErrors) {
         const fieldErrors = Object.entries(zodErrors.fieldErrors);
         fieldErrors.forEach(([field, messages]) => {
-          form.setFieldError(field, messages ? messages[0] : "Invalid input");
+          form.setFieldError(field, Array.isArray(messages) && messages.length > 0 ? String(messages[0]) : "Invalid input");
         });
       }
       setLoading(false);

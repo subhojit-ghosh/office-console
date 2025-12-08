@@ -1,4 +1,5 @@
 import { UserRole, type Prisma } from "@prisma/generated/server";
+import { z } from "zod";
 import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import {
   createProjectSchema,
@@ -157,16 +158,17 @@ export const projectsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(sanitizeInputSchema(createProjectSchema))
     .mutation(async ({ ctx, input }) => {
+      const data = input as z.infer<typeof createProjectSchema>;
       return ctx.db.project.create({
         data: {
-          name: input.name,
-          description: input.description,
-          status: input.status,
-          clientId: input.clientId,
-          timeDisplayMultiplier: input.timeDisplayMultiplier,
+          name: data.name,
+          description: data.description,
+          status: data.status,
+          clientId: data.clientId,
+          timeDisplayMultiplier: data.timeDisplayMultiplier,
           createdById: ctx.session.user.id,
           members: {
-            connect: input.memberIds?.map((id) => ({ id })) ?? [],
+            connect: data.memberIds?.map((id) => ({ id })) ?? [],
           },
         },
       });
@@ -175,16 +177,17 @@ export const projectsRouter = createTRPCRouter({
   update: protectedProcedure
     .input(sanitizeInputSchema(updateProjectSchema))
     .mutation(async ({ ctx, input }) => {
+      const data = input as z.infer<typeof updateProjectSchema>;
       return ctx.db.project.update({
-        where: { id: input.id },
+        where: { id: data.id },
         data: {
-          name: input.name,
-          description: input.description,
-          status: input.status,
-          clientId: input.clientId,
-          timeDisplayMultiplier: input.timeDisplayMultiplier,
+          name: data.name,
+          description: data.description,
+          status: data.status,
+          clientId: data.clientId,
+          timeDisplayMultiplier: data.timeDisplayMultiplier,
           members: {
-            set: input.memberIds?.map((id) => ({ id })) ?? [],
+            set: data.memberIds?.map((id) => ({ id })) ?? [],
           },
         },
       });

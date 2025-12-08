@@ -41,7 +41,7 @@ const TaskCommentBox = forwardRef<TaskCommentBoxHandle, TaskCommentBoxProps>(
     const clear = () => {
       setIsEditing(false);
       setContent("");
-      editorRef.current?.editor?.commands.setContent("", false);
+      editorRef.current?.editor?.commands.setContent("", { emitUpdate: false });
       editorRef.current?.setIsFocused(false);
       onCancel?.();
     };

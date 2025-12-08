@@ -4,6 +4,7 @@ import {
   UserRole,
   type Prisma,
 } from "@prisma/generated/server";
+import { z } from "zod";
 import {
   archiveTaskSchema,
   createTaskCommentSchema,
@@ -230,10 +231,11 @@ export const tasksRouter = createTRPCRouter({
   create: protectedProcedure
     .input(sanitizeInputSchema(createTaskSchema))
     .mutation(async ({ ctx, input }) => {
-      const { assigneeIds, links, crId, ...rest } = input;
+      const data = input as z.infer<typeof createTaskSchema>;
+      const { assigneeIds, links, crId, ...rest } = data;
 
       const projectMembers = await ctx.db.project.findUnique({
-        where: { id: input.projectId },
+        where: { id: data.projectId },
         select: { members: { select: { id: true } } },
       });
 
@@ -288,7 +290,8 @@ export const tasksRouter = createTRPCRouter({
   update: protectedProcedure
     .input(sanitizeInputSchema(updateTaskSchema))
     .mutation(async ({ ctx, input }) => {
-      const { id, assigneeIds, ...rest } = input;
+      const data = input as z.infer<typeof updateTaskSchema>;
+      const { id, assigneeIds, ...rest } = data;
       const userId = ctx.session.user.id;
 
       const existingTask = await ctx.db.task.findUnique({
