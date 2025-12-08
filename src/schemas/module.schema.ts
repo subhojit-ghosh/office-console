@@ -23,14 +23,6 @@ export const createModuleSchema = z.object({
   description: z.string().optional().nullable(),
   crId: z.string().optional().nullable(),
   projectId: z.string().nonempty("Project is required"),
-  timeDisplayMultiplier: zOptionalInput(
-    z
-      .number()
-      .min(0.1, "Too small (0.1 is the min)")
-      .max(10, "Too large (10 is the max)")
-      .optional()
-      .nullable(),
-  ),
 });
 
 export const updateModuleSchema = z.object({
@@ -39,14 +31,6 @@ export const updateModuleSchema = z.object({
   description: z.string().optional().nullable(),
   crId: z.string().optional().nullable(),
   projectId: z.string().nonempty("Project is required"),
-  timeDisplayMultiplier: zOptionalInput(
-    z
-      .number()
-      .min(0.1, "Too small (0.1 is the min)")
-      .max(10, "Too large (10 is the max)")
-      .optional()
-      .nullable(),
-  ),
 });
 
 export const deleteModuleSchema = z.object({

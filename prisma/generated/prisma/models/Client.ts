@@ -20,24 +20,13 @@ export type ClientModel = runtime.Types.Result.DefaultSelection<Prisma.$ClientPa
 
 export type AggregateClient = {
   _count: ClientCountAggregateOutputType | null
-  _avg: ClientAvgAggregateOutputType | null
-  _sum: ClientSumAggregateOutputType | null
   _min: ClientMinAggregateOutputType | null
   _max: ClientMaxAggregateOutputType | null
-}
-
-export type ClientAvgAggregateOutputType = {
-  timeDisplayMultiplier: runtime.Decimal | null
-}
-
-export type ClientSumAggregateOutputType = {
-  timeDisplayMultiplier: runtime.Decimal | null
 }
 
 export type ClientMinAggregateOutputType = {
   id: string | null
   name: string | null
-  timeDisplayMultiplier: runtime.Decimal | null
   showAssignees: boolean | null
   moduleMandatoryForTasks: boolean | null
   isActive: boolean | null
@@ -48,7 +37,6 @@ export type ClientMinAggregateOutputType = {
 export type ClientMaxAggregateOutputType = {
   id: string | null
   name: string | null
-  timeDisplayMultiplier: runtime.Decimal | null
   showAssignees: boolean | null
   moduleMandatoryForTasks: boolean | null
   isActive: boolean | null
@@ -59,7 +47,6 @@ export type ClientMaxAggregateOutputType = {
 export type ClientCountAggregateOutputType = {
   id: number
   name: number
-  timeDisplayMultiplier: number
   showAssignees: number
   crIdMandatoryTaskTypes: number
   moduleMandatoryForTasks: number
@@ -70,18 +57,9 @@ export type ClientCountAggregateOutputType = {
 }
 
 
-export type ClientAvgAggregateInputType = {
-  timeDisplayMultiplier?: true
-}
-
-export type ClientSumAggregateInputType = {
-  timeDisplayMultiplier?: true
-}
-
 export type ClientMinAggregateInputType = {
   id?: true
   name?: true
-  timeDisplayMultiplier?: true
   showAssignees?: true
   moduleMandatoryForTasks?: true
   isActive?: true
@@ -92,7 +70,6 @@ export type ClientMinAggregateInputType = {
 export type ClientMaxAggregateInputType = {
   id?: true
   name?: true
-  timeDisplayMultiplier?: true
   showAssignees?: true
   moduleMandatoryForTasks?: true
   isActive?: true
@@ -103,7 +80,6 @@ export type ClientMaxAggregateInputType = {
 export type ClientCountAggregateInputType = {
   id?: true
   name?: true
-  timeDisplayMultiplier?: true
   showAssignees?: true
   crIdMandatoryTaskTypes?: true
   moduleMandatoryForTasks?: true
@@ -151,18 +127,6 @@ export type ClientAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: ClientAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: ClientSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: ClientMinAggregateInputType
@@ -193,8 +157,6 @@ export type ClientGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: ClientCountAggregateInputType | true
-  _avg?: ClientAvgAggregateInputType
-  _sum?: ClientSumAggregateInputType
   _min?: ClientMinAggregateInputType
   _max?: ClientMaxAggregateInputType
 }
@@ -202,7 +164,6 @@ export type ClientGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 export type ClientGroupByOutputType = {
   id: string
   name: string
-  timeDisplayMultiplier: runtime.Decimal
   showAssignees: boolean
   crIdMandatoryTaskTypes: $Enums.TaskType[]
   moduleMandatoryForTasks: boolean
@@ -210,8 +171,6 @@ export type ClientGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: ClientCountAggregateOutputType | null
-  _avg: ClientAvgAggregateOutputType | null
-  _sum: ClientSumAggregateOutputType | null
   _min: ClientMinAggregateOutputType | null
   _max: ClientMaxAggregateOutputType | null
 }
@@ -237,7 +196,6 @@ export type ClientWhereInput = {
   NOT?: Prisma.ClientWhereInput | Prisma.ClientWhereInput[]
   id?: Prisma.StringFilter<"Client"> | string
   name?: Prisma.StringFilter<"Client"> | string
-  timeDisplayMultiplier?: Prisma.DecimalFilter<"Client"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFilter<"Client"> | boolean
   crIdMandatoryTaskTypes?: Prisma.EnumTaskTypeNullableListFilter<"Client">
   moduleMandatoryForTasks?: Prisma.BoolFilter<"Client"> | boolean
@@ -252,7 +210,6 @@ export type ClientWhereInput = {
 export type ClientOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
   crIdMandatoryTaskTypes?: Prisma.SortOrder
   moduleMandatoryForTasks?: Prisma.SortOrder
@@ -270,7 +227,6 @@ export type ClientWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ClientWhereInput | Prisma.ClientWhereInput[]
   OR?: Prisma.ClientWhereInput[]
   NOT?: Prisma.ClientWhereInput | Prisma.ClientWhereInput[]
-  timeDisplayMultiplier?: Prisma.DecimalFilter<"Client"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFilter<"Client"> | boolean
   crIdMandatoryTaskTypes?: Prisma.EnumTaskTypeNullableListFilter<"Client">
   moduleMandatoryForTasks?: Prisma.BoolFilter<"Client"> | boolean
@@ -285,7 +241,6 @@ export type ClientWhereUniqueInput = Prisma.AtLeast<{
 export type ClientOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
   crIdMandatoryTaskTypes?: Prisma.SortOrder
   moduleMandatoryForTasks?: Prisma.SortOrder
@@ -293,10 +248,8 @@ export type ClientOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ClientCountOrderByAggregateInput
-  _avg?: Prisma.ClientAvgOrderByAggregateInput
   _max?: Prisma.ClientMaxOrderByAggregateInput
   _min?: Prisma.ClientMinOrderByAggregateInput
-  _sum?: Prisma.ClientSumOrderByAggregateInput
 }
 
 export type ClientScalarWhereWithAggregatesInput = {
@@ -305,7 +258,6 @@ export type ClientScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ClientScalarWhereWithAggregatesInput | Prisma.ClientScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Client"> | string
   name?: Prisma.StringWithAggregatesFilter<"Client"> | string
-  timeDisplayMultiplier?: Prisma.DecimalWithAggregatesFilter<"Client"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolWithAggregatesFilter<"Client"> | boolean
   crIdMandatoryTaskTypes?: Prisma.EnumTaskTypeNullableListFilter<"Client">
   moduleMandatoryForTasks?: Prisma.BoolWithAggregatesFilter<"Client"> | boolean
@@ -317,7 +269,6 @@ export type ClientScalarWhereWithAggregatesInput = {
 export type ClientCreateInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -332,7 +283,6 @@ export type ClientCreateInput = {
 export type ClientUncheckedCreateInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -347,7 +297,6 @@ export type ClientUncheckedCreateInput = {
 export type ClientUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -362,7 +311,6 @@ export type ClientUpdateInput = {
 export type ClientUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -377,7 +325,6 @@ export type ClientUncheckedUpdateInput = {
 export type ClientCreateManyInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -389,7 +336,6 @@ export type ClientCreateManyInput = {
 export type ClientUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -401,7 +347,6 @@ export type ClientUpdateManyMutationInput = {
 export type ClientUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -421,7 +366,6 @@ export type EnumTaskTypeNullableListFilter<$PrismaModel = never> = {
 export type ClientCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
   crIdMandatoryTaskTypes?: Prisma.SortOrder
   moduleMandatoryForTasks?: Prisma.SortOrder
@@ -430,14 +374,9 @@ export type ClientCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type ClientAvgOrderByAggregateInput = {
-  timeDisplayMultiplier?: Prisma.SortOrder
-}
-
 export type ClientMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
   moduleMandatoryForTasks?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
@@ -448,16 +387,11 @@ export type ClientMaxOrderByAggregateInput = {
 export type ClientMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
   moduleMandatoryForTasks?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type ClientSumOrderByAggregateInput = {
-  timeDisplayMultiplier?: Prisma.SortOrder
 }
 
 export type ClientNullableScalarRelationFilter = {
@@ -471,14 +405,6 @@ export type ClientCreatecrIdMandatoryTaskTypesInput = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
-}
-
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -545,7 +471,6 @@ export type ClientUpdateOneWithoutRequirementsNestedInput = {
 export type ClientCreateWithoutUsersInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -559,7 +484,6 @@ export type ClientCreateWithoutUsersInput = {
 export type ClientUncheckedCreateWithoutUsersInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -589,7 +513,6 @@ export type ClientUpdateToOneWithWhereWithoutUsersInput = {
 export type ClientUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -603,7 +526,6 @@ export type ClientUpdateWithoutUsersInput = {
 export type ClientUncheckedUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -617,7 +539,6 @@ export type ClientUncheckedUpdateWithoutUsersInput = {
 export type ClientCreateWithoutProjectsInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -631,7 +552,6 @@ export type ClientCreateWithoutProjectsInput = {
 export type ClientUncheckedCreateWithoutProjectsInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -661,7 +581,6 @@ export type ClientUpdateToOneWithWhereWithoutProjectsInput = {
 export type ClientUpdateWithoutProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -675,7 +594,6 @@ export type ClientUpdateWithoutProjectsInput = {
 export type ClientUncheckedUpdateWithoutProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -689,7 +607,6 @@ export type ClientUncheckedUpdateWithoutProjectsInput = {
 export type ClientCreateWithoutRequirementsInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -703,7 +620,6 @@ export type ClientCreateWithoutRequirementsInput = {
 export type ClientUncheckedCreateWithoutRequirementsInput = {
   id?: string
   name: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: boolean
@@ -733,7 +649,6 @@ export type ClientUpdateToOneWithWhereWithoutRequirementsInput = {
 export type ClientUpdateWithoutRequirementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -747,7 +662,6 @@ export type ClientUpdateWithoutRequirementsInput = {
 export type ClientUncheckedUpdateWithoutRequirementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
   crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
   moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -810,7 +724,6 @@ export type ClientCountOutputTypeCountRequirementsArgs<ExtArgs extends runtime.T
 export type ClientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  timeDisplayMultiplier?: boolean
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: boolean
   moduleMandatoryForTasks?: boolean
@@ -826,7 +739,6 @@ export type ClientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type ClientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  timeDisplayMultiplier?: boolean
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: boolean
   moduleMandatoryForTasks?: boolean
@@ -838,7 +750,6 @@ export type ClientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type ClientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  timeDisplayMultiplier?: boolean
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: boolean
   moduleMandatoryForTasks?: boolean
@@ -850,7 +761,6 @@ export type ClientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type ClientSelectScalar = {
   id?: boolean
   name?: boolean
-  timeDisplayMultiplier?: boolean
   showAssignees?: boolean
   crIdMandatoryTaskTypes?: boolean
   moduleMandatoryForTasks?: boolean
@@ -859,7 +769,7 @@ export type ClientSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "timeDisplayMultiplier" | "showAssignees" | "crIdMandatoryTaskTypes" | "moduleMandatoryForTasks" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
+export type ClientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "showAssignees" | "crIdMandatoryTaskTypes" | "moduleMandatoryForTasks" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
 export type ClientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Client$usersArgs<ExtArgs>
   projects?: boolean | Prisma.Client$projectsArgs<ExtArgs>
@@ -879,7 +789,6 @@ export type $ClientPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
-    timeDisplayMultiplier: runtime.Decimal
     showAssignees: boolean
     crIdMandatoryTaskTypes: $Enums.TaskType[]
     moduleMandatoryForTasks: boolean
@@ -1314,7 +1223,6 @@ export interface Prisma__ClientClient<T, Null = never, ExtArgs extends runtime.T
 export interface ClientFieldRefs {
   readonly id: Prisma.FieldRef<"Client", 'String'>
   readonly name: Prisma.FieldRef<"Client", 'String'>
-  readonly timeDisplayMultiplier: Prisma.FieldRef<"Client", 'Decimal'>
   readonly showAssignees: Prisma.FieldRef<"Client", 'Boolean'>
   readonly crIdMandatoryTaskTypes: Prisma.FieldRef<"Client", 'TaskType[]'>
   readonly moduleMandatoryForTasks: Prisma.FieldRef<"Client", 'Boolean'>

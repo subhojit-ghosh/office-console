@@ -154,11 +154,11 @@ function convertToExcelRowsWithStyling(data: WorkLogExportData[]): {
 } {
   const headers = [
     "Project",
-    "Module", 
+    "Module",
     "Task",
     "Task Type",
     "Total Duration (Hours)",
-    "Total Duration (Formatted)",
+    "Total Duration (Minutes)",
     "First Entry",
     "Last Entry",
   ];
@@ -179,7 +179,7 @@ function convertToExcelRowsWithStyling(data: WorkLogExportData[]): {
       item.taskTitle,
       item.taskType,
       item.totalDuration / 60, // Convert minutes to hours
-      formatDurationFromMinutes(item.totalDuration),
+      item.totalDuration, // Show minutes only
       item.firstWorkLogDate ? dayjs(item.firstWorkLogDate).format("MMM D, YYYY") : "",
       item.lastWorkLogDate ? dayjs(item.lastWorkLogDate).format("MMM D, YYYY") : "",
     ];
@@ -241,7 +241,7 @@ export async function exportWorkLogsToExcel(
       { wch: 30 }, // Task
       { wch: 15 }, // Task Type
       { wch: 15 }, // Total Duration (Hours)
-      { wch: 15 }, // Total Duration (Formatted)
+      { wch: 15 }, // Total Duration (Minutes)
       { wch: 12 }, // First Entry
       { wch: 12 }, // Last Entry
     ];
@@ -299,7 +299,7 @@ export async function exportVisibleWorkLogsToExcel(
       { wch: 30 }, // Task
       { wch: 15 }, // Task Type
       { wch: 15 }, // Total Duration (Hours)
-      { wch: 15 }, // Total Duration (Formatted)
+      { wch: 15 }, // Total Duration (Minutes)
       { wch: 12 }, // First Entry
       { wch: 12 }, // Last Entry
     ];
@@ -373,6 +373,8 @@ export async function exportFlatWorkLogsToExcel(
   try {
     const headers = [
       "Date",
+      "Start Time",
+      "End Time",
       "User",
       "Project",
       "Module",
@@ -380,7 +382,7 @@ export async function exportFlatWorkLogsToExcel(
       "Task Type",
       "Status",
       "CR ID",
-      "Duration",
+      "Duration (Minutes)",
       "Note",
     ];
 
@@ -393,6 +395,8 @@ export async function exportFlatWorkLogsToExcel(
     workLogs.forEach((workLog) => {
       const row = [
         dayjs(workLog.startTime).format("MMM D, YYYY"),
+        dayjs(workLog.startTime).format("hh:mm A"),
+        dayjs(workLog.endTime).format("hh:mm A"),
         workLog.user.name,
         workLog.task?.project.name ?? "-",
         workLog.task?.module?.name ?? "-",
@@ -407,7 +411,7 @@ export async function exportFlatWorkLogsToExcel(
               ?.label ?? workLog.task.status
           : "-",
         workLog.task?.crId ?? "-",
-        formatDurationFromMinutes(workLog.duration),
+        workLog.duration,
         workLog.note ?? "-",
       ];
 
@@ -421,6 +425,8 @@ export async function exportFlatWorkLogsToExcel(
     // Set column widths
     const columnWidths = [
       { wch: 12 }, // Date
+      { wch: 8 }, // Start Time
+      { wch: 8 }, // End Time
       { wch: 15 }, // User
       { wch: 20 }, // Project
       { wch: 18 }, // Module
@@ -428,7 +434,7 @@ export async function exportFlatWorkLogsToExcel(
       { wch: 12 }, // Task Type
       { wch: 12 }, // Status
       { wch: 10 }, // CR ID
-      { wch: 12 }, // Duration
+      { wch: 12 }, // Duration (Minutes)
       { wch: 30 }, // Note
     ];
     worksheet["!cols"] = columnWidths;
@@ -524,7 +530,7 @@ export async function exportServerDataToExcel(
       { wch: 30 }, // Task
       { wch: 15 }, // Task Type
       { wch: 15 }, // Total Duration (Hours)
-      { wch: 15 }, // Total Duration (Formatted)
+      { wch: 15 }, // Total Duration (Minutes)
       { wch: 12 }, // First Entry
       { wch: 12 }, // Last Entry
     ];

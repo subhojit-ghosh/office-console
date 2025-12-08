@@ -45,7 +45,6 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
       description: "",
       crId: "",
       projectId: "",
-      timeDisplayMultiplier: null as number | null,
     },
     validate: zod4Resolver(
       mode === "add" ? createModuleSchema : updateModuleSchema,
@@ -75,9 +74,6 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
           description: moduleDetail.description ?? "",
           crId: moduleDetail.crId ?? "",
           projectId: moduleDetail.projectId ?? "",
-          timeDisplayMultiplier: moduleDetail.timeDisplayMultiplier
-            ? Number(moduleDetail.timeDisplayMultiplier)
-            : null,
         });
       }
     } catch (error) {
@@ -139,7 +135,6 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
         description: values.description,
         crId: values.crId,
         projectId: values.projectId,
-        timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
     } else if (mode === "edit" && id) {
       updateModule.mutate({
@@ -148,7 +143,6 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
         description: values.description,
         crId: values.crId,
         projectId: values.projectId,
-        timeDisplayMultiplier: values.timeDisplayMultiplier,
       });
     }
   };
@@ -206,16 +200,6 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
               }
             />
           </Grid.Col>
-          {session?.user.role === UserRole.ADMIN && (
-            <Grid.Col span={12}>
-              <NumberInput
-                label="Time Display Multiplier (Leave empty to inherit)"
-                description="This multiplier adjusts how tracked time is shown in the client view. For example: 1 shows the actual time, 2 doubles it, 0.5 shows half, and 3 triples it."
-                decimalScale={2}
-                {...form.getInputProps("timeDisplayMultiplier")}
-              />
-            </Grid.Col>
-          )}
           <Grid.Col span={12}>
             <Group justify="space-between">
               <Button variant="subtle" onClick={() => close()}>

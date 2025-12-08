@@ -39,7 +39,6 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
     initialValues: {
       id: "",
       name: "",
-      timeDisplayMultiplier: 1,
       showAssignees: true,
       crIdMandatoryTaskTypes: [] as TaskType[],
       moduleMandatoryForTasks: false,
@@ -70,7 +69,6 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
         form.setValues({
           id: clientDetail.id,
           name: clientDetail.name,
-          timeDisplayMultiplier: Number(clientDetail.timeDisplayMultiplier),
           showAssignees: clientDetail.showAssignees,
           crIdMandatoryTaskTypes: Array.isArray(clientDetail.crIdMandatoryTaskTypes)
             ? clientDetail.crIdMandatoryTaskTypes
@@ -131,7 +129,6 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
     if (mode === "add") {
       createClient.mutate({
         name: form.values.name,
-        timeDisplayMultiplier: form.values.timeDisplayMultiplier,
         showAssignees: form.values.showAssignees,
         crIdMandatoryTaskTypes: form.values.crIdMandatoryTaskTypes,
         moduleMandatoryForTasks: form.values.moduleMandatoryForTasks,
@@ -140,7 +137,6 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
       updateClient.mutate({
         id: form.values.id,
         name: form.values.name,
-        timeDisplayMultiplier: form.values.timeDisplayMultiplier,
         showAssignees: form.values.showAssignees,
         crIdMandatoryTaskTypes: form.values.crIdMandatoryTaskTypes,
         moduleMandatoryForTasks: form.values.moduleMandatoryForTasks,
@@ -166,14 +162,6 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
               label="Name"
               withAsterisk
               {...form.getInputProps("name")}
-            />
-          </Grid.Col>
-          <Grid.Col span={12}>
-            <NumberInput
-              label="Time Display Multiplier"
-              description="This multiplier adjusts how tracked time is shown for this client. For example: 1 shows the actual time, 2 doubles it, 0.5 shows half, and 3 triples it."
-              decimalScale={2}
-              {...form.getInputProps("timeDisplayMultiplier")}
             />
           </Grid.Col>
           <Grid.Col span={12}>

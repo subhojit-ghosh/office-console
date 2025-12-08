@@ -424,7 +424,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                                 cursor: "pointer",
                               }}
                             >
-                              {formatDurationFromMinutes(totalWorkLogMinutes)}
+                              {totalWorkLogMinutes} min
                             </Badge>
                           )}
                         </Tabs.Tab>

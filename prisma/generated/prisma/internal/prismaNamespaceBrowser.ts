@@ -85,7 +85,6 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const ClientScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   showAssignees: 'showAssignees',
   crIdMandatoryTaskTypes: 'crIdMandatoryTaskTypes',
   moduleMandatoryForTasks: 'moduleMandatoryForTasks',
@@ -132,7 +131,6 @@ export const ProjectScalarFieldEnum = {
   description: 'description',
   status: 'status',
   clientId: 'clientId',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -178,7 +176,6 @@ export const ModuleScalarFieldEnum = {
   description: 'description',
   crId: 'crId',
   projectId: 'projectId',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -1420,7 +1420,6 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const ClientScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   showAssignees: 'showAssignees',
   crIdMandatoryTaskTypes: 'crIdMandatoryTaskTypes',
   moduleMandatoryForTasks: 'moduleMandatoryForTasks',
@@ -1467,7 +1466,6 @@ export const ProjectScalarFieldEnum = {
   description: 'description',
   status: 'status',
   clientId: 'clientId',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1513,7 +1511,6 @@ export const ModuleScalarFieldEnum = {
   description: 'description',
   crId: 'crId',
   projectId: 'projectId',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1652,20 +1649,6 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'String[]'
  */
 export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
-    
-
-
-/**
- * Reference to a field of type 'Decimal'
- */
-export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
-    
-
-
-/**
- * Reference to a field of type 'Decimal[]'
- */
-export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 

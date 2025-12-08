@@ -15,12 +15,6 @@ export const getClientByIdSchema = z.object({
 
 export const createClientSchema = z.object({
   name: z.string().nonempty("Name is required"),
-  timeDisplayMultiplier: z
-    .number()
-    .min(0.1, "Too small (0.1 is the min)")
-    .max(10, "Too large (10 is the max)")
-    .default(1)
-    .optional(),
   showAssignees: z.boolean().default(true).optional(),
   crIdMandatoryTaskTypes: z.array(z.enum(TASK_TYPES)).default([]).optional(),
   moduleMandatoryForTasks: z.boolean().default(false).optional(),
@@ -29,12 +23,6 @@ export const createClientSchema = z.object({
 export const updateClientSchema = z.object({
   id: z.string().nonempty("ID is required"),
   name: z.string().nonempty("Name is required"),
-  timeDisplayMultiplier: z
-    .number()
-    .min(0.1, "Too small (0.1 is the min)")
-    .max(10, "Too large (10 is the max)")
-    .default(1)
-    .optional(),
   showAssignees: z.boolean().default(true).optional(),
   crIdMandatoryTaskTypes: z.array(z.enum(TASK_TYPES)).default([]).optional(),
   moduleMandatoryForTasks: z.boolean().default(false).optional(),

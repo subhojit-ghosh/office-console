@@ -20,18 +20,8 @@ export type ProjectModel = runtime.Types.Result.DefaultSelection<Prisma.$Project
 
 export type AggregateProject = {
   _count: ProjectCountAggregateOutputType | null
-  _avg: ProjectAvgAggregateOutputType | null
-  _sum: ProjectSumAggregateOutputType | null
   _min: ProjectMinAggregateOutputType | null
   _max: ProjectMaxAggregateOutputType | null
-}
-
-export type ProjectAvgAggregateOutputType = {
-  timeDisplayMultiplier: runtime.Decimal | null
-}
-
-export type ProjectSumAggregateOutputType = {
-  timeDisplayMultiplier: runtime.Decimal | null
 }
 
 export type ProjectMinAggregateOutputType = {
@@ -40,7 +30,6 @@ export type ProjectMinAggregateOutputType = {
   description: string | null
   status: $Enums.ProjectStatus | null
   clientId: string | null
-  timeDisplayMultiplier: runtime.Decimal | null
   createdById: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -52,7 +41,6 @@ export type ProjectMaxAggregateOutputType = {
   description: string | null
   status: $Enums.ProjectStatus | null
   clientId: string | null
-  timeDisplayMultiplier: runtime.Decimal | null
   createdById: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -64,7 +52,6 @@ export type ProjectCountAggregateOutputType = {
   description: number
   status: number
   clientId: number
-  timeDisplayMultiplier: number
   createdById: number
   createdAt: number
   updatedAt: number
@@ -72,21 +59,12 @@ export type ProjectCountAggregateOutputType = {
 }
 
 
-export type ProjectAvgAggregateInputType = {
-  timeDisplayMultiplier?: true
-}
-
-export type ProjectSumAggregateInputType = {
-  timeDisplayMultiplier?: true
-}
-
 export type ProjectMinAggregateInputType = {
   id?: true
   name?: true
   description?: true
   status?: true
   clientId?: true
-  timeDisplayMultiplier?: true
   createdById?: true
   createdAt?: true
   updatedAt?: true
@@ -98,7 +76,6 @@ export type ProjectMaxAggregateInputType = {
   description?: true
   status?: true
   clientId?: true
-  timeDisplayMultiplier?: true
   createdById?: true
   createdAt?: true
   updatedAt?: true
@@ -110,7 +87,6 @@ export type ProjectCountAggregateInputType = {
   description?: true
   status?: true
   clientId?: true
-  timeDisplayMultiplier?: true
   createdById?: true
   createdAt?: true
   updatedAt?: true
@@ -155,18 +131,6 @@ export type ProjectAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: ProjectAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: ProjectSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: ProjectMinAggregateInputType
@@ -197,8 +161,6 @@ export type ProjectGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: ProjectCountAggregateInputType | true
-  _avg?: ProjectAvgAggregateInputType
-  _sum?: ProjectSumAggregateInputType
   _min?: ProjectMinAggregateInputType
   _max?: ProjectMaxAggregateInputType
 }
@@ -209,13 +171,10 @@ export type ProjectGroupByOutputType = {
   description: string | null
   status: $Enums.ProjectStatus
   clientId: string | null
-  timeDisplayMultiplier: runtime.Decimal | null
   createdById: string
   createdAt: Date
   updatedAt: Date
   _count: ProjectCountAggregateOutputType | null
-  _avg: ProjectAvgAggregateOutputType | null
-  _sum: ProjectSumAggregateOutputType | null
   _min: ProjectMinAggregateOutputType | null
   _max: ProjectMaxAggregateOutputType | null
 }
@@ -244,7 +203,6 @@ export type ProjectWhereInput = {
   description?: Prisma.StringNullableFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   clientId?: Prisma.StringNullableFilter<"Project"> | string | null
-  timeDisplayMultiplier?: Prisma.DecimalNullableFilter<"Project"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFilter<"Project"> | string
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
@@ -261,7 +219,6 @@ export type ProjectOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   clientId?: Prisma.SortOrderInput | Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -281,7 +238,6 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   clientId?: Prisma.StringNullableFilter<"Project"> | string | null
-  timeDisplayMultiplier?: Prisma.DecimalNullableFilter<"Project"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFilter<"Project"> | string
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
@@ -298,15 +254,12 @@ export type ProjectOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   clientId?: Prisma.SortOrderInput | Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProjectCountOrderByAggregateInput
-  _avg?: Prisma.ProjectAvgOrderByAggregateInput
   _max?: Prisma.ProjectMaxOrderByAggregateInput
   _min?: Prisma.ProjectMinOrderByAggregateInput
-  _sum?: Prisma.ProjectSumOrderByAggregateInput
 }
 
 export type ProjectScalarWhereWithAggregatesInput = {
@@ -318,7 +271,6 @@ export type ProjectScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusWithAggregatesFilter<"Project"> | $Enums.ProjectStatus
   clientId?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
-  timeDisplayMultiplier?: Prisma.DecimalNullableWithAggregatesFilter<"Project"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringWithAggregatesFilter<"Project"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
@@ -329,7 +281,6 @@ export type ProjectCreateInput = {
   name: string
   description?: string | null
   status?: $Enums.ProjectStatus
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   client?: Prisma.ClientCreateNestedOneWithoutProjectsInput
@@ -345,7 +296,6 @@ export type ProjectUncheckedCreateInput = {
   description?: string | null
   status?: $Enums.ProjectStatus
   clientId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -359,7 +309,6 @@ export type ProjectUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.ClientUpdateOneWithoutProjectsNestedInput
@@ -375,7 +324,6 @@ export type ProjectUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -390,7 +338,6 @@ export type ProjectCreateManyInput = {
   description?: string | null
   status?: $Enums.ProjectStatus
   clientId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -401,7 +348,6 @@ export type ProjectUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -412,7 +358,6 @@ export type ProjectUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -434,14 +379,9 @@ export type ProjectCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type ProjectAvgOrderByAggregateInput = {
-  timeDisplayMultiplier?: Prisma.SortOrder
 }
 
 export type ProjectMaxOrderByAggregateInput = {
@@ -450,7 +390,6 @@ export type ProjectMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -462,14 +401,9 @@ export type ProjectMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type ProjectSumOrderByAggregateInput = {
-  timeDisplayMultiplier?: Prisma.SortOrder
 }
 
 export type ProjectScalarRelationFilter = {
@@ -603,14 +537,6 @@ export type EnumProjectStatusFieldUpdateOperationsInput = {
   set?: $Enums.ProjectStatus
 }
 
-export type NullableDecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type ProjectCreateNestedOneWithoutModulesInput = {
   create?: Prisma.XOR<Prisma.ProjectCreateWithoutModulesInput, Prisma.ProjectUncheckedCreateWithoutModulesInput>
   connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutModulesInput
@@ -644,7 +570,6 @@ export type ProjectCreateWithoutClientInput = {
   name: string
   description?: string | null
   status?: $Enums.ProjectStatus
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy: Prisma.UserCreateNestedOneWithoutProjectsInput
@@ -658,7 +583,6 @@ export type ProjectUncheckedCreateWithoutClientInput = {
   name: string
   description?: string | null
   status?: $Enums.ProjectStatus
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -702,7 +626,6 @@ export type ProjectScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   clientId?: Prisma.StringNullableFilter<"Project"> | string | null
-  timeDisplayMultiplier?: Prisma.DecimalNullableFilter<"Project"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFilter<"Project"> | string
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
@@ -713,7 +636,6 @@ export type ProjectCreateWithoutCreatedByInput = {
   name: string
   description?: string | null
   status?: $Enums.ProjectStatus
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   client?: Prisma.ClientCreateNestedOneWithoutProjectsInput
@@ -728,7 +650,6 @@ export type ProjectUncheckedCreateWithoutCreatedByInput = {
   description?: string | null
   status?: $Enums.ProjectStatus
   clientId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutProjectInput
@@ -751,7 +672,6 @@ export type ProjectCreateWithoutMembersInput = {
   name: string
   description?: string | null
   status?: $Enums.ProjectStatus
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   client?: Prisma.ClientCreateNestedOneWithoutProjectsInput
@@ -766,7 +686,6 @@ export type ProjectUncheckedCreateWithoutMembersInput = {
   description?: string | null
   status?: $Enums.ProjectStatus
   clientId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -816,7 +735,6 @@ export type ProjectCreateWithoutModulesInput = {
   name: string
   description?: string | null
   status?: $Enums.ProjectStatus
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   client?: Prisma.ClientCreateNestedOneWithoutProjectsInput
@@ -831,7 +749,6 @@ export type ProjectUncheckedCreateWithoutModulesInput = {
   description?: string | null
   status?: $Enums.ProjectStatus
   clientId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -860,7 +777,6 @@ export type ProjectUpdateWithoutModulesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.ClientUpdateOneWithoutProjectsNestedInput
@@ -875,7 +791,6 @@ export type ProjectUncheckedUpdateWithoutModulesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -888,7 +803,6 @@ export type ProjectCreateWithoutTasksInput = {
   name: string
   description?: string | null
   status?: $Enums.ProjectStatus
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   client?: Prisma.ClientCreateNestedOneWithoutProjectsInput
@@ -903,7 +817,6 @@ export type ProjectUncheckedCreateWithoutTasksInput = {
   description?: string | null
   status?: $Enums.ProjectStatus
   clientId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -932,7 +845,6 @@ export type ProjectUpdateWithoutTasksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.ClientUpdateOneWithoutProjectsNestedInput
@@ -947,7 +859,6 @@ export type ProjectUncheckedUpdateWithoutTasksInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -960,7 +871,6 @@ export type ProjectCreateManyClientInput = {
   name: string
   description?: string | null
   status?: $Enums.ProjectStatus
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -971,7 +881,6 @@ export type ProjectUpdateWithoutClientInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
@@ -985,7 +894,6 @@ export type ProjectUncheckedUpdateWithoutClientInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -999,7 +907,6 @@ export type ProjectUncheckedUpdateManyWithoutClientInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1011,7 +918,6 @@ export type ProjectCreateManyCreatedByInput = {
   description?: string | null
   status?: $Enums.ProjectStatus
   clientId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1021,7 +927,6 @@ export type ProjectUpdateWithoutCreatedByInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.ClientUpdateOneWithoutProjectsNestedInput
@@ -1036,7 +941,6 @@ export type ProjectUncheckedUpdateWithoutCreatedByInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   modules?: Prisma.ModuleUncheckedUpdateManyWithoutProjectNestedInput
@@ -1050,7 +954,6 @@ export type ProjectUncheckedUpdateManyWithoutCreatedByInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1060,7 +963,6 @@ export type ProjectUpdateWithoutMembersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.ClientUpdateOneWithoutProjectsNestedInput
@@ -1075,7 +977,6 @@ export type ProjectUncheckedUpdateWithoutMembersInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1089,7 +990,6 @@ export type ProjectUncheckedUpdateManyWithoutMembersInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1150,7 +1050,6 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   description?: boolean
   status?: boolean
   clientId?: boolean
-  timeDisplayMultiplier?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1168,7 +1067,6 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   status?: boolean
   clientId?: boolean
-  timeDisplayMultiplier?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1182,7 +1080,6 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   status?: boolean
   clientId?: boolean
-  timeDisplayMultiplier?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1196,13 +1093,12 @@ export type ProjectSelectScalar = {
   description?: boolean
   status?: boolean
   clientId?: boolean
-  timeDisplayMultiplier?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "status" | "clientId" | "timeDisplayMultiplier" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "status" | "clientId" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   client?: boolean | Prisma.Project$clientArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1235,7 +1131,6 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     description: string | null
     status: $Enums.ProjectStatus
     clientId: string | null
-    timeDisplayMultiplier: runtime.Decimal | null
     createdById: string
     createdAt: Date
     updatedAt: Date
@@ -1672,7 +1567,6 @@ export interface ProjectFieldRefs {
   readonly description: Prisma.FieldRef<"Project", 'String'>
   readonly status: Prisma.FieldRef<"Project", 'ProjectStatus'>
   readonly clientId: Prisma.FieldRef<"Project", 'String'>
-  readonly timeDisplayMultiplier: Prisma.FieldRef<"Project", 'Decimal'>
   readonly createdById: Prisma.FieldRef<"Project", 'String'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Project", 'DateTime'>

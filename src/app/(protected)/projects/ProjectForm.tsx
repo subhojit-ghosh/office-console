@@ -54,7 +54,6 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
       description: "",
       status: "ONGOING",
       clientId: "",
-      timeDisplayMultiplier: null as number | null,
       memberIds: [] as string[],
     },
     validate: zod4Resolver(
@@ -91,9 +90,6 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
           description: projectDetail.description ?? "",
           status: projectDetail.status,
           clientId: projectDetail.clientId ?? "",
-          timeDisplayMultiplier: projectDetail.timeDisplayMultiplier
-            ? Number(projectDetail.timeDisplayMultiplier)
-            : null,
           memberIds: Array.isArray(projectDetail.members)
             ? projectDetail.members.map((member) => member.id)
             : [],
@@ -159,7 +155,6 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
         description: values.description,
         status: values.status as Project["status"],
         clientId: values.clientId ?? undefined,
-        timeDisplayMultiplier: values.timeDisplayMultiplier,
         memberIds: values.memberIds,
       });
     } else if (mode === "edit" && id) {
@@ -169,7 +164,6 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
         description: values.description,
         status: values.status as Project["status"],
         clientId: values.clientId ?? undefined,
-        timeDisplayMultiplier: values.timeDisplayMultiplier,
         memberIds: values.memberIds,
       });
     }
@@ -248,14 +242,6 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
                       ? "Loading clients..."
                       : "Select client"
                   }
-                />
-              </Grid.Col>
-              <Grid.Col span={12}>
-                <NumberInput
-                  label="Time Display Multiplier (Leave empty to inherit)"
-                  description="This multiplier adjusts how tracked time is shown in the client view. For example: 1 shows the actual time, 2 doubles it, 0.5 shows half, and 3 triples it."
-                  decimalScale={2}
-                  {...form.getInputProps("timeDisplayMultiplier")}
                 />
               </Grid.Col>
             </>

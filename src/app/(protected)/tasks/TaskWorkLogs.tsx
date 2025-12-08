@@ -238,7 +238,7 @@ export default function TaskWorkLogs({
               style={{ textTransform: "none" }}
               mr="xs"
             >
-              {c.name}: {formatDurationFromMinutes(c.minutes)}
+              {c.name}: {c.minutes} min
             </Badge>
           ))}
         </div>
@@ -309,12 +309,10 @@ export default function TaskWorkLogs({
                     mt={8}
                   >
                     {form.values.startTime && form.values.startTime
-                      ? formatDurationFromMinutes(
-                          dayjs(form.values.endTime).diff(
-                            dayjs(form.values.startTime),
-                            "minutes",
-                          ),
-                        )
+                      ? `${dayjs(form.values.endTime).diff(
+                          dayjs(form.values.startTime),
+                          "minutes",
+                        )} min`
                       : "--"}
                   </Badge>
                 </Grid.Col>
@@ -398,7 +396,7 @@ export default function TaskWorkLogs({
                 leftSection={<IconHourglassLow size={12} />}
                 style={{ textTransform: "none" }}
               >
-                {formatDurationFromMinutes(workLog.durationMin)}
+                {workLog.durationMin} min
               </Badge>
             </Group>
 

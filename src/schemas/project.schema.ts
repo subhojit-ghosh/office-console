@@ -28,14 +28,6 @@ export const createProjectSchema = z.object({
   status: z.enum(["ONGOING", "COMPLETED", "CANCELLED", "ON_HOLD"]),
   memberIds: z.array(z.string()).optional(),
   clientId: z.string().optional().nullable(),
-  timeDisplayMultiplier: zOptionalInput(
-    z
-      .number()
-      .min(0.1, "Too small (0.1 is the min)")
-      .max(10, "Too large (10 is the max)")
-      .optional()
-      .nullable(),
-  ),
 });
 
 export const updateProjectSchema = z.object({
@@ -45,14 +37,6 @@ export const updateProjectSchema = z.object({
   status: z.enum(["ONGOING", "COMPLETED", "CANCELLED", "ON_HOLD"]),
   memberIds: z.array(z.string()).optional(),
   clientId: z.string().optional().nullable(),
-  timeDisplayMultiplier: zOptionalInput(
-    z
-      .number()
-      .min(0.1, "Too small (0.1 is the min)")
-      .max(10, "Too large (10 is the max)")
-      .optional()
-      .nullable(),
-  ),
 });
 
 export const deleteProjectSchema = z.object({

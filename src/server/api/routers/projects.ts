@@ -165,7 +165,6 @@ export const projectsRouter = createTRPCRouter({
           description: data.description,
           status: data.status,
           clientId: data.clientId,
-          timeDisplayMultiplier: data.timeDisplayMultiplier,
           createdById: ctx.session.user.id,
           members: {
             connect: data.memberIds?.map((id) => ({ id })) ?? [],
@@ -185,7 +184,6 @@ export const projectsRouter = createTRPCRouter({
           description: data.description,
           status: data.status,
           clientId: data.clientId,
-          timeDisplayMultiplier: data.timeDisplayMultiplier,
           members: {
             set: data.memberIds?.map((id) => ({ id })) ?? [],
           },

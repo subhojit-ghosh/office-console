@@ -166,11 +166,6 @@ export default function ClientsList() {
             ),
           },
           {
-            accessor: "timeDisplayMultiplier",
-            title: "Time Display Multiplier",
-            sortable: true,
-          },
-          {
             accessor: "showAssignees",
             title: "Show Assignees",
             render: (row) => <span>{row.showAssignees ? "Yes" : "No"}</span>,

@@ -72,35 +72,49 @@ export default function WorkLogsTimesheet({
             accessor: "startTime",
             title: "Date",
             sortable: true,
-            width: "10%",
+            width: "8%",
             render: ({ startTime }) => dayjs(startTime).format("MMM D, YYYY"),
+          },
+          {
+            accessor: "startTime",
+            title: "Start Time",
+            sortable: true,
+            width: "8%",
+            render: ({ startTime }) => dayjs(startTime).format("hh:mm A"),
+          },
+          {
+            accessor: "endTime",
+            title: "End Time",
+            sortable: true,
+            width: "8%",
+            render: ({ endTime }) => dayjs(endTime).format("hh:mm A"),
           },
           {
             accessor: "user.name",
             title: "User",
             sortable: true,
-            width: "12%",
+            width: "10%",
             render: ({ user }) => user.name,
           },
           {
             accessor: "task.project.name",
             title: "Project",
             sortable: true,
-            width: "12%",
+            width: "10%",
             render: ({ task }) => task?.project.name ?? "-",
           },
           {
             accessor: "task.module.name",
             title: "Module",
             sortable: true,
-            width: "12%",
+            width: "10%",
             render: ({ task }) => task?.module?.name ?? "-",
           },
           {
             accessor: "task.title",
             title: "Task",
             sortable: true,
-            width: "15%",
+            width: "12%",
             render: ({ task }) =>
               task
                 ? task.crId
@@ -112,14 +126,14 @@ export default function WorkLogsTimesheet({
             accessor: "task.type",
             title: "Task Type",
             sortable: true,
-            width: "10%",
+            width: "8%",
             render: ({ task }) => task?.type ?? "-",
           },
           {
             accessor: "task.status",
             title: "Status",
             sortable: true,
-            width: "10%",
+            width: "8%",
             render: ({ task }) =>
               task?.status
                 ? (TASK_STATUS_MAP[task.status as keyof typeof TASK_STATUS_MAP]
@@ -130,21 +144,21 @@ export default function WorkLogsTimesheet({
             accessor: "task.crId",
             title: "CR ID",
             sortable: true,
-            width: "8%",
+            width: "6%",
             render: ({ task }) => task?.crId ?? "-",
           },
           {
             accessor: "duration",
             title: "Duration",
             sortable: true,
-            width: "12%",
-            render: ({ duration }) => formatDurationFromMinutes(duration),
+            width: "10%",
+            render: ({ duration }) => `${duration} min`,
           },
           {
             accessor: "note",
             title: "Note",
             sortable: false,
-            width: "15%",
+            width: "12%",
             render: ({ note }) => (
               <Text size="sm" lineClamp={2} title={note ?? undefined}>
                 {note ?? "-"}

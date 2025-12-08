@@ -89,7 +89,6 @@ export const clientsRouter = createTRPCRouter({
       return ctx.db.client.create({
         data: {
           name: input.name,
-          timeDisplayMultiplier: input.timeDisplayMultiplier,
           showAssignees: input.showAssignees,
           crIdMandatoryTaskTypes: input.crIdMandatoryTaskTypes,
           moduleMandatoryForTasks: input.moduleMandatoryForTasks,
@@ -112,7 +111,6 @@ export const clientsRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
-          timeDisplayMultiplier: input.timeDisplayMultiplier,
           showAssignees: input.showAssignees,
           crIdMandatoryTaskTypes: input.crIdMandatoryTaskTypes,
           moduleMandatoryForTasks: input.moduleMandatoryForTasks,
