@@ -20,14 +20,14 @@ import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
 import SubScript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
-import Table from "@tiptap/extension-table";
+import { TableKit } from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
 import TipTapTaskList from "@tiptap/extension-task-list";
 import TextAlign from "@tiptap/extension-text-align";
-import TextStyle from "@tiptap/extension-text-style";
+import { TextStyleKit } from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import { type Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -64,7 +64,7 @@ const AppRichTextEditor = forwardRef<AppRichTextEditorHandle, Props>(
         Highlight,
         TextAlign,
         Color,
-        TextStyle,
+        TextStyleKit,
         ...(props.placeholder
           ? [Placeholder.configure({ placeholder: props.placeholder })]
           : []),
@@ -75,10 +75,12 @@ const AppRichTextEditor = forwardRef<AppRichTextEditorHandle, Props>(
             class: "test-item",
           },
         }),
-        Table.configure({
-          resizable: true,
-          HTMLAttributes: {
-            class: "table-auto border border-collapse",
+        TableKit.configure({
+          table: {
+            resizable: true,
+            HTMLAttributes: {
+              class: "table-auto border border-collapse",
+            },
           },
         }),
         TableRow,
@@ -111,7 +113,9 @@ const AppRichTextEditor = forwardRef<AppRichTextEditorHandle, Props>(
     });
 
     useEffect(() => {
-      editor?.commands.setContent(props.content ?? "", false);
+      editor?.commands.setContent(props.content ?? "", {
+        emitUpdate: false,
+      });
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.id]);
 
