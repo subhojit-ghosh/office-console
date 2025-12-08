@@ -20,7 +20,7 @@ import {
   Paper,
   ActionIcon,
 } from "@mantine/core";
-import { DateTimePicker } from "@mantine/dates";
+import { DatePickerInput, TimePicker, getTimeRange } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconClock, IconX } from "@tabler/icons-react";
@@ -40,12 +40,40 @@ interface QuickLogModalProps {
   preSelectedTaskId?: string;
 }
 
-// Time preset configurations
+// Time preset configurations for quick duration buttons
 const timePresets = [
   { label: "30m", minutes: 30 },
   { label: "1h", minutes: 60 },
   { label: "2h", minutes: 120 },
   { label: "4h", minutes: 240 },
+];
+
+// Time preset groups for TimePicker dropdown
+const timePickerPresets = [
+  {
+    label: "Morning",
+    values: getTimeRange({
+      startTime: "10:00:00",
+      endTime: "11:30:00",
+      interval: "00:30:00",
+    }),
+  },
+  {
+    label: "Afternoon",
+    values: getTimeRange({
+      startTime: "12:00:00",
+      endTime: "16:30:00",
+      interval: "00:30:00",
+    }),
+  },
+  {
+    label: "Evening",
+    values: getTimeRange({
+      startTime: "17:00:00",
+      endTime: "20:00:00",
+      interval: "00:30:00",
+    }),
+  },
 ];
 
 export default function QuickLogModal({
@@ -76,12 +104,14 @@ export default function QuickLogModal({
   const form = useForm({
     initialValues: {
       taskId: preSelectedTaskId ?? "",
-      startTime: null as Date | null,
-      endTime: null as Date | null,
+      date: new Date(),
+      startTime: "",
+      endTime: "",
       note: "",
     },
     validate: {
       taskId: (value) => (value ? null : "Please select a task"),
+      date: (value) => (value ? null : "Date is required"),
       startTime: (value) => (value ? null : "Start time is required"),
       endTime: (value) => (value ? null : "End time is required"),
     },
@@ -115,11 +145,36 @@ export default function QuickLogModal({
 
   // Calculate duration
   const duration = useMemo(() => {
-    const { startTime, endTime } = form.values;
-    if (!startTime || !endTime) return null;
+    const { date, startTime, endTime } = form.values;
+    if (!date || !startTime || !endTime) return null;
 
-    const start = dayjs(startTime);
-    const end = dayjs(endTime);
+    // Parse time strings
+    const parseTime = (timeStr: string): { hours: number; minutes: number } | null => {
+      const amPmMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
+      if (amPmMatch) {
+        let hours = parseInt(amPmMatch[1]!, 10);
+        const minutes = parseInt(amPmMatch[2]!, 10);
+        const isPm = amPmMatch[4]?.toUpperCase() === "PM";
+        if (hours === 12) hours = isPm ? 12 : 0;
+        else if (isPm) hours += 12;
+        return { hours, minutes };
+      }
+      const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+      if (timeMatch) {
+        return {
+          hours: parseInt(timeMatch[1]!, 10),
+          minutes: parseInt(timeMatch[2]!, 10),
+        };
+      }
+      return null;
+    };
+
+    const startParts = parseTime(startTime);
+    const endParts = parseTime(endTime);
+    if (!startParts || !endParts) return null;
+
+    const start = dayjs(date).hour(startParts.hours).minute(startParts.minutes);
+    const end = dayjs(date).hour(endParts.hours).minute(endParts.minutes);
     const diffMinutes = end.diff(start, "minute");
 
     if (diffMinutes <= 0) return null;
@@ -130,7 +185,7 @@ export default function QuickLogModal({
     if (hours === 0) return `${minutes}m`;
     if (minutes === 0) return `${hours}h`;
     return `${hours}h ${minutes}m`;
-  }, [form.values.startTime, form.values.endTime]);
+  }, [form.values.date, form.values.startTime, form.values.endTime]);
 
   // Select options for tasks
   const taskOptions = useMemo(() => {
@@ -164,40 +219,52 @@ export default function QuickLogModal({
   const applyPreset = (minutes: number) => {
     const now = dayjs();
     const start = now.subtract(minutes, "minute");
+    const selectedDate = form.values.date || now.toDate();
+    
+    // TimePicker expects time in hh:mm:ss format (24-hour) as a string
+    // It will automatically format it for display based on format="12h" prop
+    const startTime = dayjs(selectedDate)
+      .hour(start.hour())
+      .minute(start.minute())
+      .second(0)
+      .format("HH:mm:ss");
+    const endTime = dayjs(selectedDate)
+      .hour(now.hour())
+      .minute(now.minute())
+      .second(0)
+      .format("HH:mm:ss");
     
     form.setValues({
-      startTime: start.toDate(),
-      endTime: now.toDate(),
+      date: selectedDate,
+      startTime,
+      endTime,
     });
   };
 
   const handleSubmit = () => {
-    const { taskId, startTime, endTime, note } = form.values;
+    const { taskId, date, startTime, endTime, note } = form.values;
 
-    if (!taskId || !startTime || !endTime) {
+    if (!taskId || !date || !startTime || !endTime) {
       return;
     }
 
-    const start = dayjs(startTime);
-    const end = dayjs(endTime);
     const now = dayjs();
 
-    if (end.isBefore(start)) {
-      form.setFieldError("endTime", "End time must be after start time");
-      return;
-    }
-
-    if (start.isAfter(now) || end.isAfter(now)) {
-      form.setFieldError("startTime", "Times cannot be in the future");
+    // Validate that date is not in the future
+    if (dayjs(date).isAfter(now, "day")) {
+      form.setFieldError("date", "Date cannot be in the future");
       return;
     }
 
     if (!form.isValid()) return;
 
+    // The schema will transform date + time strings to DateTime objects
+    // and validate that times are on the same date and end > start
     createWorkLog.mutate({
       taskId,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
+      date,
+      startTime,
+      endTime,
       note: note || null,
     });
   };
@@ -367,31 +434,39 @@ export default function QuickLogModal({
             </Group>
           </div>
 
-          {/* Time Entry */}
+          {/* Date and Time Entry */}
           <Grid>
+            <Grid.Col span={12}>
+              <DatePickerInput
+                label="Date"
+                placeholder="Select date"
+                valueFormat="MMM D, YYYY"
+                maxDate={new Date()}
+                withAsterisk
+                {...form.getInputProps("date")}
+              />
+            </Grid.Col>
             <Grid.Col span={6}>
-              <DateTimePicker
+              <TimePicker
                 label="Start Time"
                 placeholder="Select start time"
-                valueFormat="MM D, YYYY @ h:mm A"
+                format="12h"
+                withDropdown
+                withSeconds={false}
                 withAsterisk
-                maxDate={new Date()}
-                timePickerProps={{
-                  format: "12h",
-                }}
+                presets={timePickerPresets}
                 {...form.getInputProps("startTime")}
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <DateTimePicker
+              <TimePicker
                 label="End Time"
                 placeholder="Select end time"
-                valueFormat="MMM D, YYYY @ h:mm A"
+                format="12h"
+                withDropdown
+                withSeconds={false}
                 withAsterisk
-                maxDate={new Date()}
-                timePickerProps={{
-                  format: "12h",
-                }}
+                presets={timePickerPresets}
                 {...form.getInputProps("endTime")}
               />
             </Grid.Col>

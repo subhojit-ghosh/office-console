@@ -911,6 +911,16 @@ export const workLogsRouter = createTRPCRouter({
         throw new Error(`Overlapping work log exists in "${shortTitle}"`);
       }
 
+      // Validate that startTime and endTime are on the same date
+      const startDate = new Date(input.startTime);
+      const endDate = new Date(input.endTime);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
+
+      if (startDate.getTime() !== endDate.getTime()) {
+        throw new Error("Start time and end time must be on the same date.");
+      }
+
       const durationMin =
         (input.endTime.getTime() - input.startTime.getTime()) / 60000;
 

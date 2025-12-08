@@ -13,7 +13,7 @@ import {
   Textarea,
   Tooltip,
 } from "@mantine/core";
-import { DateTimePicker, getTimeRange } from "@mantine/dates";
+import { DatePickerInput, TimePicker, getTimeRange } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -130,15 +130,56 @@ export default function TaskWorkLogs({
   const form = useForm({
     initialValues: {
       taskId,
-      startTime: undefined,
-      endTime: undefined,
+      date: new Date(),
+      startTime: "",
+      endTime: "",
       note: "",
     },
     validate: zod4Resolver(createWotkLogSchema),
   });
 
+  // Auto-set end time to 1 hour after start time when start time is first set
   useEffect(() => {
-    form.setFieldValue("endTime", form.values.startTime);
+    if (form.values.startTime && !form.values.endTime) {
+      // Parse start time and add 1 hour
+      const parseTime = (
+        timeStr: string,
+      ): { hours: number; minutes: number } | null => {
+        const amPmMatch = timeStr.match(
+          /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i,
+        );
+        if (amPmMatch) {
+          let hours = parseInt(amPmMatch[1]!, 10);
+          const minutes = parseInt(amPmMatch[2]!, 10);
+          const isPm = amPmMatch[4]?.toUpperCase() === "PM";
+          if (hours === 12) hours = isPm ? 12 : 0;
+          else if (isPm) hours += 12;
+          return { hours, minutes };
+        }
+        const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+        if (timeMatch) {
+          return {
+            hours: parseInt(timeMatch[1]!, 10),
+            minutes: parseInt(timeMatch[2]!, 10),
+          };
+        }
+        return null;
+      };
+
+      const startParts = parseTime(form.values.startTime);
+      if (startParts) {
+        const endTimeObj = dayjs()
+          .hour(startParts.hours)
+          .minute(startParts.minutes)
+          .add(1, "hour");
+        // Format back to 12h format if original was 12h
+        const is12h = form.values.startTime.match(/AM|PM/i);
+        const endTimeStr = is12h
+          ? endTimeObj.format("hh:mm A")
+          : endTimeObj.format("HH:mm");
+        form.setFieldValue("endTime", endTimeStr);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.values.startTime]);
 
@@ -185,30 +226,26 @@ export default function TaskWorkLogs({
   const handleSubmit = () => {
     form.validate();
 
-    const { startTime, endTime } = form.values;
+    const { date, startTime, endTime } = form.values;
     const now = dayjs();
 
-    if (!startTime || !endTime) return;
+    if (!date || !startTime || !endTime) return;
 
-    const start = dayjs(startTime);
-    const end = dayjs(endTime);
-
-    if (end.isSameOrBefore(start)) {
-      form.setFieldError("date", "End time must be after start time.");
-      return;
-    }
-
-    if (start.isAfter(now) || end.isAfter(now)) {
-      form.setFieldError("date", "Start and end time cannot be in the future.");
+    // Validate that date is not in the future
+    if (dayjs(date).isAfter(now, "day")) {
+      form.setFieldError("date", "Date cannot be in the future.");
       return;
     }
 
     if (!form.isValid()) return;
 
+    // The schema will transform date + time strings to DateTime objects
+    // and validate that times are on the same date and end > start
     createWorkLog.mutate({
       taskId,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
+      date,
+      startTime,
+      endTime,
       note: form.values.note,
     });
   };
@@ -264,39 +301,41 @@ export default function TaskWorkLogs({
           <Grid>
             <Grid.Col span={11}>
               <Grid>
-                <Grid.Col span={5}>
-                  <DateTimePicker
-                    placeholder="Start Date & Time"
-                    valueFormat="MMM D, YYYY @ h:mm A"
-                    timePickerProps={{
-                      format: "12h",
-                      withDropdown: true,
-                      popoverProps: {
-                        withinPortal: false,
-                        position: "top-start",
-                        withArrow: true,
-                        width: "90%",
-                      },
-                      presets,
+                <Grid.Col span={4}>
+                  <DatePickerInput
+                    label="Date"
+                    valueFormat="MMM D, YYYY"
+                    maxDate={new Date()}
+                    {...form.getInputProps("date")}
+                  />
+                </Grid.Col>
+                <Grid.Col span={3}>
+                  <TimePicker
+                    label="Start Time"
+                    format="12h"
+                    withDropdown
+                    withSeconds={false}
+                    popoverProps={{
+                      withinPortal: false,
+                      position: "top-start",
+                      withArrow: true,
                     }}
+                    presets={presets}
                     {...form.getInputProps("startTime")}
                   />
                 </Grid.Col>
-                <Grid.Col span={5}>
-                  <DateTimePicker
-                    placeholder="End Date & Time"
-                    valueFormat="MMM D, YYYY @ h:mm A"
-                    timePickerProps={{
-                      format: "12h",
-                      withDropdown: true,
-                      popoverProps: {
-                        withinPortal: false,
-                        position: "top-start",
-                        withArrow: true,
-                        width: "90%",
-                      },
-                      presets,
+                <Grid.Col span={3}>
+                  <TimePicker
+                    label="End Time"
+                    format="12h"
+                    withDropdown
+                    withSeconds={false}
+                    popoverProps={{
+                      withinPortal: false,
+                      position: "top-start",
+                      withArrow: true,
                     }}
+                    presets={presets}
                     {...form.getInputProps("endTime")}
                   />
                 </Grid.Col>
@@ -306,13 +345,61 @@ export default function TaskWorkLogs({
                     variant="light"
                     leftSection={<IconHourglassLow size={12} />}
                     style={{ textTransform: "none" }}
-                    mt={8}
+                    mt={form.values.startTime && form.values.endTime ? 28 : 8}
                   >
-                    {form.values.startTime && form.values.startTime
-                      ? `${dayjs(form.values.endTime).diff(
-                          dayjs(form.values.startTime),
-                          "minutes",
-                        )} min`
+                    {form.values.startTime &&
+                    form.values.endTime &&
+                    form.values.date
+                      ? (() => {
+                          try {
+                            // Parse time strings (handles both 12h and 24h formats)
+                            const parseTime = (
+                              timeStr: string,
+                            ): { hours: number; minutes: number } | null => {
+                              const amPmMatch = timeStr.match(
+                                /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i,
+                              );
+                              if (amPmMatch) {
+                                let hours = parseInt(amPmMatch[1]!, 10);
+                                const minutes = parseInt(amPmMatch[2]!, 10);
+                                const isPm =
+                                  amPmMatch[4]?.toUpperCase() === "PM";
+                                if (hours === 12) hours = isPm ? 12 : 0;
+                                else if (isPm) hours += 12;
+                                return { hours, minutes };
+                              }
+                              const timeMatch = timeStr.match(
+                                /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/,
+                              );
+                              if (timeMatch) {
+                                return {
+                                  hours: parseInt(timeMatch[1]!, 10),
+                                  minutes: parseInt(timeMatch[2]!, 10),
+                                };
+                              }
+                              return null;
+                            };
+
+                            const startParts = parseTime(form.values.startTime);
+                            const endParts = parseTime(form.values.endTime);
+
+                            if (startParts && endParts) {
+                              const start = dayjs(form.values.date)
+                                .hour(startParts.hours)
+                                .minute(startParts.minutes);
+                              const end = dayjs(form.values.date)
+                                .hour(endParts.hours)
+                                .minute(endParts.minutes);
+                              const diffMinutes = end.diff(start, "minutes");
+                              return diffMinutes > 0
+                                ? `${diffMinutes} min`
+                                : "--";
+                            }
+                            return "--";
+                          } catch {
+                            return "--";
+                          }
+                        })()
                       : "--"}
                   </Badge>
                 </Grid.Col>
@@ -325,12 +412,18 @@ export default function TaskWorkLogs({
                     maxRows={4}
                   />
                 </Grid.Col>
-                {!!form.errors.date && (
+                {(!!form.errors.date ||
+                  !!form.errors.startTime ||
+                  !!form.errors.endTime) && (
                   <Grid.Col span={12}>
                     <Alert
                       variant="light"
                       color="red"
-                      title={form.errors.date}
+                      title={
+                        form.errors.date ||
+                        form.errors.startTime ||
+                        form.errors.endTime
+                      }
                       icon={<IconInfoCircle />}
                     />
                   </Grid.Col>
