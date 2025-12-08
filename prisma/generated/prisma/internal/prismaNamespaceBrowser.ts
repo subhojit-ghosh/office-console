@@ -87,6 +87,8 @@ export const ClientScalarFieldEnum = {
   name: 'name',
   timeDisplayMultiplier: 'timeDisplayMultiplier',
   showAssignees: 'showAssignees',
+  crIdMandatoryTaskTypes: 'crIdMandatoryTaskTypes',
+  moduleMandatoryForTasks: 'moduleMandatoryForTasks',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

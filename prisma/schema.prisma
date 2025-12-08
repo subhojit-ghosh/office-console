@@ -11,16 +11,18 @@ datasource db {
 }
 
 model Client {
-  id                    String   @id @default(ulid())
-  name                  String   @unique
-  timeDisplayMultiplier Decimal  @default(1.00) @db.Decimal(4, 2)
-  showAssignees         Boolean  @default(true)
-  isActive              Boolean  @default(true)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                      String     @id @default(ulid())
+  name                    String     @unique
+  timeDisplayMultiplier   Decimal    @default(1.00) @db.Decimal(4, 2)
+  showAssignees           Boolean    @default(true)
+  crIdMandatoryTaskTypes  TaskType[]
+  moduleMandatoryForTasks Boolean    @default(false)
+  isActive                Boolean    @default(true)
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @updatedAt
 
-  users    User[]
-  projects Project[]
+  users        User[]
+  projects     Project[]
   requirements Requirement[]
 }
 
@@ -44,18 +46,18 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  staffProfile     StaffProfile?
-  projects         Project[]
-  createdTasks     Task[]         @relation("CreatedTasks")
-  assignedTasks    Task[]         @relation("AssignedTasks")
-  modules          Module[]       @relation("CreatedModules")
-  taskActivities   TaskActivity[] @relation("TaskActivities")
-  taskComments     TaskComment[]  @relation("TaskComments")
-  projectsAsMember Project[]      @relation("ProjectMembers")
-  feedbacks        Feedback[]     @relation("Feedbacks")
-  workLogs         WorkLog[]      @relation("WorkLogs")
-  archivedTasks    Task[]         @relation("ArchivedTasks")
-  createdRequirements Requirement[] @relation("CreatedRequirements")
+  staffProfile          StaffProfile?
+  projects              Project[]
+  createdTasks          Task[]                @relation("CreatedTasks")
+  assignedTasks         Task[]                @relation("AssignedTasks")
+  modules               Module[]              @relation("CreatedModules")
+  taskActivities        TaskActivity[]        @relation("TaskActivities")
+  taskComments          TaskComment[]         @relation("TaskComments")
+  projectsAsMember      Project[]             @relation("ProjectMembers")
+  feedbacks             Feedback[]            @relation("Feedbacks")
+  workLogs              WorkLog[]             @relation("WorkLogs")
+  archivedTasks         Task[]                @relation("ArchivedTasks")
+  createdRequirements   Requirement[]         @relation("CreatedRequirements")
   requirementActivities RequirementActivity[]
 }
 
@@ -128,25 +130,25 @@ enum RequirementType {
 }
 
 model Requirement {
-  id          String               @id @default(ulid())
+  id          String              @id @default(ulid())
   type        RequirementType
   title       String
   description String?
-  status      RequirementStatus    @default(DRAFT)
-  priority    RequirementPriority  @default(MEDIUM)
+  status      RequirementStatus   @default(DRAFT)
+  priority    RequirementPriority @default(MEDIUM)
 
-  clientId   String?
-  client     Client?               @relation(fields: [clientId], references: [id])
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
 
   createdById String
-  createdBy   User                 @relation("CreatedRequirements", fields: [createdById], references: [id])
+  createdBy   User   @relation("CreatedRequirements", fields: [createdById], references: [id])
 
-  parentId   String?
-  parent     Requirement?          @relation("RequirementChildren", fields: [parentId], references: [id])
-  children   Requirement[]         @relation("RequirementChildren")
+  parentId String?
+  parent   Requirement?  @relation("RequirementChildren", fields: [parentId], references: [id])
+  children Requirement[] @relation("RequirementChildren")
 
-  createdAt  DateTime              @default(now())
-  updatedAt  DateTime              @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   activities RequirementActivity[] @relation("RequirementActivities")
 }
@@ -169,7 +171,7 @@ model RequirementActivity {
   newValue String?
 
   userId String
-  user   User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
 }

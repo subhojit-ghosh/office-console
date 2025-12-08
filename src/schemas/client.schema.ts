@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TASK_TYPES } from "~/constants/task.constant";
 
 export const getAllClientsSchema = z.object({
   page: z.number().int().min(1).default(1).optional().nullable(),
@@ -21,6 +22,8 @@ export const createClientSchema = z.object({
     .default(1)
     .optional(),
   showAssignees: z.boolean().default(true).optional(),
+  crIdMandatoryTaskTypes: z.array(z.enum(TASK_TYPES)).default([]).optional(),
+  moduleMandatoryForTasks: z.boolean().default(false).optional(),
 });
 
 export const updateClientSchema = z.object({
@@ -33,6 +36,8 @@ export const updateClientSchema = z.object({
     .default(1)
     .optional(),
   showAssignees: z.boolean().default(true).optional(),
+  crIdMandatoryTaskTypes: z.array(z.enum(TASK_TYPES)).default([]).optional(),
+  moduleMandatoryForTasks: z.boolean().default(false).optional(),
 });
 
 export const deleteClientSchema = z.object({

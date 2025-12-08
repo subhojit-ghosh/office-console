@@ -26,6 +26,8 @@ declare module "next-auth" {
         id: string;
         name: string;
         showAssignees: boolean;
+        crIdMandatoryTaskTypes: string[];
+        moduleMandatoryForTasks: boolean;
       };
     } & DefaultSession["user"];
   }
@@ -37,6 +39,8 @@ declare module "next-auth" {
       id: string;
       name: string;
       showAssignees: boolean;
+      crIdMandatoryTaskTypes: string[];
+      moduleMandatoryForTasks: boolean;
     };
   }
 }
@@ -96,6 +100,8 @@ export const authConfig = {
                 id: user.client.id,
                 name: user.client.name,
                 showAssignees: user.client.showAssignees,
+                crIdMandatoryTaskTypes: user.client.crIdMandatoryTaskTypes as string[] || [],
+                moduleMandatoryForTasks: user.client.moduleMandatoryForTasks,
               }
             : undefined,
         };

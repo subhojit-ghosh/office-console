@@ -1422,6 +1422,8 @@ export const ClientScalarFieldEnum = {
   name: 'name',
   timeDisplayMultiplier: 'timeDisplayMultiplier',
   showAssignees: 'showAssignees',
+  crIdMandatoryTaskTypes: 'crIdMandatoryTaskTypes',
+  moduleMandatoryForTasks: 'moduleMandatoryForTasks',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1675,6 +1677,20 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'TaskType[]'
+ */
+export type ListEnumTaskTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TaskType'
+ */
+export type EnumTaskTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskType'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -1783,20 +1799,6 @@ export type EnumRequirementActivityTypeFieldRefInput<$PrismaModel> = FieldRefInp
  * Reference to a field of type 'RequirementActivityType[]'
  */
 export type ListEnumRequirementActivityTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RequirementActivityType[]'>
-    
-
-
-/**
- * Reference to a field of type 'TaskType'
- */
-export type EnumTaskTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskType'>
-    
-
-
-/**
- * Reference to a field of type 'TaskType[]'
- */
-export type ListEnumTaskTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskType[]'>
     
 
 

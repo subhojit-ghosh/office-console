@@ -15,7 +15,7 @@ import {
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { UserRole, type Project } from "@prisma/generated/browser";
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
@@ -57,7 +57,7 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
       timeDisplayMultiplier: null as number | null,
       memberIds: [] as string[],
     },
-    validate: zodResolver(
+    validate: zod4Resolver(
       mode === "add" ? createProjectSchema : updateProjectSchema,
     ),
   });
@@ -94,7 +94,9 @@ export default function ProjectForm({ mode, opened, close, id }: Props) {
           timeDisplayMultiplier: projectDetail.timeDisplayMultiplier
             ? Number(projectDetail.timeDisplayMultiplier)
             : null,
-          memberIds: projectDetail.members.map((member) => member.id) ?? [],
+          memberIds: Array.isArray(projectDetail.members)
+            ? projectDetail.members.map((member) => member.id)
+            : [],
         });
       }
     } catch (error) {

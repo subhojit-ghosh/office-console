@@ -6,19 +6,21 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  MultiSelect,
   NumberInput,
   Switch,
   TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useEffect, useState } from "react";
 
 import {
   createClientSchema,
   updateClientSchema,
 } from "~/schemas/client.schema";
+import { TASK_TYPE_OPTIONS, type TaskType } from "~/constants/task.constant";
 import { api, apiClient } from "~/trpc/react";
 
 interface Props {
@@ -39,8 +41,10 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
       name: "",
       timeDisplayMultiplier: 1,
       showAssignees: true,
+      crIdMandatoryTaskTypes: [] as TaskType[],
+      moduleMandatoryForTasks: false,
     },
-    validate: zodResolver(
+    validate: zod4Resolver(
       mode === "add" ? createClientSchema : updateClientSchema,
     ),
   });
@@ -68,6 +72,11 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
           name: clientDetail.name,
           timeDisplayMultiplier: Number(clientDetail.timeDisplayMultiplier),
           showAssignees: clientDetail.showAssignees,
+          crIdMandatoryTaskTypes: Array.isArray(clientDetail.crIdMandatoryTaskTypes)
+            ? clientDetail.crIdMandatoryTaskTypes
+            : [],
+          moduleMandatoryForTasks:
+            clientDetail.moduleMandatoryForTasks || false,
         });
       }
     } catch (error) {
@@ -124,6 +133,8 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
         name: form.values.name,
         timeDisplayMultiplier: form.values.timeDisplayMultiplier,
         showAssignees: form.values.showAssignees,
+        crIdMandatoryTaskTypes: form.values.crIdMandatoryTaskTypes,
+        moduleMandatoryForTasks: form.values.moduleMandatoryForTasks,
       });
     } else if (mode === "edit" && id) {
       updateClient.mutate({
@@ -131,6 +142,8 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
         name: form.values.name,
         timeDisplayMultiplier: form.values.timeDisplayMultiplier,
         showAssignees: form.values.showAssignees,
+        crIdMandatoryTaskTypes: form.values.crIdMandatoryTaskTypes,
+        moduleMandatoryForTasks: form.values.moduleMandatoryForTasks,
       });
     }
   };
@@ -168,6 +181,22 @@ export default function ClientForm({ mode, opened, close, id }: Props) {
               defaultChecked
               label="Show Assignees"
               {...form.getInputProps("showAssignees", { type: "checkbox" })}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <MultiSelect
+              label="CR ID Mandatory Task Types"
+              description="Select task types that require a CR ID"
+              data={TASK_TYPE_OPTIONS}
+              {...form.getInputProps("crIdMandatoryTaskTypes")}
+            />
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Switch
+              label="Module Mandatory for Tasks"
+              {...form.getInputProps("moduleMandatoryForTasks", {
+                type: "checkbox",
+              })}
             />
           </Grid.Col>
           <Grid.Col span={12}>

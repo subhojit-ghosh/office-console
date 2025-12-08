@@ -91,6 +91,8 @@ export const clientsRouter = createTRPCRouter({
           name: input.name,
           timeDisplayMultiplier: input.timeDisplayMultiplier,
           showAssignees: input.showAssignees,
+          crIdMandatoryTaskTypes: input.crIdMandatoryTaskTypes,
+          moduleMandatoryForTasks: input.moduleMandatoryForTasks,
         },
       });
     }),
@@ -112,6 +114,8 @@ export const clientsRouter = createTRPCRouter({
           name: input.name,
           timeDisplayMultiplier: input.timeDisplayMultiplier,
           showAssignees: input.showAssignees,
+          crIdMandatoryTaskTypes: input.crIdMandatoryTaskTypes,
+          moduleMandatoryForTasks: input.moduleMandatoryForTasks,
         },
       });
     }),

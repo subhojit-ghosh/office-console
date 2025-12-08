@@ -15,7 +15,7 @@ import {
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconInfoCircle } from "@tabler/icons-react";
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -31,7 +31,7 @@ export default function LoginForm() {
       email: "",
       password: "",
     },
-    validate: zodResolver(
+    validate: zod4Resolver(
       z.object({
         email: z
           .string()

@@ -55,8 +55,8 @@ export default function RootLayout({
             </MantineProvider>
           </HydrateClient>
         </TRPCReactProvider>
-        <Analytics />
-        <SpeedInsights />
+        <Analytics debug={false} />
+        <SpeedInsights debug={false} />
       </body>
     </html>
   );

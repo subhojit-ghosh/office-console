@@ -14,9 +14,9 @@ import {
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { UserRole, type User } from "@prisma/generated/browser";
-import { zodResolver } from "mantine-form-zod-resolver";
-import { useEffect, useMemo, useState } from "react";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
+import { useEffect, useMemo, useState } from "react";
 import { userRoleOptions } from "~/constants/user.constant";
 import { createUserSchema, updateUserSchema } from "~/schemas/user.schema";
 import { api, apiClient } from "~/trpc/react";
@@ -40,12 +40,14 @@ export default function UserForm({ mode, opened, close, id }: Props) {
       id: "",
       name: "",
       email: "",
-      role: "STAFF",
+      role: UserRole.STAFF as UserRole,
       password: "",
       isActive: true,
       clientId: "",
     },
-    validate: zodResolver(mode === "add" ? createUserSchema : updateUserSchema),
+    validate: zod4Resolver(
+      mode === "add" ? createUserSchema : updateUserSchema,
+    ),
   });
 
   const clientsQuery = api.clients.getAllMinimal.useQuery();
@@ -53,7 +55,9 @@ export default function UserForm({ mode, opened, close, id }: Props) {
   const filteredRoleOptions = useMemo(() => {
     if (session?.user.role === UserRole.CLIENT_ADMIN) {
       return userRoleOptions.filter((o) =>
-        [UserRole.CLIENT_ADMIN, UserRole.CLIENT_USER].includes(o.value as UserRole),
+        [UserRole.CLIENT_ADMIN, UserRole.CLIENT_USER].includes(
+          o.value as UserRole,
+        ),
       );
     }
     return userRoleOptions;
@@ -79,7 +83,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
     ) {
       form.setFieldValue("clientId", session.user.clientId);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user.clientId, session?.user.role, form.values.role]);
 
   const createUser = api.users.create.useMutation({
@@ -98,7 +102,12 @@ export default function UserForm({ mode, opened, close, id }: Props) {
       if (zodErrors) {
         const fieldErrors = Object.entries(zodErrors.fieldErrors);
         fieldErrors.forEach(([field, messages]) => {
-          form.setFieldError(field, Array.isArray(messages) && messages.length > 0 ? String(messages[0]) : "Invalid input");
+          form.setFieldError(
+            field,
+            Array.isArray(messages) && messages.length > 0
+              ? String(messages[0])
+              : "Invalid input",
+          );
         });
       }
       setLoading(false);
@@ -216,27 +225,27 @@ export default function UserForm({ mode, opened, close, id }: Props) {
           </Grid.Col>
           {isClientRole(form.values.role as UserRole) &&
             session?.user.role !== UserRole.CLIENT_ADMIN && (
-            <Grid.Col span={12}>
-              <Select
-                label="Client"
-                data={
-                  clientsQuery.data?.map((c) => ({
-                    value: c.id,
-                    label: c.name,
-                  })) ?? []
-                }
-                {...form.getInputProps("clientId")}
-                withAsterisk
-                searchable
-                disabled={loading || clientsQuery.isLoading}
-                placeholder={
-                  clientsQuery.isLoading
-                    ? "Loading clients..."
-                    : "Select client"
-                }
-              />
-            </Grid.Col>
-          )}
+              <Grid.Col span={12}>
+                <Select
+                  label="Client"
+                  data={
+                    clientsQuery.data?.map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                    })) ?? []
+                  }
+                  {...form.getInputProps("clientId")}
+                  withAsterisk
+                  searchable
+                  disabled={loading || clientsQuery.isLoading}
+                  placeholder={
+                    clientsQuery.isLoading
+                      ? "Loading clients..."
+                      : "Select client"
+                  }
+                />
+              </Grid.Col>
+            )}
           <Grid.Col span={12}>
             <PasswordInput
               label="Password"

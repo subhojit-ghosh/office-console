@@ -234,10 +234,37 @@ export const tasksRouter = createTRPCRouter({
       const data = input as z.infer<typeof createTaskSchema>;
       const { assigneeIds, links, crId, ...rest } = data;
 
-      const projectMembers = await ctx.db.project.findUnique({
+      // Get project with client settings for validation
+      const projectWithClient = await ctx.db.project.findUnique({
         where: { id: data.projectId },
-        select: { members: { select: { id: true } } },
+        select: {
+          members: { select: { id: true } },
+          client: {
+            select: {
+              crIdMandatoryTaskTypes: true,
+              moduleMandatoryForTasks: true,
+            },
+          },
+        },
       });
+
+      // Validate CR ID requirement based on project's client settings
+      const crIdMandatoryTypes =
+        projectWithClient?.client?.crIdMandatoryTaskTypes || [];
+      if (crIdMandatoryTypes.includes(rest.type || "TASK")) {
+        if (!crId || crId.trim() === "") {
+          throw new Error(`CR ID is required for ${rest.type || "TASK"} tasks`);
+        }
+      }
+
+      // Validate module requirement based on project's client settings
+      if (projectWithClient?.client?.moduleMandatoryForTasks) {
+        if (!rest.moduleId) {
+          throw new Error("Module selection is required for tasks");
+        }
+      }
+
+      const projectMembers = projectWithClient;
 
       if (
         assigneeIds?.some(
@@ -294,6 +321,7 @@ export const tasksRouter = createTRPCRouter({
       const { id, assigneeIds, ...rest } = data;
       const userId = ctx.session.user.id;
 
+      // Get existing task with project client settings for validation
       const existingTask = await ctx.db.task.findUnique({
         where: { id },
         include: {
@@ -302,11 +330,38 @@ export const tasksRouter = createTRPCRouter({
               id: true,
             },
           },
+          project: {
+            select: {
+              client: {
+                select: {
+                  crIdMandatoryTaskTypes: true,
+                  moduleMandatoryForTasks: true,
+                },
+              },
+            },
+          },
         },
       });
 
       if (!existingTask) {
         throw new Error("Task not found");
+      }
+
+      // Validate CR ID requirement based on project's client settings
+      const crIdMandatoryTypes =
+        existingTask.project?.client?.crIdMandatoryTaskTypes || [];
+      if (rest.type && crIdMandatoryTypes.includes(rest.type)) {
+        if (!rest.crId || rest.crId.trim() === "") {
+          throw new Error(`CR ID is required for ${rest.type} tasks`);
+        }
+      }
+
+      // Validate module requirement based on project's client settings
+      if (
+        existingTask.project?.client?.moduleMandatoryForTasks &&
+        rest.moduleId === null
+      ) {
+        throw new Error("Module selection is required for tasks");
       }
 
       const activityLogs: Prisma.TaskActivityCreateManyInput[] = [];

@@ -30,7 +30,7 @@ import {
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { createWotkLogSchema } from "~/schemas/work-log.schema";
@@ -134,7 +134,7 @@ export default function TaskWorkLogs({
       endTime: undefined,
       note: "",
     },
-    validate: zodResolver(createWotkLogSchema),
+    validate: zod4Resolver(createWotkLogSchema),
   });
 
   useEffect(() => {

@@ -39,6 +39,7 @@ export type ClientMinAggregateOutputType = {
   name: string | null
   timeDisplayMultiplier: runtime.Decimal | null
   showAssignees: boolean | null
+  moduleMandatoryForTasks: boolean | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -49,6 +50,7 @@ export type ClientMaxAggregateOutputType = {
   name: string | null
   timeDisplayMultiplier: runtime.Decimal | null
   showAssignees: boolean | null
+  moduleMandatoryForTasks: boolean | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -59,6 +61,8 @@ export type ClientCountAggregateOutputType = {
   name: number
   timeDisplayMultiplier: number
   showAssignees: number
+  crIdMandatoryTaskTypes: number
+  moduleMandatoryForTasks: number
   isActive: number
   createdAt: number
   updatedAt: number
@@ -79,6 +83,7 @@ export type ClientMinAggregateInputType = {
   name?: true
   timeDisplayMultiplier?: true
   showAssignees?: true
+  moduleMandatoryForTasks?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -89,6 +94,7 @@ export type ClientMaxAggregateInputType = {
   name?: true
   timeDisplayMultiplier?: true
   showAssignees?: true
+  moduleMandatoryForTasks?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +105,8 @@ export type ClientCountAggregateInputType = {
   name?: true
   timeDisplayMultiplier?: true
   showAssignees?: true
+  crIdMandatoryTaskTypes?: true
+  moduleMandatoryForTasks?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -196,6 +204,8 @@ export type ClientGroupByOutputType = {
   name: string
   timeDisplayMultiplier: runtime.Decimal
   showAssignees: boolean
+  crIdMandatoryTaskTypes: $Enums.TaskType[]
+  moduleMandatoryForTasks: boolean
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -229,6 +239,8 @@ export type ClientWhereInput = {
   name?: Prisma.StringFilter<"Client"> | string
   timeDisplayMultiplier?: Prisma.DecimalFilter<"Client"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFilter<"Client"> | boolean
+  crIdMandatoryTaskTypes?: Prisma.EnumTaskTypeNullableListFilter<"Client">
+  moduleMandatoryForTasks?: Prisma.BoolFilter<"Client"> | boolean
   isActive?: Prisma.BoolFilter<"Client"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Client"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Client"> | Date | string
@@ -242,6 +254,8 @@ export type ClientOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
+  crIdMandatoryTaskTypes?: Prisma.SortOrder
+  moduleMandatoryForTasks?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -258,6 +272,8 @@ export type ClientWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ClientWhereInput | Prisma.ClientWhereInput[]
   timeDisplayMultiplier?: Prisma.DecimalFilter<"Client"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFilter<"Client"> | boolean
+  crIdMandatoryTaskTypes?: Prisma.EnumTaskTypeNullableListFilter<"Client">
+  moduleMandatoryForTasks?: Prisma.BoolFilter<"Client"> | boolean
   isActive?: Prisma.BoolFilter<"Client"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Client"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Client"> | Date | string
@@ -271,6 +287,8 @@ export type ClientOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
+  crIdMandatoryTaskTypes?: Prisma.SortOrder
+  moduleMandatoryForTasks?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -289,6 +307,8 @@ export type ClientScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Client"> | string
   timeDisplayMultiplier?: Prisma.DecimalWithAggregatesFilter<"Client"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolWithAggregatesFilter<"Client"> | boolean
+  crIdMandatoryTaskTypes?: Prisma.EnumTaskTypeNullableListFilter<"Client">
+  moduleMandatoryForTasks?: Prisma.BoolWithAggregatesFilter<"Client"> | boolean
   isActive?: Prisma.BoolWithAggregatesFilter<"Client"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Client"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Client"> | Date | string
@@ -299,6 +319,8 @@ export type ClientCreateInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -312,6 +334,8 @@ export type ClientUncheckedCreateInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -325,6 +349,8 @@ export type ClientUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -338,6 +364,8 @@ export type ClientUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -351,6 +379,8 @@ export type ClientCreateManyInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -361,6 +391,8 @@ export type ClientUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -371,9 +403,19 @@ export type ClientUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type EnumTaskTypeNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.TaskType[] | Prisma.ListEnumTaskTypeFieldRefInput<$PrismaModel> | null
+  has?: $Enums.TaskType | Prisma.EnumTaskTypeFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.TaskType[] | Prisma.ListEnumTaskTypeFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.TaskType[] | Prisma.ListEnumTaskTypeFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type ClientCountOrderByAggregateInput = {
@@ -381,6 +423,8 @@ export type ClientCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
+  crIdMandatoryTaskTypes?: Prisma.SortOrder
+  moduleMandatoryForTasks?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -395,6 +439,7 @@ export type ClientMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
+  moduleMandatoryForTasks?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -405,6 +450,7 @@ export type ClientMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   timeDisplayMultiplier?: Prisma.SortOrder
   showAssignees?: Prisma.SortOrder
+  moduleMandatoryForTasks?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -417,6 +463,10 @@ export type ClientSumOrderByAggregateInput = {
 export type ClientNullableScalarRelationFilter = {
   is?: Prisma.ClientWhereInput | null
   isNot?: Prisma.ClientWhereInput | null
+}
+
+export type ClientCreatecrIdMandatoryTaskTypesInput = {
+  set: $Enums.TaskType[]
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -433,6 +483,11 @@ export type DecimalFieldUpdateOperationsInput = {
 
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type ClientUpdatecrIdMandatoryTaskTypesInput = {
+  set?: $Enums.TaskType[]
+  push?: $Enums.TaskType | $Enums.TaskType[]
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -492,6 +547,8 @@ export type ClientCreateWithoutUsersInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -504,6 +561,8 @@ export type ClientUncheckedCreateWithoutUsersInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -532,6 +591,8 @@ export type ClientUpdateWithoutUsersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -544,6 +605,8 @@ export type ClientUncheckedUpdateWithoutUsersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -556,6 +619,8 @@ export type ClientCreateWithoutProjectsInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -568,6 +633,8 @@ export type ClientUncheckedCreateWithoutProjectsInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -596,6 +663,8 @@ export type ClientUpdateWithoutProjectsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -608,6 +677,8 @@ export type ClientUncheckedUpdateWithoutProjectsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -620,6 +691,8 @@ export type ClientCreateWithoutRequirementsInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -632,6 +705,8 @@ export type ClientUncheckedCreateWithoutRequirementsInput = {
   name: string
   timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientCreatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -660,6 +735,8 @@ export type ClientUpdateWithoutRequirementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -672,6 +749,8 @@ export type ClientUncheckedUpdateWithoutRequirementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   timeDisplayMultiplier?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   showAssignees?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  crIdMandatoryTaskTypes?: Prisma.ClientUpdatecrIdMandatoryTaskTypesInput | $Enums.TaskType[]
+  moduleMandatoryForTasks?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -733,6 +812,8 @@ export type ClientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name?: boolean
   timeDisplayMultiplier?: boolean
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: boolean
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -747,6 +828,8 @@ export type ClientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   name?: boolean
   timeDisplayMultiplier?: boolean
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: boolean
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -757,6 +840,8 @@ export type ClientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   name?: boolean
   timeDisplayMultiplier?: boolean
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: boolean
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -767,12 +852,14 @@ export type ClientSelectScalar = {
   name?: boolean
   timeDisplayMultiplier?: boolean
   showAssignees?: boolean
+  crIdMandatoryTaskTypes?: boolean
+  moduleMandatoryForTasks?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ClientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "timeDisplayMultiplier" | "showAssignees" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
+export type ClientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "timeDisplayMultiplier" | "showAssignees" | "crIdMandatoryTaskTypes" | "moduleMandatoryForTasks" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
 export type ClientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Client$usersArgs<ExtArgs>
   projects?: boolean | Prisma.Client$projectsArgs<ExtArgs>
@@ -794,6 +881,8 @@ export type $ClientPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     name: string
     timeDisplayMultiplier: runtime.Decimal
     showAssignees: boolean
+    crIdMandatoryTaskTypes: $Enums.TaskType[]
+    moduleMandatoryForTasks: boolean
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -1227,6 +1316,8 @@ export interface ClientFieldRefs {
   readonly name: Prisma.FieldRef<"Client", 'String'>
   readonly timeDisplayMultiplier: Prisma.FieldRef<"Client", 'Decimal'>
   readonly showAssignees: Prisma.FieldRef<"Client", 'Boolean'>
+  readonly crIdMandatoryTaskTypes: Prisma.FieldRef<"Client", 'TaskType[]'>
+  readonly moduleMandatoryForTasks: Prisma.FieldRef<"Client", 'Boolean'>
   readonly isActive: Prisma.FieldRef<"Client", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Client", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Client", 'DateTime'>

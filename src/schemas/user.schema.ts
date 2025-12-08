@@ -2,7 +2,7 @@ import { z } from "zod";
 import { UserRole } from "@prisma/generated/browser";
 import { isClientRole } from "~/utils/roles";
 
-const userRoleEnum = z.nativeEnum(UserRole);
+const userRoleEnum = z.enum(UserRole);
 
 export const getAllUsersSchema = z.object({
   page: z.number().int().min(1).default(1).optional().nullable(),
@@ -22,7 +22,7 @@ export const getUserByIdSchema = z.object({
 export const createUserSchema = z
   .object({
     name: z.string().nonempty("Name is required"),
-    email: z.string().email("Valid email is required"),
+    email: z.email("Valid email is required"),
     role: userRoleEnum,
     clientId: z.string().optional().nullable(),
     password: z.string().min(6, "Password must be at least 6 characters"),
@@ -32,7 +32,7 @@ export const createUserSchema = z
     if (isClientRole(data.role) && !data.clientId) {
       ctx.addIssue({
         path: ["clientId"],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Client ID is required for client roles",
       });
     }
@@ -42,7 +42,7 @@ export const updateUserSchema = z
   .object({
     id: z.string().nonempty("ID is required"),
     name: z.string().nonempty("Name is required"),
-    email: z.string().email("Valid email is required"),
+    email: z.email("Valid email is required"),
     role: userRoleEnum,
     clientId: z.string().optional().nullable(),
     password: z
@@ -58,7 +58,7 @@ export const updateUserSchema = z
     if (isClientRole(data.role) && !data.clientId) {
       ctx.addIssue({
         path: ["clientId"],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Client ID is required for client roles",
       });
     }

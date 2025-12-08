@@ -19,7 +19,7 @@ import {
 } from "@prisma/generated/browser";
 import { IconMessage } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
@@ -67,7 +67,7 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
       clientId: "",
       parentId: "",
     },
-    validate: zodResolver(
+    validate: zod4Resolver(
       mode === "add" ? createRequirementSchema : updateRequirementSchema,
     ),
   });
@@ -114,7 +114,12 @@ export default function RequirementForm({ mode, opened, close, id }: Props) {
       if (zodErrors) {
         const fieldErrors = Object.entries(zodErrors.fieldErrors);
         fieldErrors.forEach(([field, messages]) => {
-          form.setFieldError(field, Array.isArray(messages) && messages.length > 0 ? String(messages[0]) : "Invalid input");
+          form.setFieldError(
+            field,
+            Array.isArray(messages) && messages.length > 0
+              ? String(messages[0])
+              : "Invalid input",
+          );
         });
       }
       setLoading(false);

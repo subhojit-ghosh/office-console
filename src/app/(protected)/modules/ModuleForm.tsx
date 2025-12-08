@@ -14,7 +14,7 @@ import {
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { UserRole } from "@prisma/generated/browser";
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
@@ -47,7 +47,7 @@ export default function ModuleForm({ mode, opened, close, id }: Props) {
       projectId: "",
       timeDisplayMultiplier: null as number | null,
     },
-    validate: zodResolver(
+    validate: zod4Resolver(
       mode === "add" ? createModuleSchema : updateModuleSchema,
     ),
   });

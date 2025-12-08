@@ -26,7 +26,7 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -107,7 +107,7 @@ export default function TaskLinks({
       sourceId: taskId ?? crypto.randomUUID(),
       targetId: null as string | null,
     },
-    validate: zodResolver(createTaskLinkSchema),
+    validate: zod4Resolver(createTaskLinkSchema),
   });
 
   useEffect(() => {

@@ -23,7 +23,7 @@ import {
   IconMessage,
 } from "@tabler/icons-react";
 import type { inferRouterOutputs } from "@trpc/server";
-import { zodResolver } from "mantine-form-zod-resolver";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
@@ -86,8 +86,11 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       moduleId: null as string | null,
       assigneeIds: [] as string[],
       dueDate: undefined,
+      links: [], // Add links for schema validation
     },
-    validate: zodResolver(mode === "add" ? createTaskSchema : updateTaskSchema),
+    validate: zod4Resolver(
+      mode === "add" ? createTaskSchema : updateTaskSchema,
+    ),
   });
 
   const projectsQuery = api.projects.getAllMinimal.useQuery();
@@ -100,6 +103,20 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
     },
     {
       enabled: !!form.values.projectId,
+      select: (data) => {
+        if (!data) return data;
+        return {
+          ...data,
+          client: data.client
+            ? {
+                id: data.client.id,
+                name: data.client.name,
+                crIdMandatoryTaskTypes: data.client.crIdMandatoryTaskTypes,
+                moduleMandatoryForTasks: data.client.moduleMandatoryForTasks,
+              }
+            : null,
+        };
+      },
     },
   );
 
@@ -108,6 +125,20 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       isClientRole(session?.user.role) && !session?.user.client?.showAssignees
     );
   }, [session?.user]);
+
+  const isCrIdRequired = useMemo(() => {
+    const crIdMandatoryTypes =
+      projectMembersQuery.data?.client?.crIdMandatoryTaskTypes || [];
+    const currentTaskType = form.values.type || "TASK";
+    return crIdMandatoryTypes.includes(currentTaskType);
+  }, [
+    projectMembersQuery.data?.client?.crIdMandatoryTaskTypes,
+    form.values.type,
+  ]);
+
+  const isModuleRequired = useMemo(() => {
+    return projectMembersQuery.data?.client?.moduleMandatoryForTasks || false;
+  }, [projectMembersQuery.data?.client?.moduleMandatoryForTasks]);
 
   useEffect(() => {
     if (mode === "add") {
@@ -141,11 +172,12 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
           status: taskDetail.status,
           priority: taskDetail.priority,
           projectId: taskDetail.projectId,
-          moduleId: taskDetail.moduleId ?? "",
+          moduleId: taskDetail.moduleId ?? null,
           assigneeIds: Array.isArray(taskDetail.assignees)
             ? taskDetail.assignees.map((u: { id: string }) => u.id)
             : [],
           dueDate: taskDetail.dueDate as never,
+          links: [],
         });
         setActivities(taskDetail.activities);
       }
@@ -201,34 +233,78 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
   });
 
   const handleSubmit = (values: typeof form.values) => {
+    // Ensure array fields are always arrays for zod validation
+    const safeValues = {
+      ...values,
+      assigneeIds: values.assigneeIds || [],
+      links: values.links || [],
+    };
+
+    // Zod validation is handled by the form resolver
+    // If we reach here, zod validation passed, now do custom validation
+
+    // Frontend validation for CR ID and module requirements
+    const clientSettings = projectMembersQuery.data?.client;
+
+    // Only validate CR ID and module requirements if we have project data
+    if (projectMembersQuery.data && safeValues.projectId) {
+      // Check CR ID requirement
+      if (
+        clientSettings?.crIdMandatoryTaskTypes?.includes(
+          safeValues.type as Task["type"],
+        )
+      ) {
+        if (!safeValues.crId || safeValues.crId.trim() === "") {
+          notifications.show({
+            title: "Validation Error",
+            message: `CR ID is required for ${safeValues.type} tasks`,
+            color: "red",
+          });
+          return;
+        }
+      }
+
+      // Check module requirement
+      if (clientSettings?.moduleMandatoryForTasks) {
+        if (!safeValues.moduleId) {
+          notifications.show({
+            title: "Validation Error",
+            message: "Module selection is required for tasks",
+            color: "red",
+          });
+          return;
+        }
+      }
+    }
+
     setLoading(true);
     if (mode === "add") {
       createTask.mutate({
-        title: values.title,
-        description: values.description,
-        crId: values.crId,
-        type: values.type as Task["type"],
-        status: values.status as Task["status"],
-        priority: values.priority as Task["priority"],
-        projectId: values.projectId,
-        moduleId: values.moduleId,
-        assigneeIds: values.assigneeIds,
-        dueDate: values.dueDate,
+        title: safeValues.title,
+        description: safeValues.description,
+        crId: safeValues.crId,
+        type: safeValues.type as Task["type"],
+        status: safeValues.status as Task["status"],
+        priority: safeValues.priority as Task["priority"],
+        projectId: safeValues.projectId!,
+        moduleId: safeValues.moduleId,
+        assigneeIds: safeValues.assigneeIds,
+        dueDate: safeValues.dueDate,
         links: temporaryLinks,
       });
     } else if (mode === "edit" && id) {
       updateTask.mutate({
-        id: values.id,
-        title: values.title,
-        description: values.description,
-        crId: values.crId,
-        type: values.type as Task["type"],
-        status: values.status as Task["status"],
-        priority: values.priority as Task["priority"],
-        projectId: values.projectId,
-        moduleId: values.moduleId,
-        assigneeIds: values.assigneeIds,
-        dueDate: values.dueDate,
+        id: safeValues.id,
+        title: safeValues.title,
+        description: safeValues.description,
+        crId: safeValues.crId,
+        type: safeValues.type as Task["type"],
+        status: safeValues.status as Task["status"],
+        priority: safeValues.priority as Task["priority"],
+        projectId: safeValues.projectId!,
+        moduleId: safeValues.moduleId,
+        assigneeIds: safeValues.assigneeIds,
+        dueDate: safeValues.dueDate,
       });
     }
   };
@@ -458,6 +534,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
               <Grid.Col span={12}>
                 <Select
                   label="Module"
+                  withAsterisk={isModuleRequired}
                   data={
                     modulesQuery.data?.map((m) => ({
                       value: m.id,
@@ -465,14 +542,18 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                     })) ?? []
                   }
                   {...form.getInputProps("moduleId")}
-                  disabled={loading || modulesQuery.isLoading}
+                  disabled={
+                    loading || modulesQuery.isLoading || !form.values.projectId
+                  }
                   searchable
                   placeholder={
-                    modulesQuery.isLoading
-                      ? "Loading modules..."
-                      : modulesQuery.data?.length
-                        ? "Select module"
-                        : "No modules available"
+                    !form.values.projectId
+                      ? "Select a project first"
+                      : modulesQuery.isLoading
+                        ? "Loading modules..."
+                        : modulesQuery.data?.length
+                          ? "Select module"
+                          : "No modules available"
                   }
                 />
               </Grid.Col>
@@ -480,6 +561,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                 <TextInput
                   label="CR ID"
                   placeholder="Enter Change Request ID"
+                  withAsterisk={isCrIdRequired}
                   {...form.getInputProps("crId")}
                   disabled={loading}
                 />
@@ -489,7 +571,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                   <MultiSelect
                     label="Assignees"
                     data={
-                      projectMembersQuery.data?.members.map((member) => ({
+                      projectMembersQuery.data?.members?.map((member) => ({
                         value: member.id,
                         label: member.name,
                       })) ?? []
@@ -500,7 +582,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                     placeholder={
                       projectMembersQuery.isLoading
                         ? "Loading project members..."
-                        : projectMembersQuery.data?.members.length
+                        : projectMembersQuery.data?.members?.length
                           ? "Select assignees"
                           : "No project members available"
                     }
