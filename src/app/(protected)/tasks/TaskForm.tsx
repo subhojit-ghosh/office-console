@@ -84,6 +84,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
       priority: "MEDIUM",
       projectId: null as string | null,
       moduleId: null as string | null,
+      ticketId: null as string | null,
       assigneeIds: [] as string[],
       dueDate: undefined,
       links: [], // Add links for schema validation
@@ -97,6 +98,12 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
   const modulesQuery = api.modules.getAllMinimal.useQuery({
     projectId: form.values.projectId,
   });
+  const ticketsQuery = api.tickets.getAllMinimal.useQuery(
+    {},
+    {
+      enabled: !!form.values.projectId,
+    },
+  );
   const projectMembersQuery = api.projects.getById.useQuery(
     {
       id: form.values.projectId!,
@@ -136,6 +143,20 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
     form.values.type,
   ]);
 
+  const isCrIdDisabled = useMemo(() => {
+    if (loading) return true;
+
+    // Check if a ticket is selected and has a CR ID
+    if (form.values.ticketId) {
+      const selectedTicket = ticketsQuery.data?.find(ticket => ticket.id === form.values.ticketId);
+      if (selectedTicket?.crId) {
+        return true; // Disable CR ID input when ticket with CR ID is selected
+      }
+    }
+
+    return false;
+  }, [loading, form.values.ticketId, ticketsQuery.data]);
+
   const isModuleRequired = useMemo(() => {
     return projectMembersQuery.data?.client?.moduleMandatoryForTasks || false;
   }, [projectMembersQuery.data?.client?.moduleMandatoryForTasks]);
@@ -173,6 +194,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
           priority: taskDetail.priority,
           projectId: taskDetail.projectId,
           moduleId: taskDetail.moduleId ?? null,
+          ticketId: taskDetail.ticketId ?? null,
           assigneeIds: Array.isArray(taskDetail.assignees)
             ? taskDetail.assignees.map((u: { id: string }) => u.id)
             : [],
@@ -288,6 +310,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
         priority: safeValues.priority as Task["priority"],
         projectId: safeValues.projectId!,
         moduleId: safeValues.moduleId,
+        ticketId: safeValues.ticketId,
         assigneeIds: safeValues.assigneeIds,
         dueDate: safeValues.dueDate,
         links: temporaryLinks,
@@ -303,6 +326,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
         priority: safeValues.priority as Task["priority"],
         projectId: safeValues.projectId!,
         moduleId: safeValues.moduleId,
+        ticketId: safeValues.ticketId,
         assigneeIds: safeValues.assigneeIds,
         dueDate: safeValues.dueDate,
       });
@@ -558,12 +582,49 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
                 />
               </Grid.Col>
               <Grid.Col span={12}>
+                <Select
+                  label="Ticket"
+                  data={
+                    ticketsQuery.data?.map((ticket) => ({
+                      value: ticket.id,
+                      label: ticket.title,
+                    })) ?? []
+                  }
+                  {...form.getInputProps("ticketId")}
+                  onChange={(value) => {
+                    form.setFieldValue("ticketId", value);
+                    // Auto-fill CR ID from selected ticket
+                    if (value) {
+                      const selectedTicket = ticketsQuery.data?.find(ticket => ticket.id === value);
+                      if (selectedTicket?.crId) {
+                        form.setFieldValue("crId", selectedTicket.crId);
+                      }
+                    } else {
+                      // Clear CR ID if ticket is deselected
+                      form.setFieldValue("crId", "");
+                    }
+                  }}
+                  disabled={loading || ticketsQuery.isLoading || !form.values.projectId}
+                  searchable
+                  clearable
+                  placeholder={
+                    !form.values.projectId
+                      ? "Select a project first"
+                      : ticketsQuery.isLoading
+                        ? "Loading tickets..."
+                        : ticketsQuery.data?.length
+                          ? "Select ticket (optional)"
+                          : "No tickets available"
+                  }
+                />
+              </Grid.Col>
+              <Grid.Col span={12}>
                 <TextInput
                   label="CR ID"
                   placeholder="Enter Change Request ID"
                   withAsterisk={isCrIdRequired}
                   {...form.getInputProps("crId")}
-                  disabled={loading}
+                  disabled={isCrIdDisabled}
                 />
               </Grid.Col>
               {!shouldHideAssignees && (

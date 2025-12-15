@@ -232,7 +232,21 @@ export const tasksRouter = createTRPCRouter({
     .input(sanitizeInputSchema(createTaskSchema))
     .mutation(async ({ ctx, input }) => {
       const data = input as z.infer<typeof createTaskSchema>;
-      const { assigneeIds, links, crId, ...rest } = data;
+      const { assigneeIds, links, ticketId, ...rest } = data;
+
+      // If ticketId is provided, get the ticket's crId to override task crId
+      let finalCrId = rest.crId;
+      if (ticketId) {
+        const ticket = await ctx.db.ticket.findUnique({
+          where: { id: ticketId },
+          select: { crId: true, clientId: true },
+        });
+        if (!ticket) {
+          throw new Error("Ticket not found");
+        }
+        // Override task crId with ticket crId
+        finalCrId = ticket.crId;
+      }
 
       // Get project with client settings for validation
       const projectWithClient = await ctx.db.project.findUnique({
@@ -252,7 +266,7 @@ export const tasksRouter = createTRPCRouter({
       const crIdMandatoryTypes =
         projectWithClient?.client?.crIdMandatoryTaskTypes || [];
       if (crIdMandatoryTypes.includes(rest.type || "TASK")) {
-        if (!crId || crId.trim() === "") {
+        if (!finalCrId || finalCrId.trim() === "") {
           throw new Error(`CR ID is required for ${rest.type || "TASK"} tasks`);
         }
       }
@@ -281,7 +295,8 @@ export const tasksRouter = createTRPCRouter({
       const task = await ctx.db.task.create({
         data: {
           ...rest,
-          crId,
+          crId: finalCrId,
+          ticketId: ticketId || null,
           createdById: userId,
           assignees: assigneeIds
             ? { connect: assigneeIds.map((id) => ({ id })) }
@@ -318,7 +333,7 @@ export const tasksRouter = createTRPCRouter({
     .input(sanitizeInputSchema(updateTaskSchema))
     .mutation(async ({ ctx, input }) => {
       const data = input as z.infer<typeof updateTaskSchema>;
-      const { id, assigneeIds, ...rest } = data;
+      const { id, assigneeIds, ticketId, ...rest } = data;
       const userId = ctx.session.user.id;
 
       // Get existing task with project client settings for validation
@@ -345,6 +360,25 @@ export const tasksRouter = createTRPCRouter({
 
       if (!existingTask) {
         throw new Error("Task not found");
+      }
+
+      // If ticketId is provided, get the ticket's crId to override task crId
+      let finalCrId = rest.crId;
+      if (ticketId !== undefined) {
+        if (ticketId) {
+          const ticket = await ctx.db.ticket.findUnique({
+            where: { id: ticketId },
+            select: { crId: true, clientId: true },
+          });
+          if (!ticket) {
+            throw new Error("Ticket not found");
+          }
+          // Override task crId with ticket crId
+          finalCrId = ticket.crId;
+        } else {
+          // ticketId is being set to null/undefined
+          finalCrId = null;
+        }
       }
 
       // Validate CR ID requirement based on project's client settings
@@ -442,6 +476,21 @@ export const tasksRouter = createTRPCRouter({
         });
       }
 
+      // Log ticketId changes separately
+      if (ticketId !== undefined) {
+        const oldTicketId = existingTask.ticketId;
+        if (ticketId !== oldTicketId) {
+          activityLogs.push({
+            taskId: id,
+            userId,
+            type: TaskActivityType.FIELD_CHANGE,
+            field: "ticketId",
+            oldValue: oldTicketId || null,
+            newValue: ticketId || null,
+          });
+        }
+      }
+
       // Only update completedAt if status is being changed
       const statusChanged =
         rest.status !== undefined && rest.status !== existingTask.status;
@@ -462,6 +511,8 @@ export const tasksRouter = createTRPCRouter({
         where: { id },
         data: {
           ...rest,
+          crId: finalCrId,
+          ticketId: ticketId !== undefined ? ticketId : undefined,
           assignees: assigneeIds
             ? { set: assigneeIds.map((id) => ({ id })) }
             : undefined,

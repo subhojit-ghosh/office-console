@@ -47,6 +47,7 @@ export const createTaskSchema = z.object({
   priority: z.enum(TASK_PRIORITIES).optional(),
   projectId: z.string(),
   moduleId: z.string().optional().nullable(),
+  ticketId: z.string().optional().nullable(),
   assigneeIds: z.array(z.string()).optional(),
   dueDate: z.preprocess(parseDate, z.date().optional().nullable()),
   links: z
@@ -70,6 +71,7 @@ export const updateTaskSchema = z.object({
   priority: z.enum(TASK_PRIORITIES).optional(),
   projectId: z.string(),
   moduleId: z.string().optional().nullable(),
+  ticketId: z.string().optional().nullable(),
   assigneeIds: z.array(z.string()).optional(),
   dueDate: z.preprocess(parseDate, z.date().optional().nullable()),
 });

@@ -17,8 +17,8 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models'
-export type * from './prismaNamespace'
+export type * from '../models.ts'
+export type * from './prismaNamespace.ts'
 
 export const Decimal = runtime.Decimal
 
@@ -63,7 +63,10 @@ export const ModelName = {
   TaskComment: 'TaskComment',
   Feedback: 'Feedback',
   WorkLog: 'WorkLog',
-  TaskLink: 'TaskLink'
+  TaskLink: 'TaskLink',
+  Ticket: 'Ticket',
+  TicketActivity: 'TicketActivity',
+  TicketComment: 'TicketComment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,8 +88,9 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const ClientScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   showAssignees: 'showAssignees',
+  crIdMandatoryTaskTypes: 'crIdMandatoryTaskTypes',
+  moduleMandatoryForTasks: 'moduleMandatoryForTasks',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -130,7 +134,6 @@ export const ProjectScalarFieldEnum = {
   description: 'description',
   status: 'status',
   clientId: 'clientId',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -176,7 +179,6 @@ export const ModuleScalarFieldEnum = {
   description: 'description',
   crId: 'crId',
   projectId: 'projectId',
-  timeDisplayMultiplier: 'timeDisplayMultiplier',
   createdById: 'createdById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -195,6 +197,7 @@ export const TaskScalarFieldEnum = {
   priority: 'priority',
   projectId: 'projectId',
   moduleId: 'moduleId',
+  ticketId: 'ticketId',
   createdById: 'createdById',
   dueDate: 'dueDate',
   completedAt: 'completedAt',
@@ -272,6 +275,49 @@ export const TaskLinkScalarFieldEnum = {
 } as const
 
 export type TaskLinkScalarFieldEnum = (typeof TaskLinkScalarFieldEnum)[keyof typeof TaskLinkScalarFieldEnum]
+
+
+export const TicketScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  crId: 'crId',
+  status: 'status',
+  clientId: 'clientId',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
+
+
+export const TicketActivityScalarFieldEnum = {
+  id: 'id',
+  ticketId: 'ticketId',
+  type: 'type',
+  field: 'field',
+  oldValue: 'oldValue',
+  newValue: 'newValue',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type TicketActivityScalarFieldEnum = (typeof TicketActivityScalarFieldEnum)[keyof typeof TicketActivityScalarFieldEnum]
+
+
+export const TicketCommentScalarFieldEnum = {
+  id: 'id',
+  ticketId: 'ticketId',
+  userId: 'userId',
+  content: 'content',
+  type: 'type',
+  edited: 'edited',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TicketCommentScalarFieldEnum = (typeof TicketCommentScalarFieldEnum)[keyof typeof TicketCommentScalarFieldEnum]
 
 
 export const SortOrder = {

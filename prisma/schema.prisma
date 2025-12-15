@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "./generated/prisma"
+  output   = "./generated"
 }
 
 datasource db {
@@ -23,6 +23,7 @@ model Client {
   users        User[]
   projects     Project[]
   requirements Requirement[]
+  tickets      Ticket[]
 }
 
 enum UserRole {
@@ -58,6 +59,9 @@ model User {
   archivedTasks         Task[]                @relation("ArchivedTasks")
   createdRequirements   Requirement[]         @relation("CreatedRequirements")
   requirementActivities RequirementActivity[]
+  createdTickets        Ticket[]              @relation("CreatedTickets")
+  ticketActivities      TicketActivity[]      @relation("TicketActivities")
+  ticketComments        TicketComment[]       @relation("TicketComments")
 }
 
 enum StaffPosition {
@@ -198,6 +202,14 @@ enum TaskStatus {
   CANCELED
 }
 
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
 enum TaskPriority {
   LOW
   MEDIUM
@@ -232,6 +244,9 @@ model Task {
   moduleId String?
   module   Module? @relation(fields: [moduleId], references: [id])
 
+  ticketId String?
+  ticket   Ticket? @relation(fields: [ticketId], references: [id])
+
   createdById String
   createdBy   User   @relation("CreatedTasks", fields: [createdById], references: [id])
 
@@ -260,6 +275,13 @@ enum TaskActivityType {
   UNASSIGNED
 }
 
+enum TicketActivityType {
+  CREATED
+  FIELD_CHANGE
+  UPDATED
+  REOPENED
+}
+
 model TaskActivity {
   id String @id @default(ulid())
 
@@ -281,6 +303,10 @@ enum TaskCommentType {
   GENERAL
   BLOCK_REASON
   ON_HOLD_REASON
+}
+
+enum TicketCommentType {
+  GENERAL
 }
 
 model TaskComment {
@@ -357,4 +383,55 @@ model TaskLink {
   createdAt DateTime @default(now())
 
   @@unique([sourceId, targetId, type])
+}
+
+model Ticket {
+  id          String       @id @default(ulid())
+  title       String
+  description String?
+  crId        String?
+  status      TicketStatus @default(OPEN)
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+
+  createdById String
+  createdBy   User   @relation("CreatedTickets", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activities TicketActivity[] @relation("TicketActivities")
+  comments   TicketComment[]  @relation("TicketComments")
+  tasks      Task[]
+}
+
+model TicketActivity {
+  id String @id @default(ulid())
+
+  ticketId String
+  ticket   Ticket @relation("TicketActivities", fields: [ticketId], references: [id])
+
+  type     TicketActivityType
+  field    String? // Only used when type = FIELD_CHANGE
+  oldValue String?
+  newValue String?
+
+  userId String
+  user   User   @relation("TicketActivities", fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model TicketComment {
+  id        String            @id @default(ulid())
+  ticketId  String
+  ticket    Ticket            @relation("TicketComments", fields: [ticketId], references: [id])
+  userId    String
+  user      User              @relation("TicketComments", fields: [userId], references: [id])
+  content   String
+  type      TicketCommentType @default(GENERAL)
+  edited    Boolean           @default(false)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 }

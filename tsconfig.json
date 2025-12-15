@@ -30,7 +30,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
-      "@prisma/generated/server": ["./prisma/generated/prisma/client"],
+      "@prisma/generated/server": ["./prisma/generated/client"],
       "@prisma/generated/browser": ["./prisma/generated/browser"]
     }
   },

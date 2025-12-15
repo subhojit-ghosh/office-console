@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Module
@@ -20,18 +20,8 @@ export type ModuleModel = runtime.Types.Result.DefaultSelection<Prisma.$ModulePa
 
 export type AggregateModule = {
   _count: ModuleCountAggregateOutputType | null
-  _avg: ModuleAvgAggregateOutputType | null
-  _sum: ModuleSumAggregateOutputType | null
   _min: ModuleMinAggregateOutputType | null
   _max: ModuleMaxAggregateOutputType | null
-}
-
-export type ModuleAvgAggregateOutputType = {
-  timeDisplayMultiplier: runtime.Decimal | null
-}
-
-export type ModuleSumAggregateOutputType = {
-  timeDisplayMultiplier: runtime.Decimal | null
 }
 
 export type ModuleMinAggregateOutputType = {
@@ -40,7 +30,6 @@ export type ModuleMinAggregateOutputType = {
   description: string | null
   crId: string | null
   projectId: string | null
-  timeDisplayMultiplier: runtime.Decimal | null
   createdById: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -52,7 +41,6 @@ export type ModuleMaxAggregateOutputType = {
   description: string | null
   crId: string | null
   projectId: string | null
-  timeDisplayMultiplier: runtime.Decimal | null
   createdById: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -64,7 +52,6 @@ export type ModuleCountAggregateOutputType = {
   description: number
   crId: number
   projectId: number
-  timeDisplayMultiplier: number
   createdById: number
   createdAt: number
   updatedAt: number
@@ -72,21 +59,12 @@ export type ModuleCountAggregateOutputType = {
 }
 
 
-export type ModuleAvgAggregateInputType = {
-  timeDisplayMultiplier?: true
-}
-
-export type ModuleSumAggregateInputType = {
-  timeDisplayMultiplier?: true
-}
-
 export type ModuleMinAggregateInputType = {
   id?: true
   name?: true
   description?: true
   crId?: true
   projectId?: true
-  timeDisplayMultiplier?: true
   createdById?: true
   createdAt?: true
   updatedAt?: true
@@ -98,7 +76,6 @@ export type ModuleMaxAggregateInputType = {
   description?: true
   crId?: true
   projectId?: true
-  timeDisplayMultiplier?: true
   createdById?: true
   createdAt?: true
   updatedAt?: true
@@ -110,7 +87,6 @@ export type ModuleCountAggregateInputType = {
   description?: true
   crId?: true
   projectId?: true
-  timeDisplayMultiplier?: true
   createdById?: true
   createdAt?: true
   updatedAt?: true
@@ -155,18 +131,6 @@ export type ModuleAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: ModuleAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: ModuleSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: ModuleMinAggregateInputType
@@ -197,8 +161,6 @@ export type ModuleGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: ModuleCountAggregateInputType | true
-  _avg?: ModuleAvgAggregateInputType
-  _sum?: ModuleSumAggregateInputType
   _min?: ModuleMinAggregateInputType
   _max?: ModuleMaxAggregateInputType
 }
@@ -209,13 +171,10 @@ export type ModuleGroupByOutputType = {
   description: string | null
   crId: string | null
   projectId: string
-  timeDisplayMultiplier: runtime.Decimal | null
   createdById: string
   createdAt: Date
   updatedAt: Date
   _count: ModuleCountAggregateOutputType | null
-  _avg: ModuleAvgAggregateOutputType | null
-  _sum: ModuleSumAggregateOutputType | null
   _min: ModuleMinAggregateOutputType | null
   _max: ModuleMaxAggregateOutputType | null
 }
@@ -244,7 +203,6 @@ export type ModuleWhereInput = {
   description?: Prisma.StringNullableFilter<"Module"> | string | null
   crId?: Prisma.StringNullableFilter<"Module"> | string | null
   projectId?: Prisma.StringFilter<"Module"> | string
-  timeDisplayMultiplier?: Prisma.DecimalNullableFilter<"Module"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFilter<"Module"> | string
   createdAt?: Prisma.DateTimeFilter<"Module"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Module"> | Date | string
@@ -259,7 +217,6 @@ export type ModuleOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   crId?: Prisma.SortOrderInput | Prisma.SortOrder
   projectId?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -277,7 +234,6 @@ export type ModuleWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Module"> | string | null
   crId?: Prisma.StringNullableFilter<"Module"> | string | null
   projectId?: Prisma.StringFilter<"Module"> | string
-  timeDisplayMultiplier?: Prisma.DecimalNullableFilter<"Module"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFilter<"Module"> | string
   createdAt?: Prisma.DateTimeFilter<"Module"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Module"> | Date | string
@@ -292,15 +248,12 @@ export type ModuleOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   crId?: Prisma.SortOrderInput | Prisma.SortOrder
   projectId?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ModuleCountOrderByAggregateInput
-  _avg?: Prisma.ModuleAvgOrderByAggregateInput
   _max?: Prisma.ModuleMaxOrderByAggregateInput
   _min?: Prisma.ModuleMinOrderByAggregateInput
-  _sum?: Prisma.ModuleSumOrderByAggregateInput
 }
 
 export type ModuleScalarWhereWithAggregatesInput = {
@@ -312,7 +265,6 @@ export type ModuleScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Module"> | string | null
   crId?: Prisma.StringNullableWithAggregatesFilter<"Module"> | string | null
   projectId?: Prisma.StringWithAggregatesFilter<"Module"> | string
-  timeDisplayMultiplier?: Prisma.DecimalNullableWithAggregatesFilter<"Module"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringWithAggregatesFilter<"Module"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Module"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Module"> | Date | string
@@ -323,7 +275,6 @@ export type ModuleCreateInput = {
   name: string
   description?: string | null
   crId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutModulesInput
@@ -337,7 +288,6 @@ export type ModuleUncheckedCreateInput = {
   description?: string | null
   crId?: string | null
   projectId: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -349,7 +299,6 @@ export type ModuleUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutModulesNestedInput
@@ -363,7 +312,6 @@ export type ModuleUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -376,7 +324,6 @@ export type ModuleCreateManyInput = {
   description?: string | null
   crId?: string | null
   projectId: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -387,7 +334,6 @@ export type ModuleUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -398,7 +344,6 @@ export type ModuleUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -420,14 +365,9 @@ export type ModuleCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   crId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type ModuleAvgOrderByAggregateInput = {
-  timeDisplayMultiplier?: Prisma.SortOrder
 }
 
 export type ModuleMaxOrderByAggregateInput = {
@@ -436,7 +376,6 @@ export type ModuleMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   crId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -448,14 +387,9 @@ export type ModuleMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   crId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
-  timeDisplayMultiplier?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type ModuleSumOrderByAggregateInput = {
-  timeDisplayMultiplier?: Prisma.SortOrder
 }
 
 export type ModuleNullableScalarRelationFilter = {
@@ -568,7 +502,6 @@ export type ModuleCreateWithoutCreatedByInput = {
   name: string
   description?: string | null
   crId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutModulesInput
@@ -581,7 +514,6 @@ export type ModuleUncheckedCreateWithoutCreatedByInput = {
   description?: string | null
   crId?: string | null
   projectId: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutModuleInput
@@ -622,7 +554,6 @@ export type ModuleScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"Module"> | string | null
   crId?: Prisma.StringNullableFilter<"Module"> | string | null
   projectId?: Prisma.StringFilter<"Module"> | string
-  timeDisplayMultiplier?: Prisma.DecimalNullableFilter<"Module"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFilter<"Module"> | string
   createdAt?: Prisma.DateTimeFilter<"Module"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Module"> | Date | string
@@ -633,7 +564,6 @@ export type ModuleCreateWithoutProjectInput = {
   name: string
   description?: string | null
   crId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy: Prisma.UserCreateNestedOneWithoutModulesInput
@@ -645,7 +575,6 @@ export type ModuleUncheckedCreateWithoutProjectInput = {
   name: string
   description?: string | null
   crId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -683,7 +612,6 @@ export type ModuleCreateWithoutTasksInput = {
   name: string
   description?: string | null
   crId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutModulesInput
@@ -696,7 +624,6 @@ export type ModuleUncheckedCreateWithoutTasksInput = {
   description?: string | null
   crId?: string | null
   projectId: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -723,7 +650,6 @@ export type ModuleUpdateWithoutTasksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutModulesNestedInput
@@ -736,7 +662,6 @@ export type ModuleUncheckedUpdateWithoutTasksInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -748,7 +673,6 @@ export type ModuleCreateManyCreatedByInput = {
   description?: string | null
   crId?: string | null
   projectId: string
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -758,7 +682,6 @@ export type ModuleUpdateWithoutCreatedByInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutModulesNestedInput
@@ -771,7 +694,6 @@ export type ModuleUncheckedUpdateWithoutCreatedByInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutModuleNestedInput
@@ -783,7 +705,6 @@ export type ModuleUncheckedUpdateManyWithoutCreatedByInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -793,7 +714,6 @@ export type ModuleCreateManyProjectInput = {
   name: string
   description?: string | null
   crId?: string | null
-  timeDisplayMultiplier?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -804,7 +724,6 @@ export type ModuleUpdateWithoutProjectInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.UserUpdateOneRequiredWithoutModulesNestedInput
@@ -816,7 +735,6 @@ export type ModuleUncheckedUpdateWithoutProjectInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -828,7 +746,6 @@ export type ModuleUncheckedUpdateManyWithoutProjectInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   crId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timeDisplayMultiplier?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -871,7 +788,6 @@ export type ModuleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   description?: boolean
   crId?: boolean
   projectId?: boolean
-  timeDisplayMultiplier?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -887,7 +803,6 @@ export type ModuleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   description?: boolean
   crId?: boolean
   projectId?: boolean
-  timeDisplayMultiplier?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -901,7 +816,6 @@ export type ModuleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   description?: boolean
   crId?: boolean
   projectId?: boolean
-  timeDisplayMultiplier?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -915,13 +829,12 @@ export type ModuleSelectScalar = {
   description?: boolean
   crId?: boolean
   projectId?: boolean
-  timeDisplayMultiplier?: boolean
   createdById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ModuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "crId" | "projectId" | "timeDisplayMultiplier" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["module"]>
+export type ModuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "crId" | "projectId" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["module"]>
 export type ModuleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -950,7 +863,6 @@ export type $ModulePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     description: string | null
     crId: string | null
     projectId: string
-    timeDisplayMultiplier: runtime.Decimal | null
     createdById: string
     createdAt: Date
     updatedAt: Date
@@ -1385,7 +1297,6 @@ export interface ModuleFieldRefs {
   readonly description: Prisma.FieldRef<"Module", 'String'>
   readonly crId: Prisma.FieldRef<"Module", 'String'>
   readonly projectId: Prisma.FieldRef<"Module", 'String'>
-  readonly timeDisplayMultiplier: Prisma.FieldRef<"Module", 'Decimal'>
   readonly createdById: Prisma.FieldRef<"Module", 'String'>
   readonly createdAt: Prisma.FieldRef<"Module", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Module", 'DateTime'>

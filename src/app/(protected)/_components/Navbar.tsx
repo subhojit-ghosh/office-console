@@ -13,6 +13,7 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconFoldersFilled,
+  IconHelp,
   IconHomeFilled,
   IconMoon,
   IconSun,
@@ -49,6 +50,7 @@ export function Navbar({ toggleMobile }: NavbarProps) {
     { link: "/tasks", label: "Tasks", icon: FaTasks },
     { link: "/modules", label: "Modules", icon: FaCubes },
     { link: "/projects", label: "Projects", icon: IconFoldersFilled },
+    { link: "/tickets", label: "Tickets", icon: IconHelp },
     // { link: "/requirements", label: "Requirements", icon: IconFileDescriptionFilled },
     ...(session?.user?.role === UserRole.ADMIN ||
     session?.user?.role === UserRole.CLIENT_ADMIN

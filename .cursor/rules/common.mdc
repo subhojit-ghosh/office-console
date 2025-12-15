@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+Try running `pnpm check` most of the time instead of `pnpm build` all the time.

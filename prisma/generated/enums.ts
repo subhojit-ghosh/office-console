@@ -95,6 +95,17 @@ export const TaskStatus = {
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 
 
+export const TicketStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED',
+  REOPENED: 'REOPENED'
+} as const
+
+export type TicketStatus = (typeof TicketStatus)[keyof typeof TicketStatus]
+
+
 export const TaskPriority = {
   LOW: 'LOW',
   MEDIUM: 'MEDIUM',
@@ -113,7 +124,8 @@ export const TaskType = {
   RESEARCH: 'RESEARCH',
   DOCUMENTATION: 'DOCUMENTATION',
   TEST: 'TEST',
-  MEETING: 'MEETING'
+  MEETING: 'MEETING',
+  SUPPORT: 'SUPPORT'
 } as const
 
 export type TaskType = (typeof TaskType)[keyof typeof TaskType]
@@ -130,6 +142,16 @@ export const TaskActivityType = {
 export type TaskActivityType = (typeof TaskActivityType)[keyof typeof TaskActivityType]
 
 
+export const TicketActivityType = {
+  CREATED: 'CREATED',
+  FIELD_CHANGE: 'FIELD_CHANGE',
+  UPDATED: 'UPDATED',
+  REOPENED: 'REOPENED'
+} as const
+
+export type TicketActivityType = (typeof TicketActivityType)[keyof typeof TicketActivityType]
+
+
 export const TaskCommentType = {
   GENERAL: 'GENERAL',
   BLOCK_REASON: 'BLOCK_REASON',
@@ -137,6 +159,13 @@ export const TaskCommentType = {
 } as const
 
 export type TaskCommentType = (typeof TaskCommentType)[keyof typeof TaskCommentType]
+
+
+export const TicketCommentType = {
+  GENERAL: 'GENERAL'
+} as const
+
+export type TicketCommentType = (typeof TicketCommentType)[keyof typeof TicketCommentType]
 
 
 export const FeedbackType = {
