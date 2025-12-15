@@ -92,8 +92,8 @@ export default function TicketsList() {
       title: "Delete Ticket",
       children: (
         <Text size="sm">
-          Are you sure you want to delete ticket "{ticket.title}"? This action
-          cannot be undone.
+          Are you sure you want to delete ticket &quot;{ticket.title}&quot;?
+          This action cannot be undone.
         </Text>
       ),
       labels: { confirm: "Delete", cancel: "Cancel" },
@@ -148,7 +148,7 @@ export default function TicketsList() {
       accessor: "crId",
       title: "CR ID",
       sortable: true,
-      render: (record: TicketsResponse["tickets"][0]) => record.crId || "-",
+      render: (record: TicketsResponse["tickets"][0]) => record.crId ?? "-",
     },
     {
       accessor: "createdBy",
@@ -223,7 +223,7 @@ export default function TicketsList() {
           onChange={(value) =>
             setFilters({
               ...filters,
-              status: (value as TicketStatus) || undefined,
+              status: (value as TicketStatus | null) ?? undefined,
             })
           }
           leftSection={<IconFilter2 size={16} />}

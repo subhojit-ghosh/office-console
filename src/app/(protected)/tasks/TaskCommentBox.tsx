@@ -32,12 +32,6 @@ const TaskCommentBox = forwardRef<TaskCommentBoxHandle, TaskCommentBoxProps>(
     const [isEditing, setIsEditing] = useState(editMode);
     const editorRef = useRef<AppRichTextEditorHandle | null>(null);
 
-    useImperativeHandle(ref, () => ({
-      clear: () => {
-        clear();
-      },
-    }));
-
     const clear = () => {
       setIsEditing(false);
       setContent("");
@@ -45,6 +39,12 @@ const TaskCommentBox = forwardRef<TaskCommentBoxHandle, TaskCommentBoxProps>(
       editorRef.current?.setIsFocused(false);
       onCancel?.();
     };
+
+    useImperativeHandle(ref, () => ({
+      clear: () => {
+        clear();
+      },
+    }));
 
     return (
       <>
@@ -65,7 +65,7 @@ const TaskCommentBox = forwardRef<TaskCommentBoxHandle, TaskCommentBoxProps>(
               onClick={() => {
                 onSave?.(content);
               }}
-              disabled={loading || editorRef.current?.editor?.isEmpty}
+              disabled={loading || !content.trim()}
               loading={loading}
             >
               Save

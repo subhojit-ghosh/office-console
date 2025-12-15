@@ -102,22 +102,26 @@ export const dashboardRouter = createTRPCRouter({
       const targetUserId = input.userId;
 
       // Build date filter for tasks
-      const taskDateFilter = input.startDate &&
-        input.endDate && {
-          completedAt: {
-            gte: input.startDate,
-            lte: input.endDate,
-          },
-        };
+      const taskDateFilter =
+        input.startDate && input.endDate
+          ? {
+              completedAt: {
+                gte: input.startDate,
+                lte: input.endDate,
+              },
+            }
+          : undefined;
 
       // Build date filter for work logs
-      const workLogDateFilter = input.startDate &&
-        input.endDate && {
-          startTime: {
-            gte: input.startDate,
-            lte: input.endDate,
-          },
-        };
+      const workLogDateFilter =
+        input.startDate && input.endDate
+          ? {
+              startTime: {
+                gte: input.startDate,
+                lte: input.endDate,
+              },
+            }
+          : undefined;
 
       // Get all tasks assigned to the user
       const totalTasks = await ctx.db.task.count({
@@ -125,7 +129,7 @@ export const dashboardRouter = createTRPCRouter({
           assignees: {
             some: { id: targetUserId },
           },
-          ...(taskDateFilter || {}),
+          ...(taskDateFilter ?? {}),
         },
       });
 
@@ -136,7 +140,7 @@ export const dashboardRouter = createTRPCRouter({
             some: { id: targetUserId },
           },
           status: "DONE",
-          ...(taskDateFilter || {}),
+          ...(taskDateFilter ?? {}),
         },
       });
 
@@ -157,7 +161,7 @@ export const dashboardRouter = createTRPCRouter({
           dueDate: {
             not: null,
           },
-          ...(taskDateFilter || {}),
+          ...(taskDateFilter ?? {}),
         },
       });
 
@@ -174,7 +178,7 @@ export const dashboardRouter = createTRPCRouter({
           dueDate: {
             not: null,
           },
-          ...(taskDateFilter || {}),
+          ...(taskDateFilter ?? {}),
         },
         select: {
           completedAt: true,
@@ -196,7 +200,7 @@ export const dashboardRouter = createTRPCRouter({
       const workLogs = await ctx.db.workLog.findMany({
         where: {
           userId: targetUserId,
-          ...(workLogDateFilter || {}),
+          ...(workLogDateFilter ?? {}),
         },
         select: {
           durationMin: true,
@@ -280,7 +284,7 @@ export const dashboardRouter = createTRPCRouter({
 
       workLogs.forEach((log) => {
         const dateKey = log.startTime.toISOString().split("T")[0]!;
-        const currentHours = activityByDate.get(dateKey) || 0;
+        const currentHours = activityByDate.get(dateKey) ?? 0;
         activityByDate.set(dateKey, currentHours + log.durationMin / 60);
       });
 
@@ -311,13 +315,15 @@ export const dashboardRouter = createTRPCRouter({
       const targetUserId = input.userId;
 
       // Build date filter
-      const dateFilter = input.startDate &&
-        input.endDate && {
-          createdAt: {
-            gte: input.startDate,
-            lte: input.endDate,
-          },
-        };
+      const dateFilter =
+        input.startDate && input.endDate
+          ? {
+              createdAt: {
+                gte: input.startDate,
+                lte: input.endDate,
+              },
+            }
+          : undefined;
 
       // Get all tasks for the user
       const tasks = await ctx.db.task.findMany({
@@ -325,7 +331,7 @@ export const dashboardRouter = createTRPCRouter({
           assignees: {
             some: { id: targetUserId },
           },
-          ...(dateFilter || {}),
+          ...(dateFilter ?? {}),
         },
         select: {
           status: true,
@@ -337,7 +343,7 @@ export const dashboardRouter = createTRPCRouter({
       // Status breakdown
       const statusBreakdown = tasks.reduce(
         (acc, task) => {
-          acc[task.status] = (acc[task.status] || 0) + 1;
+          acc[task.status] = (acc[task.status] ?? 0) + 1;
           return acc;
         },
         {} as Record<string, number>,
@@ -346,7 +352,7 @@ export const dashboardRouter = createTRPCRouter({
       // Priority breakdown
       const priorityBreakdown = tasks.reduce(
         (acc, task) => {
-          acc[task.priority] = (acc[task.priority] || 0) + 1;
+          acc[task.priority] = (acc[task.priority] ?? 0) + 1;
           return acc;
         },
         {} as Record<string, number>,
@@ -423,7 +429,7 @@ export const dashboardRouter = createTRPCRouter({
         }
 
         const weekData = weeklyData.get(weekKey)!;
-        const currentHours = weekData.get(dayOfWeek) || 0;
+        const currentHours = weekData.get(dayOfWeek) ?? 0;
         weekData.set(dayOfWeek, currentHours + log.durationMin / 60);
       });
 
@@ -435,13 +441,13 @@ export const dashboardRouter = createTRPCRouter({
         const weekData = weeklyData.get(weekKey)!;
         result.push({
           week: weekKey,
-          Monday: Math.round((weekData.get(1) || 0) * 10) / 10,
-          Tuesday: Math.round((weekData.get(2) || 0) * 10) / 10,
-          Wednesday: Math.round((weekData.get(3) || 0) * 10) / 10,
-          Thursday: Math.round((weekData.get(4) || 0) * 10) / 10,
-          Friday: Math.round((weekData.get(5) || 0) * 10) / 10,
-          Saturday: Math.round((weekData.get(6) || 0) * 10) / 10,
-          Sunday: Math.round((weekData.get(0) || 0) * 10) / 10,
+          Monday: Math.round((weekData.get(1) ?? 0) * 10) / 10,
+          Tuesday: Math.round((weekData.get(2) ?? 0) * 10) / 10,
+          Wednesday: Math.round((weekData.get(3) ?? 0) * 10) / 10,
+          Thursday: Math.round((weekData.get(4) ?? 0) * 10) / 10,
+          Friday: Math.round((weekData.get(5) ?? 0) * 10) / 10,
+          Saturday: Math.round((weekData.get(6) ?? 0) * 10) / 10,
+          Sunday: Math.round((weekData.get(0) ?? 0) * 10) / 10,
         });
       }
 

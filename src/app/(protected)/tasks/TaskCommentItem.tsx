@@ -150,7 +150,6 @@ export default function TaskCommentItem({
               onCancel={() => setMode("view")}
               loading={loading}
               onSave={(content) => {
-                comment.content = content;
                 updateComment.mutate({
                   id: comment.id,
                   content,

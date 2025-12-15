@@ -17,13 +17,13 @@ async function main() {
     WHERE role = 'CLIENT'::"UserRole"
   `);
   
-  // eslint-disable-next-line no-console
+   
   console.log(`Updated ${result} users from CLIENT to CLIENT_USER.`);
 }
 
 main()
   .catch((e) => {
-    // eslint-disable-next-line no-console
+     
     console.error(e);
     process.exit(1);
   })

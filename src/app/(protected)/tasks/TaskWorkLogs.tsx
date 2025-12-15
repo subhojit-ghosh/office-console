@@ -145,9 +145,7 @@ export default function TaskWorkLogs({
       const parseTime = (
         timeStr: string,
       ): { hours: number; minutes: number } | null => {
-        const amPmMatch = timeStr.match(
-          /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i,
-        );
+        const amPmMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(timeStr);
         if (amPmMatch) {
           let hours = parseInt(amPmMatch[1]!, 10);
           const minutes = parseInt(amPmMatch[2]!, 10);
@@ -156,7 +154,7 @@ export default function TaskWorkLogs({
           else if (isPm) hours += 12;
           return { hours, minutes };
         }
-        const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+        const timeMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(timeStr);
         if (timeMatch) {
           return {
             hours: parseInt(timeMatch[1]!, 10),
@@ -173,7 +171,7 @@ export default function TaskWorkLogs({
           .minute(startParts.minutes)
           .add(1, "hour");
         // Format back to 12h format if original was 12h
-        const is12h = form.values.startTime.match(/AM|PM/i);
+        const is12h = /AM|PM/i.exec(form.values.startTime);
         const endTimeStr = is12h
           ? endTimeObj.format("hh:mm A")
           : endTimeObj.format("HH:mm");
@@ -356,9 +354,7 @@ export default function TaskWorkLogs({
                             const parseTime = (
                               timeStr: string,
                             ): { hours: number; minutes: number } | null => {
-                              const amPmMatch = timeStr.match(
-                                /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i,
-                              );
+                              const amPmMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(timeStr);
                               if (amPmMatch) {
                                 let hours = parseInt(amPmMatch[1]!, 10);
                                 const minutes = parseInt(amPmMatch[2]!, 10);
@@ -368,9 +364,7 @@ export default function TaskWorkLogs({
                                 else if (isPm) hours += 12;
                                 return { hours, minutes };
                               }
-                              const timeMatch = timeStr.match(
-                                /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/,
-                              );
+                              const timeMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(timeStr);
                               if (timeMatch) {
                                 return {
                                   hours: parseInt(timeMatch[1]!, 10),
@@ -420,8 +414,8 @@ export default function TaskWorkLogs({
                       variant="light"
                       color="red"
                       title={
-                        form.errors.date ||
-                        form.errors.startTime ||
+                        form.errors.date ??
+                        form.errors.startTime ??
                         form.errors.endTime
                       }
                       icon={<IconInfoCircle />}

@@ -213,7 +213,7 @@ export default function ActivityHeatmap({ userId }: ActivityHeatmapProps) {
                     {/* Days in week */}
                     {week.map((date, dayIdx) => {
                       const dateKey = date.toISOString().split("T")[0]!;
-                      const hours = activityMap.get(dateKey) || 0;
+                      const hours = activityMap.get(dateKey) ?? 0;
                       const isOutsideRange = date < startDate || date > endDate;
 
                       if (isOutsideRange) {

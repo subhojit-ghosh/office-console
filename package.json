@@ -7,7 +7,7 @@
   "scripts": {
     "ci:build": "pnpm run db:migrate:deploy && pnpm run build",
     "build": "next build",
-    "check": "next lint && tsc --noEmit",
+    "check": "pnpm run lint && pnpm run typecheck",
     "db:generate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
@@ -18,8 +18,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "postinstall": "prisma generate",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit"

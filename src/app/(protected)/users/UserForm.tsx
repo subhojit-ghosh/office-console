@@ -79,7 +79,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
     if (
       session?.user.clientId &&
       session?.user.role === UserRole.CLIENT_ADMIN &&
-      isClientRole(form.values.role as UserRole)
+      isClientRole(form.values.role)
     ) {
       form.setFieldValue("clientId", session.user.clientId);
     }
@@ -166,10 +166,10 @@ export default function UserForm({ mode, opened, close, id }: Props) {
       createUser.mutate({
         name: values.name,
         email: values.email,
-        role: values.role as User["role"],
+        role: values.role,
         password: values.password,
         isActive: values.isActive,
-        clientId: isClientRole(values.role as UserRole)
+        clientId: isClientRole(values.role)
           ? values.clientId
           : undefined,
       });
@@ -178,10 +178,10 @@ export default function UserForm({ mode, opened, close, id }: Props) {
         id: values.id,
         name: values.name,
         email: values.email,
-        role: values.role as User["role"],
+        role: values.role,
         password: values.password || undefined,
         isActive: values.isActive,
-        clientId: isClientRole(values.role as UserRole)
+        clientId: isClientRole(values.role)
           ? values.clientId
           : undefined,
       });
@@ -223,7 +223,7 @@ export default function UserForm({ mode, opened, close, id }: Props) {
               disabled={loading}
             />
           </Grid.Col>
-          {isClientRole(form.values.role as UserRole) &&
+          {isClientRole(form.values.role) &&
             session?.user.role !== UserRole.CLIENT_ADMIN && (
               <Grid.Col span={12}>
                 <Select

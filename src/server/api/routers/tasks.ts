@@ -4,7 +4,7 @@ import {
   UserRole,
   type Prisma,
 } from "@prisma/generated/server";
-import { z } from "zod";
+import { type z } from "zod";
 import {
   archiveTaskSchema,
   createTaskCommentSchema,
@@ -231,7 +231,7 @@ export const tasksRouter = createTRPCRouter({
   create: protectedProcedure
     .input(sanitizeInputSchema(createTaskSchema))
     .mutation(async ({ ctx, input }) => {
-      const data = input as z.infer<typeof createTaskSchema>;
+      const data = input;
       const { assigneeIds, links, ticketId, ...rest } = data;
 
       // If ticketId is provided, get the ticket's crId to override task crId
@@ -264,10 +264,12 @@ export const tasksRouter = createTRPCRouter({
 
       // Validate CR ID requirement based on project's client settings
       const crIdMandatoryTypes =
-        projectWithClient?.client?.crIdMandatoryTaskTypes || [];
-      if (crIdMandatoryTypes.includes(rest.type || "TASK")) {
+        projectWithClient?.client?.crIdMandatoryTaskTypes ?? [];
+      if (crIdMandatoryTypes.includes(rest.type ?? "TASK")) {
         if (!finalCrId || finalCrId.trim() === "") {
-          throw new Error(`CR ID is required for ${rest.type || "TASK"} tasks`);
+          throw new Error(
+            `CR ID is required for ${rest.type ?? "TASK"} tasks`,
+          );
         }
       }
 
@@ -296,7 +298,7 @@ export const tasksRouter = createTRPCRouter({
         data: {
           ...rest,
           crId: finalCrId,
-          ticketId: ticketId || null,
+          ticketId: ticketId ?? null,
           createdById: userId,
           assignees: assigneeIds
             ? { connect: assigneeIds.map((id) => ({ id })) }
@@ -332,7 +334,7 @@ export const tasksRouter = createTRPCRouter({
   update: protectedProcedure
     .input(sanitizeInputSchema(updateTaskSchema))
     .mutation(async ({ ctx, input }) => {
-      const data = input as z.infer<typeof updateTaskSchema>;
+      const data = input;
       const { id, assigneeIds, ticketId, ...rest } = data;
       const userId = ctx.session.user.id;
 
@@ -383,7 +385,7 @@ export const tasksRouter = createTRPCRouter({
 
       // Validate CR ID requirement based on project's client settings
       const crIdMandatoryTypes =
-        existingTask.project?.client?.crIdMandatoryTaskTypes || [];
+        existingTask.project?.client?.crIdMandatoryTaskTypes ?? [];
       if (rest.type && crIdMandatoryTypes.includes(rest.type)) {
         if (!rest.crId || rest.crId.trim() === "") {
           throw new Error(`CR ID is required for ${rest.type} tasks`);
@@ -485,8 +487,8 @@ export const tasksRouter = createTRPCRouter({
             userId,
             type: TaskActivityType.FIELD_CHANGE,
             field: "ticketId",
-            oldValue: oldTicketId || null,
-            newValue: ticketId || null,
+            oldValue: oldTicketId ?? null,
+            newValue: ticketId ?? null,
           });
         }
       }

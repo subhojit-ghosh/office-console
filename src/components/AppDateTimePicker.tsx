@@ -29,10 +29,14 @@ export function AppDateTimePicker({
 
   useEffect(() => {
     if (value) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDate(value);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTimeStr(dayjs(value).format("hh:mm A"));
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDate(null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTimeStr("");
     }
   }, [value]);

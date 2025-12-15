@@ -135,8 +135,8 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
 
   const isCrIdRequired = useMemo(() => {
     const crIdMandatoryTypes =
-      projectMembersQuery.data?.client?.crIdMandatoryTaskTypes || [];
-    const currentTaskType = form.values.type || "TASK";
+      projectMembersQuery.data?.client?.crIdMandatoryTaskTypes ?? [];
+    const currentTaskType = form.values.type ?? "TASK";
     return crIdMandatoryTypes.includes(currentTaskType);
   }, [
     projectMembersQuery.data?.client?.crIdMandatoryTaskTypes,
@@ -158,7 +158,7 @@ export default function TaskForm({ mode, opened, close, id }: Props) {
   }, [loading, form.values.ticketId, ticketsQuery.data]);
 
   const isModuleRequired = useMemo(() => {
-    return projectMembersQuery.data?.client?.moduleMandatoryForTasks || false;
+    return projectMembersQuery.data?.client?.moduleMandatoryForTasks ?? false;
   }, [projectMembersQuery.data?.client?.moduleMandatoryForTasks]);
 
   useEffect(() => {

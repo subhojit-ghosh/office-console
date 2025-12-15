@@ -16,7 +16,7 @@ import {
 import { DatePickerInput } from "@mantine/dates";
 import { IconHomeFilled, IconFoldersFilled } from "@tabler/icons-react";
 import { FaTasks } from "react-icons/fa";
-import { useState, useEffect, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { UserRole } from "@prisma/generated/browser";
 import { api } from "~/trpc/react";
@@ -135,7 +135,7 @@ function getDateRangeForPreset(preset: DateRangePreset): [Date, Date] {
 // Analytics dashboard for staff/admin roles
 function AnalyticsDashboard() {
   const { data: session } = useSession();
-  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [dateRangePreset, setDateRangePreset] =
     useState<DateRangePreset>("month");
   const [customDateRange, setCustomDateRange] = useState<
@@ -159,17 +159,12 @@ function AnalyticsDashboard() {
     enabled: session?.user?.role === UserRole.ADMIN,
   });
 
-  // Set default user when users load
-  useEffect(() => {
-    if (session?.user?.id && !selectedUserId) {
-      setSelectedUserId(session.user.id);
-    }
-  }, [session?.user?.id, selectedUserId]);
+  const effectiveUserId = selectedUserId ?? session?.user?.id ?? null;
 
   // Fetch analytics data for selected user with date range
   const personalMetricsQuery = api.dashboard.personalMetrics.useQuery(
-    { userId: selectedUserId, startDate, endDate },
-    { enabled: !!selectedUserId },
+    { userId: effectiveUserId ?? "", startDate, endDate },
+    { enabled: !!effectiveUserId },
   );
 
   // Prepare user options for select (names only, no emails)
@@ -199,8 +194,8 @@ function AnalyticsDashboard() {
             <Select
               placeholder="Select user"
               data={userOptions}
-              value={selectedUserId}
-              onChange={(value) => value && setSelectedUserId(value)}
+              value={effectiveUserId ?? ""}
+              onChange={(value) => setSelectedUserId(value)}
               searchable
               disabled={usersQuery.isLoading}
             />
@@ -265,13 +260,13 @@ function AnalyticsDashboard() {
                 thickness={12}
                 sections={[
                   {
-                    value: personalMetricsQuery.data?.completionRate || 0,
+                    value: personalMetricsQuery.data?.completionRate ?? 0,
                     color: "violet",
                   },
                 ]}
                 label={
                   <Text ta="center" fw={700} size="xl">
-                    {personalMetricsQuery.data?.completionRate || 0}%
+                    {personalMetricsQuery.data?.completionRate ?? 0}%
                   </Text>
                 }
               />
@@ -293,13 +288,13 @@ function AnalyticsDashboard() {
                 thickness={12}
                 sections={[
                   {
-                    value: personalMetricsQuery.data?.onTimeDelivery || 0,
+                    value: personalMetricsQuery.data?.onTimeDelivery ?? 0,
                     color: "violet",
                   },
                 ]}
                 label={
                   <Text ta="center" fw={700} size="xl">
-                    {personalMetricsQuery.data?.onTimeDelivery || 0}%
+                    {personalMetricsQuery.data?.onTimeDelivery ?? 0}%
                   </Text>
                 }
               />
@@ -317,7 +312,7 @@ function AnalyticsDashboard() {
           ) : (
             <Stack align="center" justify="center" style={{ minHeight: 120 }}>
               <Text className={classes.value}>
-                {personalMetricsQuery.data?.tasksCompleted || 0}
+                {personalMetricsQuery.data?.tasksCompleted ?? 0}
               </Text>
               <Text size="sm" c="dimmed">
                 tasks
@@ -336,7 +331,7 @@ function AnalyticsDashboard() {
           ) : (
             <Stack align="center" justify="center" style={{ minHeight: 120 }}>
               <Text className={classes.value}>
-                {personalMetricsQuery.data?.hoursLogged || 0}
+                {personalMetricsQuery.data?.hoursLogged ?? 0}
               </Text>
               <Text size="sm" c="dimmed">
                 hours
@@ -362,7 +357,7 @@ function AnalyticsDashboard() {
                   Active
                 </Text>
                 <Text fw={700} c="blue">
-                  {personalMetricsQuery.data?.activeTasks || 0}
+                  {personalMetricsQuery.data?.activeTasks ?? 0}
                 </Text>
               </Group>
               <Group justify="space-between">
@@ -370,7 +365,7 @@ function AnalyticsDashboard() {
                   Pending
                 </Text>
                 <Text fw={700}>
-                  {personalMetricsQuery.data?.pendingTasks || 0}
+                  {personalMetricsQuery.data?.pendingTasks ?? 0}
                 </Text>
               </Group>
               <Group justify="space-between">
@@ -380,12 +375,12 @@ function AnalyticsDashboard() {
                 <Text
                   fw={700}
                   c={
-                    (personalMetricsQuery.data?.overdueTasks || 0) > 0
+                    (personalMetricsQuery.data?.overdueTasks ?? 0) > 0
                       ? "red"
                       : undefined
                   }
                 >
-                  {personalMetricsQuery.data?.overdueTasks || 0}
+                  {personalMetricsQuery.data?.overdueTasks ?? 0}
                 </Text>
               </Group>
             </Stack>
@@ -395,7 +390,7 @@ function AnalyticsDashboard() {
 
       {/* Activity Heatmap */}
       <Box px="md" mb="lg">
-        <ActivityHeatmap userId={selectedUserId} />
+        <ActivityHeatmap userId={effectiveUserId ?? ""} />
       </Box>
     </>
   );

@@ -15,9 +15,7 @@ function parseTimeString(
   if (!timeStr || typeof timeStr !== "string") return null;
 
   // Handle 12h format with AM/PM
-  const amPmMatch = timeStr.match(
-    /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i,
-  );
+  const amPmMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(timeStr);
   if (amPmMatch) {
     let hours = parseInt(amPmMatch[1]!, 10);
     const minutes = parseInt(amPmMatch[2]!, 10);
@@ -33,7 +31,7 @@ function parseTimeString(
   }
 
   // Handle 24h format (hh:mm or hh:mm:ss)
-  const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  const timeMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(timeStr);
   if (timeMatch) {
     const hours = parseInt(timeMatch[1]!, 10);
     const minutes = parseInt(timeMatch[2]!, 10);

@@ -4,8 +4,6 @@ import {
   Button,
   Group,
   Modal,
-  Select,
-  type SelectProps,
   Stack,
   Text,
   Textarea,
@@ -122,7 +120,7 @@ export default function QuickLogModal({
     if (preSelectedTaskId) {
       form.setFieldValue("taskId", preSelectedTaskId);
     }
-  }, [preSelectedTaskId]);
+  }, [form, preSelectedTaskId]);
 
   const createWorkLog = api.workLogs.create.useMutation({
     onMutate: () => setLoading(true),
@@ -150,7 +148,7 @@ export default function QuickLogModal({
 
     // Parse time strings
     const parseTime = (timeStr: string): { hours: number; minutes: number } | null => {
-      const amPmMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
+      const amPmMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(timeStr);
       if (amPmMatch) {
         let hours = parseInt(amPmMatch[1]!, 10);
         const minutes = parseInt(amPmMatch[2]!, 10);
@@ -159,7 +157,7 @@ export default function QuickLogModal({
         else if (isPm) hours += 12;
         return { hours, minutes };
       }
-      const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+      const timeMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(timeStr);
       if (timeMatch) {
         return {
           hours: parseInt(timeMatch[1]!, 10),
@@ -185,9 +183,19 @@ export default function QuickLogModal({
     if (hours === 0) return `${minutes}m`;
     if (minutes === 0) return `${hours}h`;
     return `${hours}h ${minutes}m`;
-  }, [form.values.date, form.values.startTime, form.values.endTime]);
+  }, [form.values]);
 
   // Select options for tasks
+  type TaskOption = {
+    value: string;
+    label: string;
+    type: TaskType;
+    status: TaskStatus;
+    title: string;
+    project: string;
+    module: string | null;
+  };
+
   const taskOptions = useMemo(() => {
     if (!recentTasks) return [];
 
@@ -205,8 +213,8 @@ export default function QuickLogModal({
         status: task.status as TaskStatus,
         title: task.title,
         project: projectName,
-        module: moduleName,
-      };
+        module: moduleName ?? null,
+      } satisfies TaskOption;
     });
   }, [recentTasks]);
 
@@ -265,7 +273,7 @@ export default function QuickLogModal({
       date,
       startTime,
       endTime,
-      note: note || null,
+      note: note.trim() ? note : null,
     });
   };
 
@@ -274,17 +282,7 @@ export default function QuickLogModal({
     onClose();
   };
 
-  const renderSelectOption: SelectProps["renderOption"] = ({ option }) => {
-    const taskOption = option as unknown as {
-      value: string;
-      label: string;
-      type: TaskType;
-      status: TaskStatus;
-      title: string;
-      project: string;
-      module?: string;
-    };
-
+  const renderTaskOption = (taskOption: TaskOption) => {
     const typeConfig = TASK_TYPE_MAP[taskOption.type];
     const statusConfig = TASK_STATUS_MAP[taskOption.status];
 
@@ -306,7 +304,8 @@ export default function QuickLogModal({
           </Text>
           <Group gap={6}>
             <Text size="xs" c="dimmed">
-              {taskOption.project} {taskOption.module ? `/ ${taskOption.module}` : ""}
+              {taskOption.project}
+              {taskOption.module ? ` / ${taskOption.module}` : ""}
             </Text>
             <Badge
               size="xs"
@@ -351,17 +350,7 @@ export default function QuickLogModal({
               {selectedTask ? (
                 <Paper withBorder p="xs" radius="md" bg="var(--mantine-color-body)">
                   <Group justify="space-between" wrap="nowrap">
-                    {renderSelectOption({
-                      option: {
-                        value: selectedTask.value,
-                        label: selectedTask.label,
-                        type: selectedTask.type,
-                        status: selectedTask.status,
-                        title: selectedTask.title,
-                        project: selectedTask.project,
-                        module: selectedTask.module,
-                      } as any,
-                    })}
+                    {renderTaskOption(selectedTask)}
                     <ActionIcon
                       variant="subtle"
                       color="gray"
@@ -383,7 +372,9 @@ export default function QuickLogModal({
                   withAsterisk
                   description="Select a task to log time for"
                 >
-                  {selectedTask || <Input.Placeholder>Select a task</Input.Placeholder>}
+                  {selectedTask ?? (
+                    <Input.Placeholder>Select a task</Input.Placeholder>
+                  )}
                 </InputBase>
               )}
             </Combobox.Target>
@@ -405,7 +396,7 @@ export default function QuickLogModal({
                     )
                     .map((item) => (
                       <Combobox.Option value={item.value} key={item.value}>
-                        {renderSelectOption({ option: item })}
+                        {renderTaskOption(item)}
                       </Combobox.Option>
                     ))
                 ) : (

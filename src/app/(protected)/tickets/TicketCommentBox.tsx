@@ -32,12 +32,6 @@ const TicketCommentBox = forwardRef<TicketCommentBoxHandle, TicketCommentBoxProp
     const [isEditing, setIsEditing] = useState(editMode);
     const editorRef = useRef<AppRichTextEditorHandle | null>(null);
 
-    useImperativeHandle(ref, () => ({
-      clear: () => {
-        clear();
-      },
-    }));
-
     const clear = () => {
       setIsEditing(false);
       setContent("");
@@ -45,6 +39,12 @@ const TicketCommentBox = forwardRef<TicketCommentBoxHandle, TicketCommentBoxProp
       editorRef.current?.setIsFocused(false);
       onCancel?.();
     };
+
+    useImperativeHandle(ref, () => ({
+      clear: () => {
+        clear();
+      },
+    }));
 
     return (
       <>

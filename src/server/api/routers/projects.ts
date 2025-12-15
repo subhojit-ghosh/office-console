@@ -1,5 +1,5 @@
 import { UserRole, type Prisma } from "@prisma/generated/server";
-import { z } from "zod";
+import { type z } from "zod";
 import { TASK_STATUS_FILTERS } from "~/constants/task.constant";
 import {
   createProjectSchema,
@@ -158,7 +158,7 @@ export const projectsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(sanitizeInputSchema(createProjectSchema))
     .mutation(async ({ ctx, input }) => {
-      const data = input as z.infer<typeof createProjectSchema>;
+      const data = input;
       return ctx.db.project.create({
         data: {
           name: data.name,
@@ -176,7 +176,7 @@ export const projectsRouter = createTRPCRouter({
   update: protectedProcedure
     .input(sanitizeInputSchema(updateProjectSchema))
     .mutation(async ({ ctx, input }) => {
-      const data = input as z.infer<typeof updateProjectSchema>;
+      const data = input;
       return ctx.db.project.update({
         where: { id: data.id },
         data: {

@@ -14,7 +14,8 @@ import {
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { zod4Resolver } from "mantine-form-zod-resolver";
-import { useEffect, useMemo, useState } from "react";
+import type { Session } from "next-auth";
+import { useEffect, useMemo, useState, type ComponentProps } from "react";
 import AppRichTextEditor from "~/components/AppRichTextEditor";
 import { EditableBadgeDropdown } from "~/components/EditableBadgeDropdown";
 import { TICKET_STATUS_OPTIONS } from "~/constants/ticket.constant";
@@ -32,7 +33,7 @@ interface Props {
   opened: boolean;
   close: () => void;
   ticketId?: string | null;
-  session?: any; // Pass session from parent to avoid useSession in modal context
+  session?: Session | null; // Pass session from parent to avoid useSession in modal context
 }
 
 export default function TicketForm({
@@ -44,7 +45,9 @@ export default function TicketForm({
 }: Props) {
   const utils = api.useUtils();
   const [loading, setLoading] = useState(false);
-  const [activities, setActivities] = useState<any[]>([]);
+  const [activities, setActivities] = useState<
+    ComponentProps<typeof TicketActivityFeed>["activities"]
+  >([]);
   const [commentsCount, setCommentsCount] = useState(0);
 
   const clientsQuery = api.clients.getAllMinimal.useQuery(undefined, {
