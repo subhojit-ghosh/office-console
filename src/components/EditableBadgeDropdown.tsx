@@ -1,10 +1,6 @@
 import { Button, Group, Menu, type FloatingPosition } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
-import {
-  IconChevronDown,
-  type Icon,
-  type IconProps,
-} from "@tabler/icons-react";
+import { IconChevronDown, type IconProps } from "@tabler/icons-react";
 import type { ForwardRefExoticComponent, RefAttributes } from "react";
 
 interface EditableBadgeDropdownProps<T extends string> {
@@ -13,7 +9,7 @@ interface EditableBadgeDropdownProps<T extends string> {
     value: T;
     label: string;
     color?: string;
-    icon?: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
+    icon?: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>;
   }[];
   onChange: (value: T) => void;
   compact?: boolean;
