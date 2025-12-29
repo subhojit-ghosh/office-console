@@ -3,7 +3,6 @@
 import {
   ActionIcon,
   Badge,
-  Box,
   Button,
   Group,
   Menu,
@@ -18,7 +17,6 @@ import { notifications } from "@mantine/notifications";
 import { useSession } from "next-auth/react";
 import {
   IconDotsVertical,
-  IconFilter2,
   IconHelp,
   IconPlus,
   IconSearch,
@@ -121,11 +119,6 @@ export default function TicketsList() {
           }}
         >
           <Text fw={500}>{record.title}</Text>
-          {record.description && (
-            <Text size="xs" c="dimmed" lineClamp={1}>
-              {record.description}
-            </Text>
-          )}
         </Button>
       ),
     },
@@ -192,8 +185,36 @@ export default function TicketsList() {
         <Group gap="xs">
           <IconHelp />
           <Title size="lg">Tickets</Title>
+          <TextInput
+            ml="md"
+            type="search"
+            leftSection={<IconSearch size={16} />}
+            placeholder="Search tickets..."
+            style={{ width: 250 }}
+            defaultValue={filters.search}
+            onChange={(e) =>
+              setFilters({ ...filters, search: e.currentTarget.value })
+            }
+          />
+          <Select
+            placeholder="All Status"
+            clearable
+            data={TICKET_STATUS_OPTIONS.map((opt) => ({
+              value: opt.value,
+              label: opt.label,
+            }))}
+            defaultValue={filters.status}
+            onChange={(value) =>
+              setFilters({
+                ...filters,
+                status: (value as TicketStatus | null) ?? undefined,
+              })
+            }
+          />
         </Group>
         <Button
+          style={{ float: "right" }}
+          variant="outline"
           leftSection={<IconPlus size={16} />}
           onClick={() => {
             setFormMode("add");
@@ -203,32 +224,6 @@ export default function TicketsList() {
         >
           Create
         </Button>
-      </Group>
-
-      <Group px="md" mb="md">
-        <TextInput
-          placeholder="Search tickets..."
-          leftSection={<IconSearch size={16} />}
-          value={filters.search}
-          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          style={{ flex: 1 }}
-        />
-        <Select
-          placeholder="Filter by status"
-          data={TICKET_STATUS_OPTIONS.map((opt) => ({
-            value: opt.value,
-            label: opt.label,
-          }))}
-          value={filters.status}
-          onChange={(value) =>
-            setFilters({
-              ...filters,
-              status: (value as TicketStatus | null) ?? undefined,
-            })
-          }
-          leftSection={<IconFilter2 size={16} />}
-          clearable
-        />
       </Group>
 
       <AppTable
