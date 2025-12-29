@@ -49,6 +49,7 @@ export default function TicketForm({
     ComponentProps<typeof TicketActivityFeed>["activities"]
   >([]);
   const [commentsCount, setCommentsCount] = useState(0);
+  const [originalStatus, setOriginalStatus] = useState<string>("");
 
   const clientsQuery = api.clients.getAllMinimal.useQuery(undefined, {
     enabled: !isClientRole(session?.user.role),
@@ -80,6 +81,7 @@ export default function TicketForm({
   useEffect(() => {
     if (mode === "add") {
       form.reset();
+      setOriginalStatus("");
     }
     if (mode === "edit" && ticketId) {
       void loadDataForEdit();
@@ -102,6 +104,7 @@ export default function TicketForm({
           status: ticketDetail.status,
         });
         setActivities(ticketDetail.activities);
+        setOriginalStatus(ticketDetail.status);
       }
     } catch (error) {
       console.error("Error loading ticket details:", error);
@@ -119,6 +122,7 @@ export default function TicketForm({
         color: "green",
       });
       void utils.tickets.getAll.invalidate();
+      // Reload data to update the original status
       void loadDataForEdit();
     },
     onError: (error) => {
@@ -198,11 +202,12 @@ export default function TicketForm({
   const canReopen = useMemo(() => {
     return (
       mode === "edit" &&
-      form.values.status !== "REOPENED" &&
-      form.values.status !== "OPEN" &&
-      form.values.status !== "IN_PROGRESS"
+      originalStatus !== "REOPENED" &&
+      originalStatus !== "OPEN" &&
+      originalStatus !== "IN_PROGRESS" &&
+      originalStatus !== ""
     );
-  }, [mode, form.values.status]);
+  }, [mode, originalStatus]);
 
   return (
     <Modal
