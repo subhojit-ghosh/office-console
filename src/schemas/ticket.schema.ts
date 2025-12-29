@@ -38,6 +38,7 @@ export const updateTicketSchema = z.object({
   description: z.string().optional().nullable(),
   crId: z.string().optional().nullable(),
   status: z.enum(TICKET_STATUSES).optional(),
+  clientId: z.string().optional(),
 });
 
 export const reopenTicketSchema = z.object({

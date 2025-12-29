@@ -241,14 +241,7 @@ export default function TicketForm({
                 />
               </Grid.Col>
               <Grid.Col span={12}>
-                <Tabs
-                  variant="default"
-                  defaultValue={
-                    mode === "add" || isClientRole(session?.user.role)
-                      ? "comments"
-                      : "comments"
-                  }
-                >
+                <Tabs variant="default" defaultValue="comments">
                   <Tabs.List>
                     {mode === "edit" && (
                       <Tabs.Tab value="comments">
