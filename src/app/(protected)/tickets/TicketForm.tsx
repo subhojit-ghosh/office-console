@@ -2,6 +2,7 @@
 
 import {
   Button,
+  Checkbox,
   Grid,
   Group,
   Modal,
@@ -12,6 +13,7 @@ import {
   Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import type { Session } from "next-auth";
@@ -50,6 +52,8 @@ export default function TicketForm({
   >([]);
   const [commentsCount, setCommentsCount] = useState(0);
   const [originalStatus, setOriginalStatus] = useState<string>("");
+  const [createdById, setCreatedById] = useState<string | null>(null);
+  const [signoffModalOpened, setSignoffModalOpened] = useState(false);
 
   const clientsQuery = api.clients.getAllMinimal.useQuery(undefined, {
     enabled: !isClientRole(session?.user.role),
@@ -82,6 +86,7 @@ export default function TicketForm({
     if (mode === "add") {
       form.reset();
       setOriginalStatus("");
+      setCreatedById(null);
     }
     if (mode === "edit" && ticketId) {
       void loadDataForEdit();
@@ -105,6 +110,7 @@ export default function TicketForm({
         });
         setActivities(ticketDetail.activities);
         setOriginalStatus(ticketDetail.status);
+        setCreatedById(ticketDetail.createdBy.id);
       }
     } catch (error) {
       console.error("Error loading ticket details:", error);
@@ -199,15 +205,62 @@ export default function TicketForm({
     }
   };
 
+  const signoffTicket = api.tickets.signoff.useMutation({
+    onSuccess: async () => {
+      notifications.show({
+        message: "Ticket has been signed off successfully.",
+        color: "green",
+      });
+      setSignoffModalOpened(false);
+      void utils.tickets.getAll.invalidate();
+      // Reload data to update the status
+      void loadDataForEdit();
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Error",
+        message: error.message,
+        color: "red",
+      });
+    },
+  });
+
+  const signoffForm = useForm({
+    initialValues: {
+      comment: "",
+      confirmed: false,
+    },
+    validate: {
+      confirmed: (value) =>
+        value ? null : "You must confirm that the ticket is resolved and accepted",
+    },
+  });
+
+  const canSignoff = useMemo(() => {
+    const isClientUser = isClientRole(session?.user.role);
+    const isRequester = createdById === session?.user.id;
+    const isResolved = originalStatus === "RESOLVED";
+    return mode === "edit" && isClientUser && isRequester && isResolved;
+  }, [mode, originalStatus, createdById, session?.user.id, session?.user.role]);
+
   const canReopen = useMemo(() => {
     return (
       mode === "edit" &&
       originalStatus !== "REOPENED" &&
       originalStatus !== "OPEN" &&
       originalStatus !== "IN_PROGRESS" &&
+      originalStatus !== "SIGNED_OFF" &&
       originalStatus !== ""
     );
   }, [mode, originalStatus]);
+
+  const handleSignoff = () => {
+    if (!ticketId) return;
+    signoffTicket.mutate({
+      id: ticketId,
+      comment: signoffForm.values.comment.trim() || null,
+    });
+  };
 
   return (
     <Modal
@@ -303,7 +356,7 @@ export default function TicketForm({
                   />
                 </Grid.Col>
               )}
-              {mode === "edit" && (
+              {mode === "edit" && !isClientRole(session?.user.role) && (
                 <Grid.Col span={12}>
                   <EditableBadgeDropdown
                     value={form.values.status}
@@ -313,6 +366,18 @@ export default function TicketForm({
                     hoverEffect={false}
                     fullWidth={true}
                   />
+                </Grid.Col>
+              )}
+              {canSignoff && (
+                <Grid.Col span={12}>
+                  <Button
+                    variant="filled"
+                    color="teal"
+                    fullWidth
+                    onClick={() => setSignoffModalOpened(true)}
+                  >
+                    Sign Off
+                  </Button>
                 </Grid.Col>
               )}
               {canReopen && (
@@ -351,6 +416,71 @@ export default function TicketForm({
           </Grid.Col>
         </Grid>
       </form>
+
+      <Modal
+        opened={signoffModalOpened}
+        onClose={() => {
+          setSignoffModalOpened(false);
+          signoffForm.reset();
+        }}
+        title="Sign Off Ticket"
+        centered
+      >
+        <form
+          onSubmit={signoffForm.onSubmit(() => {
+            modals.openConfirmModal({
+              title: "Confirm Sign Off",
+              children: (
+                <Text size="sm">
+                  Are you sure you want to sign off this ticket? This action is
+                  irreversible and will mark the ticket as accepted and resolved.
+                </Text>
+              ),
+              labels: { confirm: "Sign Off", cancel: "Cancel" },
+              confirmProps: { color: "teal" },
+              onConfirm: handleSignoff,
+            });
+          })}
+        >
+          <Text size="sm" mb="md">
+            Please confirm that this ticket has been resolved and you accept the
+            solution.
+          </Text>
+
+          <Textarea
+            label="Comment (Optional)"
+            placeholder="Add any additional comments about the resolution..."
+            {...signoffForm.getInputProps("comment")}
+            mb="md"
+            minRows={3}
+          />
+
+          <Checkbox
+            label="I confirm this ticket is resolved and accepted"
+            {...signoffForm.getInputProps("confirmed", { type: "checkbox" })}
+            mb="md"
+          />
+
+          <Group justify="flex-end" mt="md">
+            <Button
+              variant="default"
+              onClick={() => {
+                setSignoffModalOpened(false);
+                signoffForm.reset();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              color="teal"
+              loading={signoffTicket.isPending}
+            >
+              Sign Off
+            </Button>
+          </Group>
+        </form>
+      </Modal>
     </Modal>
   );
 }

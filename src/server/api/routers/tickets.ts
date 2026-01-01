@@ -1,7 +1,7 @@
 import {
   TicketActivityType,
+  TicketCommentType,
   TicketStatus,
-  UserRole,
   type Prisma,
 } from "@prisma/generated/server";
 import { TRPCError } from "@trpc/server";
@@ -14,6 +14,7 @@ import {
   getTicketByIdSchema,
   getTicketCommentsByTicketIdSchema,
   reopenTicketSchema,
+  signoffTicketSchema,
   updateTicketCommentSchema,
   updateTicketSchema,
 } from "~/schemas/ticket.schema";
@@ -244,6 +245,23 @@ export const ticketsRouter = createTRPCRouter({
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
+      // Prevent client users from changing status (especially to SIGNED_OFF)
+      // Status changes should go through the dedicated signoff mutation
+      if (ctx.session.user.clientId && rest.status !== undefined) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Client users cannot change ticket status. Use the signoff action instead.",
+        });
+      }
+
+      // Prevent updating tickets that are already signed off
+      if (existingTicket.status === TicketStatus.SIGNED_OFF) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Cannot update a ticket that has been signed off.",
+        });
+      }
+
       const activityLogs: Prisma.TicketActivityCreateManyInput[] = [];
 
       const fieldChangeKeys: (keyof typeof rest)[] = ["status", "crId"];
@@ -313,6 +331,14 @@ export const ticketsRouter = createTRPCRouter({
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
+      // Prevent reopening tickets that are signed off (irreversible)
+      if (existingTicket.status === TicketStatus.SIGNED_OFF) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Cannot reopen a ticket that has been signed off.",
+        });
+      }
+
       // Update status to REOPENED and log activity
       const updatedTicket = await ctx.db.ticket.update({
         where: { id: input.id },
@@ -329,6 +355,101 @@ export const ticketsRouter = createTRPCRouter({
           newValue: TicketStatus.REOPENED,
         },
       });
+
+      return updatedTicket;
+    }),
+
+  signoff: protectedProcedure
+    .input(sanitizeInputSchema(signoffTicketSchema))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Get existing ticket with access control
+      const existingTicket = await ctx.db.ticket.findUnique({
+        where: { id: input.id },
+        select: {
+          id: true,
+          status: true,
+          clientId: true,
+          createdById: true,
+          signedOffAt: true,
+        },
+      });
+
+      if (!existingTicket) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Ticket not found" });
+      }
+
+      // Authorization: Only client users can sign off tickets
+      if (!ctx.session.user.clientId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only client users can sign off tickets.",
+        });
+      }
+
+      // Authorization: Only the requester (createdBy) can sign off
+      if (existingTicket.createdById !== userId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only the ticket requester can sign off this ticket.",
+        });
+      }
+
+      // Access control: client users can only sign off tickets from their client
+      if (existingTicket.clientId !== ctx.session.user.clientId) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+      }
+
+      // State check: Only allow signoff when ticket is RESOLVED
+      if (existingTicket.status !== TicketStatus.RESOLVED) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Ticket must be in RESOLVED status before it can be signed off.",
+        });
+      }
+
+      // Prevent double signoff
+      if (existingTicket.signedOffAt) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Ticket has already been signed off.",
+        });
+      }
+
+      // Update ticket status and audit fields
+      const updatedTicket = await ctx.db.ticket.update({
+        where: { id: input.id },
+        data: {
+          status: TicketStatus.SIGNED_OFF,
+          signedOffAt: new Date(),
+          signedOffById: userId,
+        },
+      });
+
+      // Create activity log entry
+      await ctx.db.ticketActivity.create({
+        data: {
+          ticketId: input.id,
+          userId,
+          type: TicketActivityType.FIELD_CHANGE,
+          field: "status",
+          oldValue: TicketStatus.RESOLVED,
+          newValue: TicketStatus.SIGNED_OFF,
+        },
+      });
+
+      // Create comment if provided
+      if (input.comment?.trim()) {
+        await ctx.db.ticketComment.create({
+          data: {
+            ticketId: input.id,
+            userId,
+            type: TicketCommentType.GENERAL,
+            content: input.comment.trim(),
+          },
+        });
+      }
 
       return updatedTicket;
     }),

@@ -100,7 +100,8 @@ export const TicketStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
   RESOLVED: 'RESOLVED',
   CLOSED: 'CLOSED',
-  REOPENED: 'REOPENED'
+  REOPENED: 'REOPENED',
+  SIGNED_OFF: 'SIGNED_OFF'
 } as const
 
 export type TicketStatus = (typeof TicketStatus)[keyof typeof TicketStatus]

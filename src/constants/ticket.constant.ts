@@ -4,6 +4,7 @@ export const TICKET_STATUSES = [
   "RESOLVED",
   "CLOSED",
   "REOPENED",
+  "SIGNED_OFF",
 ] as const;
 
 export type TicketStatus = (typeof TICKET_STATUSES)[number];
@@ -14,6 +15,7 @@ export const TICKET_STATUS_MAP = {
   RESOLVED: { label: "Resolved", color: "green" },
   CLOSED: { label: "Closed", color: "gray" },
   REOPENED: { label: "Reopened", color: "orange" },
+  SIGNED_OFF: { label: "Signed Off", color: "teal" },
 } as const;
 
 export const TICKET_STATUS_OPTIONS = TICKET_STATUSES.map((status) => ({

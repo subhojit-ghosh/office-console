@@ -63,3 +63,8 @@ export const updateTicketCommentSchema = z.object({
 export const deleteTicketCommentSchema = z.object({
   id: z.string().nonempty("ID is required"),
 });
+
+export const signoffTicketSchema = z.object({
+  id: z.string().nonempty("ID is required"),
+  comment: z.string().optional().nullable(),
+});

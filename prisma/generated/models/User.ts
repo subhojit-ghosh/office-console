@@ -229,6 +229,7 @@ export type UserWhereInput = {
   createdRequirements?: Prisma.RequirementListRelationFilter
   requirementActivities?: Prisma.RequirementActivityListRelationFilter
   createdTickets?: Prisma.TicketListRelationFilter
+  signedOffTickets?: Prisma.TicketListRelationFilter
   ticketActivities?: Prisma.TicketActivityListRelationFilter
   ticketComments?: Prisma.TicketCommentListRelationFilter
 }
@@ -258,6 +259,7 @@ export type UserOrderByWithRelationInput = {
   createdRequirements?: Prisma.RequirementOrderByRelationAggregateInput
   requirementActivities?: Prisma.RequirementActivityOrderByRelationAggregateInput
   createdTickets?: Prisma.TicketOrderByRelationAggregateInput
+  signedOffTickets?: Prisma.TicketOrderByRelationAggregateInput
   ticketActivities?: Prisma.TicketActivityOrderByRelationAggregateInput
   ticketComments?: Prisma.TicketCommentOrderByRelationAggregateInput
 }
@@ -290,6 +292,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdRequirements?: Prisma.RequirementListRelationFilter
   requirementActivities?: Prisma.RequirementActivityListRelationFilter
   createdTickets?: Prisma.TicketListRelationFilter
+  signedOffTickets?: Prisma.TicketListRelationFilter
   ticketActivities?: Prisma.TicketActivityListRelationFilter
   ticketComments?: Prisma.TicketCommentListRelationFilter
 }, "id" | "email">
@@ -348,6 +351,7 @@ export type UserCreateInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -376,6 +380,7 @@ export type UserUncheckedCreateInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -404,6 +409,7 @@ export type UserUpdateInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -432,6 +438,7 @@ export type UserUncheckedUpdateInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -817,12 +824,28 @@ export type UserCreateNestedOneWithoutCreatedTicketsInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedOneWithoutSignedOffTicketsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSignedOffTicketsInput, Prisma.UserUncheckedCreateWithoutSignedOffTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSignedOffTicketsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutCreatedTicketsNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedTicketsInput, Prisma.UserUncheckedCreateWithoutCreatedTicketsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedTicketsInput
   upsert?: Prisma.UserUpsertWithoutCreatedTicketsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedTicketsInput, Prisma.UserUpdateWithoutCreatedTicketsInput>, Prisma.UserUncheckedUpdateWithoutCreatedTicketsInput>
+}
+
+export type UserUpdateOneWithoutSignedOffTicketsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSignedOffTicketsInput, Prisma.UserUncheckedCreateWithoutSignedOffTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSignedOffTicketsInput
+  upsert?: Prisma.UserUpsertWithoutSignedOffTicketsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSignedOffTicketsInput, Prisma.UserUpdateWithoutSignedOffTicketsInput>, Prisma.UserUncheckedUpdateWithoutSignedOffTicketsInput>
 }
 
 export type UserCreateNestedOneWithoutTicketActivitiesInput = {
@@ -876,6 +899,7 @@ export type UserCreateWithoutClientInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -903,6 +927,7 @@ export type UserUncheckedCreateWithoutClientInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -971,6 +996,7 @@ export type UserCreateWithoutStaffProfileInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -998,6 +1024,7 @@ export type UserUncheckedCreateWithoutStaffProfileInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1041,6 +1068,7 @@ export type UserUpdateWithoutStaffProfileInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -1068,6 +1096,7 @@ export type UserUncheckedUpdateWithoutStaffProfileInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1095,6 +1124,7 @@ export type UserCreateWithoutProjectsInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -1122,6 +1152,7 @@ export type UserUncheckedCreateWithoutProjectsInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1154,6 +1185,7 @@ export type UserCreateWithoutProjectsAsMemberInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -1181,6 +1213,7 @@ export type UserUncheckedCreateWithoutProjectsAsMemberInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1224,6 +1257,7 @@ export type UserUpdateWithoutProjectsInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -1251,6 +1285,7 @@ export type UserUncheckedUpdateWithoutProjectsInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1294,6 +1329,7 @@ export type UserCreateWithoutCreatedRequirementsInput = {
   archivedTasks?: Prisma.TaskCreateNestedManyWithoutArchivedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -1321,6 +1357,7 @@ export type UserUncheckedCreateWithoutCreatedRequirementsInput = {
   archivedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutArchivedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1364,6 +1401,7 @@ export type UserUpdateWithoutCreatedRequirementsInput = {
   archivedTasks?: Prisma.TaskUpdateManyWithoutArchivedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -1391,6 +1429,7 @@ export type UserUncheckedUpdateWithoutCreatedRequirementsInput = {
   archivedTasks?: Prisma.TaskUncheckedUpdateManyWithoutArchivedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1418,6 +1457,7 @@ export type UserCreateWithoutRequirementActivitiesInput = {
   archivedTasks?: Prisma.TaskCreateNestedManyWithoutArchivedByInput
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -1445,6 +1485,7 @@ export type UserUncheckedCreateWithoutRequirementActivitiesInput = {
   archivedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutArchivedByInput
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1488,6 +1529,7 @@ export type UserUpdateWithoutRequirementActivitiesInput = {
   archivedTasks?: Prisma.TaskUpdateManyWithoutArchivedByNestedInput
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -1515,6 +1557,7 @@ export type UserUncheckedUpdateWithoutRequirementActivitiesInput = {
   archivedTasks?: Prisma.TaskUncheckedUpdateManyWithoutArchivedByNestedInput
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1542,6 +1585,7 @@ export type UserCreateWithoutModulesInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -1569,6 +1613,7 @@ export type UserUncheckedCreateWithoutModulesInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1612,6 +1657,7 @@ export type UserUpdateWithoutModulesInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -1639,6 +1685,7 @@ export type UserUncheckedUpdateWithoutModulesInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1666,6 +1713,7 @@ export type UserCreateWithoutCreatedTasksInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -1693,6 +1741,7 @@ export type UserUncheckedCreateWithoutCreatedTasksInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1725,6 +1774,7 @@ export type UserCreateWithoutAssignedTasksInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -1752,6 +1802,7 @@ export type UserUncheckedCreateWithoutAssignedTasksInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1784,6 +1835,7 @@ export type UserCreateWithoutArchivedTasksInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -1811,6 +1863,7 @@ export type UserUncheckedCreateWithoutArchivedTasksInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1854,6 +1907,7 @@ export type UserUpdateWithoutCreatedTasksInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -1881,6 +1935,7 @@ export type UserUncheckedUpdateWithoutCreatedTasksInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1935,6 +1990,7 @@ export type UserUpdateWithoutArchivedTasksInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -1962,6 +2018,7 @@ export type UserUncheckedUpdateWithoutArchivedTasksInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1989,6 +2046,7 @@ export type UserCreateWithoutTaskActivitiesInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -2016,6 +2074,7 @@ export type UserUncheckedCreateWithoutTaskActivitiesInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -2059,6 +2118,7 @@ export type UserUpdateWithoutTaskActivitiesInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -2086,6 +2146,7 @@ export type UserUncheckedUpdateWithoutTaskActivitiesInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -2113,6 +2174,7 @@ export type UserCreateWithoutTaskCommentsInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -2140,6 +2202,7 @@ export type UserUncheckedCreateWithoutTaskCommentsInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -2183,6 +2246,7 @@ export type UserUpdateWithoutTaskCommentsInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -2210,6 +2274,7 @@ export type UserUncheckedUpdateWithoutTaskCommentsInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -2237,6 +2302,7 @@ export type UserCreateWithoutFeedbacksInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -2264,6 +2330,7 @@ export type UserUncheckedCreateWithoutFeedbacksInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -2307,6 +2374,7 @@ export type UserUpdateWithoutFeedbacksInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -2334,6 +2402,7 @@ export type UserUncheckedUpdateWithoutFeedbacksInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -2361,6 +2430,7 @@ export type UserCreateWithoutWorkLogsInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -2388,6 +2458,7 @@ export type UserUncheckedCreateWithoutWorkLogsInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -2431,6 +2502,7 @@ export type UserUpdateWithoutWorkLogsInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -2458,6 +2530,7 @@ export type UserUncheckedUpdateWithoutWorkLogsInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -2485,6 +2558,7 @@ export type UserCreateWithoutCreatedTicketsInput = {
   archivedTasks?: Prisma.TaskCreateNestedManyWithoutArchivedByInput
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
@@ -2512,6 +2586,7 @@ export type UserUncheckedCreateWithoutCreatedTicketsInput = {
   archivedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutArchivedByInput
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -2519,6 +2594,67 @@ export type UserUncheckedCreateWithoutCreatedTicketsInput = {
 export type UserCreateOrConnectWithoutCreatedTicketsInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutCreatedTicketsInput, Prisma.UserUncheckedCreateWithoutCreatedTicketsInput>
+}
+
+export type UserCreateWithoutSignedOffTicketsInput = {
+  id?: string
+  name: string
+  email: string
+  role: $Enums.UserRole
+  password: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  client?: Prisma.ClientCreateNestedOneWithoutUsersInput
+  staffProfile?: Prisma.StaffProfileCreateNestedOneWithoutUserInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutCreatedByInput
+  createdTasks?: Prisma.TaskCreateNestedManyWithoutCreatedByInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneesInput
+  modules?: Prisma.ModuleCreateNestedManyWithoutCreatedByInput
+  taskActivities?: Prisma.TaskActivityCreateNestedManyWithoutUserInput
+  taskComments?: Prisma.TaskCommentCreateNestedManyWithoutUserInput
+  projectsAsMember?: Prisma.ProjectCreateNestedManyWithoutMembersInput
+  feedbacks?: Prisma.FeedbackCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogCreateNestedManyWithoutUserInput
+  archivedTasks?: Prisma.TaskCreateNestedManyWithoutArchivedByInput
+  createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
+  requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
+  createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
+  ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSignedOffTicketsInput = {
+  id?: string
+  name: string
+  email: string
+  role: $Enums.UserRole
+  clientId?: string | null
+  password: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  staffProfile?: Prisma.StaffProfileUncheckedCreateNestedOneWithoutUserInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatedByInput
+  createdTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneesInput
+  modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutCreatedByInput
+  taskActivities?: Prisma.TaskActivityUncheckedCreateNestedManyWithoutUserInput
+  taskComments?: Prisma.TaskCommentUncheckedCreateNestedManyWithoutUserInput
+  projectsAsMember?: Prisma.ProjectUncheckedCreateNestedManyWithoutMembersInput
+  feedbacks?: Prisma.FeedbackUncheckedCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogUncheckedCreateNestedManyWithoutUserInput
+  archivedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutArchivedByInput
+  createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
+  requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
+  createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
+  ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSignedOffTicketsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSignedOffTicketsInput, Prisma.UserUncheckedCreateWithoutSignedOffTicketsInput>
 }
 
 export type UserUpsertWithoutCreatedTicketsInput = {
@@ -2555,6 +2691,7 @@ export type UserUpdateWithoutCreatedTicketsInput = {
   archivedTasks?: Prisma.TaskUpdateManyWithoutArchivedByNestedInput
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -2582,6 +2719,74 @@ export type UserUncheckedUpdateWithoutCreatedTicketsInput = {
   archivedTasks?: Prisma.TaskUncheckedUpdateManyWithoutArchivedByNestedInput
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
+  ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
+  ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutSignedOffTicketsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSignedOffTicketsInput, Prisma.UserUncheckedUpdateWithoutSignedOffTicketsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSignedOffTicketsInput, Prisma.UserUncheckedCreateWithoutSignedOffTicketsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSignedOffTicketsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSignedOffTicketsInput, Prisma.UserUncheckedUpdateWithoutSignedOffTicketsInput>
+}
+
+export type UserUpdateWithoutSignedOffTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  client?: Prisma.ClientUpdateOneWithoutUsersNestedInput
+  staffProfile?: Prisma.StaffProfileUpdateOneWithoutUserNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutCreatedByNestedInput
+  createdTasks?: Prisma.TaskUpdateManyWithoutCreatedByNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneesNestedInput
+  modules?: Prisma.ModuleUpdateManyWithoutCreatedByNestedInput
+  taskActivities?: Prisma.TaskActivityUpdateManyWithoutUserNestedInput
+  taskComments?: Prisma.TaskCommentUpdateManyWithoutUserNestedInput
+  projectsAsMember?: Prisma.ProjectUpdateManyWithoutMembersNestedInput
+  feedbacks?: Prisma.FeedbackUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUpdateManyWithoutUserNestedInput
+  archivedTasks?: Prisma.TaskUpdateManyWithoutArchivedByNestedInput
+  createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
+  requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
+  createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
+  ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSignedOffTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  staffProfile?: Prisma.StaffProfileUncheckedUpdateOneWithoutUserNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdTasks?: Prisma.TaskUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneesNestedInput
+  modules?: Prisma.ModuleUncheckedUpdateManyWithoutCreatedByNestedInput
+  taskActivities?: Prisma.TaskActivityUncheckedUpdateManyWithoutUserNestedInput
+  taskComments?: Prisma.TaskCommentUncheckedUpdateManyWithoutUserNestedInput
+  projectsAsMember?: Prisma.ProjectUncheckedUpdateManyWithoutMembersNestedInput
+  feedbacks?: Prisma.FeedbackUncheckedUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUncheckedUpdateManyWithoutUserNestedInput
+  archivedTasks?: Prisma.TaskUncheckedUpdateManyWithoutArchivedByNestedInput
+  createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
+  requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
+  createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -2610,6 +2815,7 @@ export type UserCreateWithoutTicketActivitiesInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketComments?: Prisma.TicketCommentCreateNestedManyWithoutUserInput
 }
 
@@ -2637,6 +2843,7 @@ export type UserUncheckedCreateWithoutTicketActivitiesInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketComments?: Prisma.TicketCommentUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -2680,6 +2887,7 @@ export type UserUpdateWithoutTicketActivitiesInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
 
@@ -2707,6 +2915,7 @@ export type UserUncheckedUpdateWithoutTicketActivitiesInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -2734,6 +2943,7 @@ export type UserCreateWithoutTicketCommentsInput = {
   createdRequirements?: Prisma.RequirementCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityCreateNestedManyWithoutUserInput
 }
 
@@ -2761,6 +2971,7 @@ export type UserUncheckedCreateWithoutTicketCommentsInput = {
   createdRequirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutCreatedByInput
   requirementActivities?: Prisma.RequirementActivityUncheckedCreateNestedManyWithoutUserInput
   createdTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutCreatedByInput
+  signedOffTickets?: Prisma.TicketUncheckedCreateNestedManyWithoutSignedOffByInput
   ticketActivities?: Prisma.TicketActivityUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -2804,6 +3015,7 @@ export type UserUpdateWithoutTicketCommentsInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
 }
 
@@ -2831,6 +3043,7 @@ export type UserUncheckedUpdateWithoutTicketCommentsInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -2868,6 +3081,7 @@ export type UserUpdateWithoutClientInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -2895,6 +3109,7 @@ export type UserUncheckedUpdateWithoutClientInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -2933,6 +3148,7 @@ export type UserUpdateWithoutProjectsAsMemberInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -2960,6 +3176,7 @@ export type UserUncheckedUpdateWithoutProjectsAsMemberInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -2999,6 +3216,7 @@ export type UserUpdateWithoutAssignedTasksInput = {
   createdRequirements?: Prisma.RequirementUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUpdateManyWithoutUserNestedInput
 }
@@ -3026,6 +3244,7 @@ export type UserUncheckedUpdateWithoutAssignedTasksInput = {
   createdRequirements?: Prisma.RequirementUncheckedUpdateManyWithoutCreatedByNestedInput
   requirementActivities?: Prisma.RequirementActivityUncheckedUpdateManyWithoutUserNestedInput
   createdTickets?: Prisma.TicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  signedOffTickets?: Prisma.TicketUncheckedUpdateManyWithoutSignedOffByNestedInput
   ticketActivities?: Prisma.TicketActivityUncheckedUpdateManyWithoutUserNestedInput
   ticketComments?: Prisma.TicketCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -3061,6 +3280,7 @@ export type UserCountOutputType = {
   createdRequirements: number
   requirementActivities: number
   createdTickets: number
+  signedOffTickets: number
   ticketActivities: number
   ticketComments: number
 }
@@ -3079,6 +3299,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   createdRequirements?: boolean | UserCountOutputTypeCountCreatedRequirementsArgs
   requirementActivities?: boolean | UserCountOutputTypeCountRequirementActivitiesArgs
   createdTickets?: boolean | UserCountOutputTypeCountCreatedTicketsArgs
+  signedOffTickets?: boolean | UserCountOutputTypeCountSignedOffTicketsArgs
   ticketActivities?: boolean | UserCountOutputTypeCountTicketActivitiesArgs
   ticketComments?: boolean | UserCountOutputTypeCountTicketCommentsArgs
 }
@@ -3187,6 +3408,13 @@ export type UserCountOutputTypeCountCreatedTicketsArgs<ExtArgs extends runtime.T
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountSignedOffTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TicketWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountTicketActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TicketActivityWhereInput
 }
@@ -3224,6 +3452,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdRequirements?: boolean | Prisma.User$createdRequirementsArgs<ExtArgs>
   requirementActivities?: boolean | Prisma.User$requirementActivitiesArgs<ExtArgs>
   createdTickets?: boolean | Prisma.User$createdTicketsArgs<ExtArgs>
+  signedOffTickets?: boolean | Prisma.User$signedOffTicketsArgs<ExtArgs>
   ticketActivities?: boolean | Prisma.User$ticketActivitiesArgs<ExtArgs>
   ticketComments?: boolean | Prisma.User$ticketCommentsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -3284,6 +3513,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdRequirements?: boolean | Prisma.User$createdRequirementsArgs<ExtArgs>
   requirementActivities?: boolean | Prisma.User$requirementActivitiesArgs<ExtArgs>
   createdTickets?: boolean | Prisma.User$createdTicketsArgs<ExtArgs>
+  signedOffTickets?: boolean | Prisma.User$signedOffTicketsArgs<ExtArgs>
   ticketActivities?: boolean | Prisma.User$ticketActivitiesArgs<ExtArgs>
   ticketComments?: boolean | Prisma.User$ticketCommentsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -3313,6 +3543,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdRequirements: Prisma.$RequirementPayload<ExtArgs>[]
     requirementActivities: Prisma.$RequirementActivityPayload<ExtArgs>[]
     createdTickets: Prisma.$TicketPayload<ExtArgs>[]
+    signedOffTickets: Prisma.$TicketPayload<ExtArgs>[]
     ticketActivities: Prisma.$TicketActivityPayload<ExtArgs>[]
     ticketComments: Prisma.$TicketCommentPayload<ExtArgs>[]
   }
@@ -3735,6 +3966,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   createdRequirements<T extends Prisma.User$createdRequirementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdRequirementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RequirementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   requirementActivities<T extends Prisma.User$requirementActivitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$requirementActivitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RequirementActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdTickets<T extends Prisma.User$createdTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  signedOffTickets<T extends Prisma.User$signedOffTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$signedOffTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ticketActivities<T extends Prisma.User$ticketActivitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ticketActivitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TicketActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ticketComments<T extends Prisma.User$ticketCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ticketCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TicketCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -4500,6 +4732,30 @@ export type User$requirementActivitiesArgs<ExtArgs extends runtime.Types.Extensi
  * User.createdTickets
  */
 export type User$createdTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Ticket
+   */
+  select?: Prisma.TicketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Ticket
+   */
+  omit?: Prisma.TicketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TicketInclude<ExtArgs> | null
+  where?: Prisma.TicketWhereInput
+  orderBy?: Prisma.TicketOrderByWithRelationInput | Prisma.TicketOrderByWithRelationInput[]
+  cursor?: Prisma.TicketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TicketScalarFieldEnum | Prisma.TicketScalarFieldEnum[]
+}
+
+/**
+ * User.signedOffTickets
+ */
+export type User$signedOffTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Ticket
    */
