@@ -187,7 +187,10 @@ export const ticketsRouter = createTRPCRouter({
       }
 
       // Access control: client users can only see tickets from their client
-      if (ctx.session.user.clientId && ticket.clientId !== ctx.session.user.clientId) {
+      if (
+        ctx.session.user.clientId &&
+        ticket.clientId !== ctx.session.user.clientId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -241,7 +244,10 @@ export const ticketsRouter = createTRPCRouter({
       }
 
       // Access control: client users can only update tickets from their client
-      if (ctx.session.user.clientId && existingTicket.clientId !== ctx.session.user.clientId) {
+      if (
+        ctx.session.user.clientId &&
+        existingTicket.clientId !== ctx.session.user.clientId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -250,7 +256,8 @@ export const ticketsRouter = createTRPCRouter({
       if (ctx.session.user.clientId && rest.status !== undefined) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "Client users cannot change ticket status. Use the signoff action instead.",
+          message:
+            "Client users cannot change ticket status. Use the signoff action instead.",
         });
       }
 
@@ -327,7 +334,10 @@ export const ticketsRouter = createTRPCRouter({
       }
 
       // Access control: client users can only reopen tickets from their client
-      if (ctx.session.user.clientId && existingTicket.clientId !== ctx.session.user.clientId) {
+      if (
+        ctx.session.user.clientId &&
+        existingTicket.clientId !== ctx.session.user.clientId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -405,7 +415,8 @@ export const ticketsRouter = createTRPCRouter({
       if (existingTicket.status !== TicketStatus.RESOLVED) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Ticket must be in RESOLVED status before it can be signed off.",
+          message:
+            "Ticket must be in RESOLVED status before it can be signed off.",
         });
       }
 
@@ -468,7 +479,10 @@ export const ticketsRouter = createTRPCRouter({
       }
 
       // Access control: client users can only see comments on tickets from their client
-      if (ctx.session.user.clientId && ticket.clientId !== ctx.session.user.clientId) {
+      if (
+        ctx.session.user.clientId &&
+        ticket.clientId !== ctx.session.user.clientId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -509,7 +523,10 @@ export const ticketsRouter = createTRPCRouter({
       }
 
       // Access control: client users can only comment on tickets from their client
-      if (ctx.session.user.clientId && ticket.clientId !== ctx.session.user.clientId) {
+      if (
+        ctx.session.user.clientId &&
+        ticket.clientId !== ctx.session.user.clientId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -537,11 +554,17 @@ export const ticketsRouter = createTRPCRouter({
       });
 
       if (!comment) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Comment not found" });
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Comment not found",
+        });
       }
 
       if (comment.userId !== userId) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "You are not authorized to update this comment" });
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to update this comment",
+        });
       }
 
       // Check ticket access
@@ -555,7 +578,10 @@ export const ticketsRouter = createTRPCRouter({
       }
 
       // Access control: client users can only update comments on tickets from their client
-      if (ctx.session.user.clientId && ticket.clientId !== ctx.session.user.clientId) {
+      if (
+        ctx.session.user.clientId &&
+        ticket.clientId !== ctx.session.user.clientId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -580,11 +606,17 @@ export const ticketsRouter = createTRPCRouter({
       });
 
       if (!comment) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Comment not found" });
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Comment not found",
+        });
       }
 
       if (comment.userId !== userId) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "You are not authorized to delete this comment" });
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to delete this comment",
+        });
       }
 
       // Check ticket access
@@ -598,7 +630,10 @@ export const ticketsRouter = createTRPCRouter({
       }
 
       // Access control: client users can only delete comments on tickets from their client
-      if (ctx.session.user.clientId && ticket.clientId !== ctx.session.user.clientId) {
+      if (
+        ctx.session.user.clientId &&
+        ticket.clientId !== ctx.session.user.clientId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
@@ -610,9 +645,16 @@ export const ticketsRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(deleteRequirementSchema)
     .mutation(async ({ ctx, input }) => {
-      const existing = await ctx.db.ticket.findUnique({ where: { id: input.id }, select: { clientId: true } });
-      if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Ticket not found" });
-      if (ctx.session.user.clientId && existing.clientId !== ctx.session.user.clientId) {
+      const existing = await ctx.db.ticket.findUnique({
+        where: { id: input.id },
+        select: { clientId: true },
+      });
+      if (!existing)
+        throw new TRPCError({ code: "NOT_FOUND", message: "Ticket not found" });
+      if (
+        ctx.session.user.clientId &&
+        existing.clientId !== ctx.session.user.clientId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
       return ctx.db.ticket.delete({ where: { id: input.id } });
