@@ -33,9 +33,10 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
-import { createWotkLogSchema } from "~/schemas/work-log.schema";
+import { createWorkLogFormSchema } from "~/schemas/work-log.schema";
 import { api } from "~/trpc/react";
 import { formatDurationFromMinutes } from "~/utils/format-duration-from-minutes";
+import { combineDateAndTime, parseTimeString } from "~/utils/date";
 
 dayjs.extend(duration);
 dayjs.extend(isSameOrBefore);
@@ -135,42 +136,18 @@ export default function TaskWorkLogs({
       endTime: "",
       note: "",
     },
-    validate: zod4Resolver(createWotkLogSchema),
+    validate: zod4Resolver(createWorkLogFormSchema),
   });
 
   // Auto-set end time to 1 hour after start time when start time is first set
   useEffect(() => {
     if (form.values.startTime && !form.values.endTime) {
-      // Parse start time and add 1 hour
-      const parseTime = (
-        timeStr: string,
-      ): { hours: number; minutes: number } | null => {
-        const amPmMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(timeStr);
-        if (amPmMatch) {
-          let hours = parseInt(amPmMatch[1]!, 10);
-          const minutes = parseInt(amPmMatch[2]!, 10);
-          const isPm = amPmMatch[4]?.toUpperCase() === "PM";
-          if (hours === 12) hours = isPm ? 12 : 0;
-          else if (isPm) hours += 12;
-          return { hours, minutes };
-        }
-        const timeMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(timeStr);
-        if (timeMatch) {
-          return {
-            hours: parseInt(timeMatch[1]!, 10),
-            minutes: parseInt(timeMatch[2]!, 10),
-          };
-        }
-        return null;
-      };
-
-      const startParts = parseTime(form.values.startTime);
+      const startParts = parseTimeString(form.values.startTime);
       if (startParts) {
         const endTimeObj = dayjs()
           .hour(startParts.hours)
           .minute(startParts.minutes)
           .add(1, "hour");
-        // Format back to 12h format if original was 12h
         const is12h = /AM|PM/i.exec(form.values.startTime);
         const endTimeStr = is12h
           ? endTimeObj.format("hh:mm A")
@@ -237,13 +214,24 @@ export default function TaskWorkLogs({
 
     if (!form.isValid()) return;
 
-    // The schema will transform date + time strings to DateTime objects
-    // and validate that times are on the same date and end > start
+    // Combine date + time on the client (user's timezone) to get correct UTC
+    const startDateTime = combineDateAndTime(date, startTime);
+    const endDateTime = combineDateAndTime(date, endTime);
+
+    if (!startDateTime || !endDateTime) {
+      form.setFieldError("startTime", "Invalid time format");
+      return;
+    }
+
+    if (endDateTime <= startDateTime) {
+      form.setFieldError("endTime", "End time must be after start time");
+      return;
+    }
+
     createWorkLog.mutate({
       taskId,
-      date,
-      startTime,
-      endTime,
+      startTime: startDateTime,
+      endTime: endDateTime,
       note: form.values.note,
     });
   };
@@ -350,41 +338,11 @@ export default function TaskWorkLogs({
                     form.values.date
                       ? (() => {
                           try {
-                            // Parse time strings (handles both 12h and 24h formats)
-                            const parseTime = (
-                              timeStr: string,
-                            ): { hours: number; minutes: number } | null => {
-                              const amPmMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(timeStr);
-                              if (amPmMatch) {
-                                let hours = parseInt(amPmMatch[1]!, 10);
-                                const minutes = parseInt(amPmMatch[2]!, 10);
-                                const isPm =
-                                  amPmMatch[4]?.toUpperCase() === "PM";
-                                if (hours === 12) hours = isPm ? 12 : 0;
-                                else if (isPm) hours += 12;
-                                return { hours, minutes };
-                              }
-                              const timeMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(timeStr);
-                              if (timeMatch) {
-                                return {
-                                  hours: parseInt(timeMatch[1]!, 10),
-                                  minutes: parseInt(timeMatch[2]!, 10),
-                                };
-                              }
-                              return null;
-                            };
+                            const startDt = combineDateAndTime(form.values.date, form.values.startTime);
+                            const endDt = combineDateAndTime(form.values.date, form.values.endTime);
 
-                            const startParts = parseTime(form.values.startTime);
-                            const endParts = parseTime(form.values.endTime);
-
-                            if (startParts && endParts) {
-                              const start = dayjs(form.values.date)
-                                .hour(startParts.hours)
-                                .minute(startParts.minutes);
-                              const end = dayjs(form.values.date)
-                                .hour(endParts.hours)
-                                .minute(endParts.minutes);
-                              const diffMinutes = end.diff(start, "minutes");
+                            if (startDt && endDt) {
+                              const diffMinutes = Math.round((endDt.getTime() - startDt.getTime()) / 60000);
                               return diffMinutes > 0
                                 ? `${diffMinutes} min`
                                 : "--";

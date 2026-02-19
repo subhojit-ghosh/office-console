@@ -31,6 +31,7 @@ import {
   type TaskType,
 } from "~/constants/task.constant";
 import { api } from "~/trpc/react";
+import { combineDateAndTime, parseTimeString } from "~/utils/date";
 
 interface QuickLogModalProps {
   opened: boolean;
@@ -146,35 +147,11 @@ export default function QuickLogModal({
     const { date, startTime, endTime } = form.values;
     if (!date || !startTime || !endTime) return null;
 
-    // Parse time strings
-    const parseTime = (timeStr: string): { hours: number; minutes: number } | null => {
-      const amPmMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(timeStr);
-      if (amPmMatch) {
-        let hours = parseInt(amPmMatch[1]!, 10);
-        const minutes = parseInt(amPmMatch[2]!, 10);
-        const isPm = amPmMatch[4]?.toUpperCase() === "PM";
-        if (hours === 12) hours = isPm ? 12 : 0;
-        else if (isPm) hours += 12;
-        return { hours, minutes };
-      }
-      const timeMatch = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(timeStr);
-      if (timeMatch) {
-        return {
-          hours: parseInt(timeMatch[1]!, 10),
-          minutes: parseInt(timeMatch[2]!, 10),
-        };
-      }
-      return null;
-    };
+    const startDt = combineDateAndTime(date, startTime);
+    const endDt = combineDateAndTime(date, endTime);
+    if (!startDt || !endDt) return null;
 
-    const startParts = parseTime(startTime);
-    const endParts = parseTime(endTime);
-    if (!startParts || !endParts) return null;
-
-    const start = dayjs(date).hour(startParts.hours).minute(startParts.minutes);
-    const end = dayjs(date).hour(endParts.hours).minute(endParts.minutes);
-    const diffMinutes = end.diff(start, "minute");
-
+    const diffMinutes = Math.round((endDt.getTime() - startDt.getTime()) / 60000);
     if (diffMinutes <= 0) return null;
 
     const hours = Math.floor(diffMinutes / 60);
@@ -266,13 +243,24 @@ export default function QuickLogModal({
 
     if (!form.isValid()) return;
 
-    // The schema will transform date + time strings to DateTime objects
-    // and validate that times are on the same date and end > start
+    // Combine date + time on the client (user's timezone) to get correct UTC
+    const startDateTime = combineDateAndTime(date, startTime);
+    const endDateTime = combineDateAndTime(date, endTime);
+
+    if (!startDateTime || !endDateTime) {
+      form.setFieldError("startTime", "Invalid time format");
+      return;
+    }
+
+    if (endDateTime <= startDateTime) {
+      form.setFieldError("endTime", "End time must be after start time");
+      return;
+    }
+
     createWorkLog.mutate({
       taskId,
-      date,
-      startTime,
-      endTime,
+      startTime: startDateTime,
+      endTime: endDateTime,
       note: note.trim() ? note : null,
     });
   };
